@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+
+  website:
+    image: cod4it/wepromolink:1.0
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=https://+:443;http://+:80
