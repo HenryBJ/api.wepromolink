@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Polly;
 using WePromoLink;
 using WePromoLink.Data;
@@ -10,11 +11,19 @@ using WePromoLink.Workers;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
+builder.Services.Configure<BTCPaySettings>(builder.Configuration.GetSection("BTCPay"));
 builder.Services.AddDbContext<DataContext>(x=>x.UseSqlServer(connectionString));
 builder.Services.AddSingleton<HitQueue>();
-builder.Services.AddSingleton<BTCPayServer.Client.BTCPayServerClient>();
+builder.Services.AddSingleton<BTCPayServer.Client.BTCPayServerClient>( x => 
+{
+    var ctx = builder.Services.BuildServiceProvider();
+    using (var scope = ctx.CreateScope())
+    {
+        var s = scope.ServiceProvider.GetRequiredService<IOptions<BTCPaySettings>>();
+        return new BTCPayServer.Client.BTCPayServerClient(new Uri(s.Value.Url));
+    }
+});
 builder.Services.AddHostedService<HitWorker>();
-builder.Services.Configure<BTCPaySettings>(builder.Configuration.GetSection("BTCPay"));
 builder.Services.AddTransient<IPaymentService, BTCPaymentService>();
 builder.Services.AddTransient<IAffiliateLinkService,AffiliateLinkService>();
 builder.Services.AddTransient<ISponsoredLinkService, SponsoredLinkService>();

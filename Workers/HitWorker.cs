@@ -10,10 +10,14 @@ public class HitWorker : BackgroundService
     private readonly DataContext _db;
     private readonly ILogger<HitWorker> _logger;
 
-    public HitWorker(HitQueue queue, DataContext db, ILogger<HitWorker> logger)
+    public HitWorker(HitQueue queue, IServiceScopeFactory fac, ILogger<HitWorker> logger)
     {
+        using (var scope = fac.CreateScope())
+        {
+            var s = scope.ServiceProvider.GetRequiredService<DataContext>();
+            _db = s;
+        }
         _queue = queue;
-        _db = db;
         _logger = logger;
     }
 
