@@ -10,3 +10,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=https://+:443;http://+:80
+      - USER_SECRETS_ID=310d3c99-f000-4003-b50b-bc06ded5b546
+    volumes:
+    - ./Secrets/:/root/.microsoft/usersecrets/$USER_SECRETS_ID:ro
