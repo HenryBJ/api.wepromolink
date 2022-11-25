@@ -1,0 +1,126 @@
+using Microsoft.EntityFrameworkCore;
+using Polly;
+using WePromoLink;
+using WePromoLink.Data;
+using WePromoLink.Services;
+using WePromoLink.Settings;
+using WePromoLink.Workers;
+
+
+var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("Default");
+builder.Services.AddDbContext<DataContext>(x=>x.UseSqlServer(connectionString));
+builder.Services.AddSingleton<HitQueue>();
+builder.Services.AddSingleton<BTCPayServer.Client.BTCPayServerClient>();
+builder.Services.AddHostedService<HitWorker>();
+builder.Services.Configure<BTCPaySettings>(builder.Configuration.GetSection("BTCPay"));
+builder.Services.AddTransient<IPaymentService, BTCPaymentService>();
+builder.Services.AddTransient<IAffiliateLinkService,AffiliateLinkService>();
+builder.Services.AddTransient<ISponsoredLinkService, SponsoredLinkService>();
+builder.Services.AddTransient<IStatsLinkService, StatsLinkService>();
+builder.Services.AddCors(e=>e.AddPolicy("MyCORSPolicy",builder=>builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+var app = builder.Build();
+
+app.UseCors("MyCORSPolicy");
+
+InitializeDataBase(app);
+
+app.MapGet("/", () => "WePromoLink API v1.0");
+
+// List sponsored links
+app.MapGet("/links", async (int? page, ISponsoredLinkService service) => 
+{
+    try
+    {
+        var results = await service.ListSponsoredLinks(page);    
+        return Results.Ok(results);    
+    }
+    catch (System.Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return Results.Problem();
+    }
+}); 
+
+// Get Stats for affiliate link
+app.MapGet("/stats/affiliate/{afflinkId}", async (string afflinkId, IStatsLinkService service) => 
+{
+    if(String.IsNullOrEmpty(afflinkId)) return Results.BadRequest();
+    var result = await service.AffiliateLinkStats(afflinkId);
+    return Results.Ok(result);
+}); 
+
+
+// Get Stats for sponsored link
+app.MapGet("/stats/sponsored/{linkId}", async (string linkId, IStatsLinkService service) => 
+{
+    if(String.IsNullOrEmpty(linkId)) return Results.BadRequest();
+    var result = await service.SponsoredLinkStats(linkId);
+    return Results.Ok(result);
+
+}); 
+
+//Fund sponsored link
+app.MapPost("/fund/{sponsoredLinkId}", async (string sponsoredLinkId, ISponsoredLinkService service )=>
+{
+    if(String.IsNullOrEmpty(sponsoredLinkId)) return Results.BadRequest();
+    await service.FundSponsoredLink(sponsoredLinkId);
+    return Results.Ok();
+}); 
+
+//Create sponsored link
+app.MapPost("/link", async (CreateSponsoredLink link, ISponsoredLinkService service)=>
+{
+    if(link == null) return Results.BadRequest();
+    var result = await service.CreateSponsoredLink(link);
+    return Results.Ok(result);
+
+}); 
+
+//Create affiliate link
+app.MapPost("/afflink",async (CreateAffiliateLink link, IAffiliateLinkService service)=>
+{
+    if(link == null) return Results.BadRequest();
+    var result = await service.CreateAffiliateLink(link);
+    return Results.Ok(result);
+}); 
+
+// Access to affiliate links
+app.MapGet("/{afflink}", async (string afflink, HttpContext ctx, IAffiliateLinkService service) => 
+{
+    if(String.IsNullOrEmpty(afflink)) return Results.BadRequest();
+    var url = await service.HitAffiliateLink(new HitAffiliate
+    {
+        AffLinkId = afflink, 
+        Origin = ctx.Request.HttpContext.Connection.RemoteIpAddress,
+        HitAt = DateTime.UtcNow  
+    });
+    return String.IsNullOrEmpty(url)? Results.NotFound():Results.Redirect(url);
+}); 
+
+//BTCPay webhook
+app.MapPost("/webhook",async (HttpContext ctx, IPaymentService service)=>
+{
+    await service.HandleWebHook(ctx);
+    return Results.Ok();
+});
+
+app.Run();
+
+
+
+void InitializeDataBase(IApplicationBuilder app)
+{            
+    Policy
+    .Handle<Exception>()
+    .WaitAndRetry(9,r=>TimeSpan.FromSeconds(5))
+    .Execute(()=>
+    {
+        using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+            Console.WriteLine("Migration DB...");
+            scope.ServiceProvider?.GetService<DataContext>()?.MigrateDB();
+        }
+    });
+};
