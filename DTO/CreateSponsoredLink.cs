@@ -22,7 +22,7 @@ public class CreateSponsoredLink
     [StringLength(500)]
     [EmailAddress]
     [Required]
-    public string? Email { get; set; }
+    public string Email { get; set; }
 
     [Required]
     public decimal EPM { get; set; }
