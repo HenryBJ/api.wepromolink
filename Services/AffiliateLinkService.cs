@@ -13,7 +13,7 @@ public class AffiliateLinkService : IAffiliateLinkService
         _db = ctx;
     }
 
-    public async Task<string> CreateAffiliateLink(CreateAffiliateLink affLink)
+    public async Task<object> CreateAffiliateLink(CreateAffiliateLink affLink, HttpContext ctx)
     {
         var sponsoredLink = await _db.SponsoredLinks.Where(e=>e.ExternalId == affLink.SponsoredLinkId).SingleOrDefaultAsync(); 
         if(sponsoredLink == null) throw new Exception("Sponsored link not found");
@@ -44,7 +44,7 @@ public class AffiliateLinkService : IAffiliateLinkService
         };
         _db.AffiliateLinks.Add(affiliateLinkModel);
         await _db.SaveChangesAsync();
-        return externalId;
+        return new {id=externalId, link=$"{ctx.Request.Scheme}://{ctx.Request.Host}/{externalId}"};
     }
 
     public Task<string> HitAffiliateLink(HitAffiliate hit)

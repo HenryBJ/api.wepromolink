@@ -97,7 +97,7 @@ app.MapPost("/link", async (CreateSponsoredLink link,SponsoredLinkValidator vali
 }); 
 
 //Create affiliate link
-app.MapPost("/afflink",async (CreateAffiliateLink link, AffiliateLinkValidator validator, IAffiliateLinkService service)=>
+app.MapPost("/afflink",async (CreateAffiliateLink link, HttpContext ctx, AffiliateLinkValidator validator, IAffiliateLinkService service)=>
 {
     if(link == null) return Results.BadRequest();
 
@@ -106,8 +106,17 @@ app.MapPost("/afflink",async (CreateAffiliateLink link, AffiliateLinkValidator v
     {
         return Results.ValidationProblem(validationResult.ToDictionary());
     }
-
-    var result = await service.CreateAffiliateLink(link);
+    object result;
+    try
+    {
+        result = await service.CreateAffiliateLink(link, ctx);
+    }
+    catch(Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return Results.Problem(ex.Message);
+    }
+    
     return Results.Ok(result);
 }); 
 

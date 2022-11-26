@@ -2,6 +2,6 @@ namespace WePromoLink.Services;
 
 public interface IAffiliateLinkService
 {
-    Task<string> CreateAffiliateLink(CreateAffiliateLink affLink);
+    Task<object> CreateAffiliateLink(CreateAffiliateLink affLink, HttpContext ctx);
     Task<string> HitAffiliateLink(HitAffiliate hit);
 }
