@@ -10,7 +10,7 @@ public class PaymentTransaction
     public bool IsDeposit { get; set; }
     public int EmailModelId { get; set; }
     public string Status { get; set; }
-    public string PaymentLink { get; set; }
+    public string? PaymentLink { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? ExpiredAt { get; set; }
 }

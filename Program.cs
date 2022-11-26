@@ -76,18 +76,26 @@ app.MapGet("/stats/sponsored/{linkId}", async (string linkId, IStatsLinkService 
 });
 
 //Fund sponsored link
-app.MapPost("/fund", async (FundSponsoredLink funLinkId, FundSponsoredLinkValidator validator,  ISponsoredLinkService service) =>
+app.MapPost("/fund", async (FundSponsoredLink funLinkId, FundSponsoredLinkValidator validator, ISponsoredLinkService service) =>
 {
-    if (funLinkId == null) return Results.BadRequest();
-
-    var validationResult = await validator.ValidateAsync(funLinkId);
-    if (!validationResult.IsValid)
+    try
     {
-        return Results.ValidationProblem(validationResult.ToDictionary());
+        if (funLinkId == null) return Results.BadRequest();
+        var validationResult = await validator.ValidateAsync(funLinkId);
+        if (!validationResult.IsValid)
+        {
+            return Results.ValidationProblem(validationResult.ToDictionary());
+        }
+        var result = await service.FundSponsoredLink(funLinkId);
+        return Results.Ok(result);
+
+    }
+    catch (System.Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return Results.Problem();
     }
 
-    var result = await service.FundSponsoredLink(funLinkId);
-    return Results.Ok(result);
 });
 
 //Create sponsored link
