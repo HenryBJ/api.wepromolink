@@ -7,5 +7,5 @@ public class SponsoredLink
     public string? Url { get; set; }
     public string? ImageUrl { get; set; }
     public decimal Budget { get; set; }
-    public int EPM { get; set; }
+    public decimal EPM { get; set; }
 }

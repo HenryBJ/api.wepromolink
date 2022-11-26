@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WePromoLink.Data;
 using WePromoLink.Models;
 
@@ -48,8 +49,29 @@ public class SponsoredLinkService : ISponsoredLinkService
         throw new NotImplementedException();
     }
 
-    public Task<SponsoredLinkList> ListSponsoredLinks(int? page)
+    public async Task<SponsoredLinkList> ListSponsoredLinks(int? page)
     {
-        throw new NotImplementedException();
+        SponsoredLinkList list = new SponsoredLinkList();
+        int cant = 50;
+        page = page ?? 1;
+        page = page <= 0? 1: page;
+        
+        list.SponsoredLinks = await _db.SponsoredLinks
+        .OrderByDescending(e=>e.CreatedAt)
+        .Skip((page.Value!-1) * cant)
+        .Take(cant)
+        .Select(e=>new SponsoredLink
+        {
+            Budget = e.Budget,
+            EPM = e.EPM,
+            Id = e.ExternalId,
+            ImageUrl = e.ImageUrl,
+            Title = e.Title,
+            Url = e.Url
+        })
+        .ToListAsync();
+        list.Page = page.Value!;
+        list.TotalPages = (await _db.SponsoredLinks.CountAsync()) / cant;
+        return list;
     }
 }
