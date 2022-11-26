@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace WePromoLink;
+namespace WePromoLink.DTO;
 
 public class CreateSponsoredLink
 {
