@@ -15,6 +15,7 @@ var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.Configure<BTCPaySettings>(builder.Configuration.GetSection("BTCPay"));
 builder.Services.AddDbContext<DataContext>(x=>x.UseSqlServer(connectionString));
 builder.Services.AddScoped<SponsoredLinkValidator>();
+builder.Services.AddScoped<AffiliateLinkValidator>();
 builder.Services.AddSingleton<HitQueue>();
 builder.Services.AddSingleton<BTCPayServer.Client.BTCPayServerClient>( x => 
 {
@@ -96,9 +97,16 @@ app.MapPost("/link", async (CreateSponsoredLink link,SponsoredLinkValidator vali
 }); 
 
 //Create affiliate link
-app.MapPost("/afflink",async (CreateAffiliateLink link, IAffiliateLinkService service)=>
+app.MapPost("/afflink",async (CreateAffiliateLink link, AffiliateLinkValidator validator, IAffiliateLinkService service)=>
 {
     if(link == null) return Results.BadRequest();
+
+    var validationResult = await validator.ValidateAsync(link);
+    if(!validationResult.IsValid)
+    {
+        return Results.ValidationProblem(validationResult.ToDictionary());
+    }
+
     var result = await service.CreateAffiliateLink(link);
     return Results.Ok(result);
 }); 

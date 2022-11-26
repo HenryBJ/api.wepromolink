@@ -71,7 +71,7 @@ public class SponsoredLinkService : ISponsoredLinkService
         })
         .ToListAsync();
         list.Page = page.Value!;
-        list.TotalPages = (await _db.SponsoredLinks.CountAsync()) / cant;
+        list.TotalPages = ((await _db.SponsoredLinks.CountAsync()) / cant) + 1;
         return list;
     }
 }
