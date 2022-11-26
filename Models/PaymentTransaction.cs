@@ -8,6 +8,9 @@ public class PaymentTransaction
     public int? SponsoredLinkId { get; set; }
     public decimal Amount { get; set; }
     public bool IsDeposit { get; set; }
-    public string Email { get; set; }
+    public int EmailModelId { get; set; }
+    public string Status { get; set; }
+    public string PaymentLink { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime? ExpiredAt { get; set; }
 }

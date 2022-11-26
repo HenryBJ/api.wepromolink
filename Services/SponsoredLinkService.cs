@@ -67,6 +67,19 @@ public class SponsoredLinkService : ISponsoredLinkService
         var slink = await _db.SponsoredLinks.Where(e=>e.ExternalId == fundLink.SponsoredLinkId).SingleOrDefaultAsync();
         if(slink == null) throw new Exception("Sponsored link not found");
 
+        PaymentTransaction pay = new PaymentTransaction
+        {
+            Title = "DEPOSIT BTC",
+            SponsoredLinkId = slink.Id,
+            Amount = fundLink.Amount,
+            CreatedAt = DateTime.UtcNow,
+            ExpiredAt = DateTime.UtcNow.AddHours(5),
+            EmailModelId = email.Id,
+            IsDeposit = true,
+            Status = "PENDING"
+        };
+        _db.PaymentTransactions.Add(pay);
+        await _db.SaveChangesAsync();
 
         CreateInvoiceRequest request = new CreateInvoiceRequest
         {
@@ -78,10 +91,11 @@ public class SponsoredLinkService : ISponsoredLinkService
                 Expiration = TimeSpan.FromHours(5),
                 RedirectURL = fundLink.RedirectUrl
             },
-            Metadata = new Newtonsoft.Json.Linq.JObject(new {EmailId = email.Id, SponsoredId = slink.Id})
+            Metadata = new Newtonsoft.Json.Linq.JObject(pay)
         };
-        
         var response = await _client.CreateInvoice(_options.Value.StoreId, request);
+        pay.PaymentLink = response.CheckoutLink;
+        await _db.SaveChangesAsync();
         return response.CheckoutLink;
     }
 
