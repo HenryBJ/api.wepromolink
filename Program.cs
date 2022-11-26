@@ -5,6 +5,7 @@ using WePromoLink;
 using WePromoLink.Data;
 using WePromoLink.Services;
 using WePromoLink.Settings;
+using WePromoLink.Validators;
 using WePromoLink.Workers;
 
 
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.Configure<BTCPaySettings>(builder.Configuration.GetSection("BTCPay"));
 builder.Services.AddDbContext<DataContext>(x=>x.UseSqlServer(connectionString));
+builder.Services.AddScoped<SponsoredLinkValidator>();
 builder.Services.AddSingleton<HitQueue>();
 builder.Services.AddSingleton<BTCPayServer.Client.BTCPayServerClient>( x => 
 {
@@ -79,9 +81,15 @@ app.MapPost("/fund/{sponsoredLinkId}", async (string sponsoredLinkId, ISponsored
 }); 
 
 //Create sponsored link
-app.MapPost("/link", async (CreateSponsoredLink link, ISponsoredLinkService service)=>
+app.MapPost("/link", async (CreateSponsoredLink link,SponsoredLinkValidator validator, ISponsoredLinkService service)=>
 {
     if(link == null) return Results.BadRequest();
+
+    var validationResult = await validator.ValidateAsync(link);
+    if(!validationResult.IsValid)
+    {
+        return Results.ValidationProblem(validationResult.ToDictionary());
+    }
     var result = await service.CreateSponsoredLink(link);
     return Results.Ok(result);
 
