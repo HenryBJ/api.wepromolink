@@ -1,21 +1,29 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using BTCPayServer.Client;
+using BTCPayServer.Client.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json.Linq;
+using WePromoLink.Models;
 using WePromoLink.Settings;
+using static BTCPayServer.Client.Models.InvoiceDataBase;
 
 namespace WePromoLink.Services;
 
 public class BTCPaymentService : IPaymentService
 {
+    private readonly BTCPayServerClient _client;
+    private const string INVOICE_URL = "{0}/api/v1/stores/{1}/invoices";
     private readonly IOptions<BTCPaySettings> _settings;
     private readonly ILogger<BTCPaymentService> _logger;
 
-    public BTCPaymentService(ILogger<BTCPaymentService> logger, IOptions<BTCPaySettings> settings)
+    public BTCPaymentService(ILogger<BTCPaymentService> logger, IOptions<BTCPaySettings> settings, BTCPayServerClient client)
     {
         _logger = logger;
         _settings = settings;
+        _client = client;
     }
 
     public async Task HandleWebHook(HttpContext ctx)
@@ -79,5 +87,23 @@ public class BTCPaymentService : IPaymentService
             }
         }
         return null;
+    }
+
+    public async Task<string> CreateInvoice(PaymentTransaction payment, string RedirectUrl = "")
+    {
+       var result = await _client.CreateInvoice(_settings.Value.StoreId, new CreateInvoiceRequest
+        {
+            Amount = payment.Amount,
+            Currency = "BTC",
+            Checkout = new CheckoutOptions
+            {
+                SpeedPolicy = SpeedPolicy.MediumSpeed,
+                Expiration = TimeSpan.FromHours(5),
+                RedirectURL = RedirectUrl
+            },
+            Metadata = JObject.FromObject(payment)
+        });
+
+        return result.CheckoutLink;
     }
 }

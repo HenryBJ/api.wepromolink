@@ -1,5 +1,3 @@
-using BTCPayServer.Client;
-using BTCPayServer.Client.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -8,20 +6,19 @@ using WePromoLink.Data;
 using WePromoLink.DTO;
 using WePromoLink.Models;
 using WePromoLink.Settings;
-using static BTCPayServer.Client.Models.InvoiceDataBase;
 
 namespace WePromoLink.Services;
 
 public class SponsoredLinkService : ISponsoredLinkService
 {
-    private readonly BTCPayServerClient _client;
+    private readonly IPaymentService _client;
     private readonly IOptions<BTCPaySettings> _options;
     private readonly DataContext _db;
-    public SponsoredLinkService(DataContext db, BTCPayServerClient client, IOptions<BTCPaySettings> options)
+    public SponsoredLinkService(DataContext db, IOptions<BTCPaySettings> options, IPaymentService client)
     {
         _db = db;
-        _client = client;
         _options = options;
+        _client = client;
     }
     public async Task<string> CreateSponsoredLink(CreateSponsoredLink link)
     {
@@ -84,23 +81,12 @@ public class SponsoredLinkService : ISponsoredLinkService
             _db.PaymentTransactions.Add(pay);
             await _db.SaveChangesAsync();
 
-            CreateInvoiceRequest request = new CreateInvoiceRequest
-            {
-                Currency = "BTC",
-                Amount = fundLink.Amount,
-                Checkout = new CheckoutOptions
-                {
-                    SpeedPolicy = SpeedPolicy.MediumSpeed,
-                    Expiration = TimeSpan.FromHours(5),
-                    RedirectURL = fundLink.RedirectUrl
-                },
-                Metadata = JObject.FromObject(pay)
-            };
-            var response = await _client.CreateInvoice(_options.Value.StoreId, request);
-            pay.PaymentLink = response.CheckoutLink;
+            string link = await _client.CreateInvoice(pay);
+            if(String.IsNullOrEmpty(link)) throw new Exception("Empty or null link");
+            pay.PaymentLink = link;
             await _db.SaveChangesAsync();
             await dbTrans.CommitAsync();
-            return response.CheckoutLink;
+            return link ;
         }
 
     }

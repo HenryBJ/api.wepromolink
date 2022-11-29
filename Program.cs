@@ -1,3 +1,6 @@
+using System.Net.Http.Headers;
+using System.Text;
+using BTCPayServer.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Polly;
@@ -19,17 +22,19 @@ builder.Services.AddScoped<SponsoredLinkValidator>();
 builder.Services.AddScoped<AffiliateLinkValidator>();
 builder.Services.AddScoped<FundSponsoredLinkValidator>();
 builder.Services.AddSingleton<HitQueue>();
-builder.Services.AddSingleton<BTCPayServer.Client.BTCPayServerClient>(x =>
+builder.Services.AddTransient<IPaymentService, BTCPaymentService>();
+builder.Services.AddScoped<BTCPayServerClient>(x =>
 {
-    var ctx = builder.Services.BuildServiceProvider();
-    using (var scope = ctx.CreateScope())
-    {
-        var s = scope.ServiceProvider.GetRequiredService<IOptions<BTCPaySettings>>();
-        return new BTCPayServer.Client.BTCPayServerClient(new Uri(s.Value.Url));
-    }
+    var s = x.GetRequiredService<IOptions<BTCPaySettings>>();
+    
+    HttpClient c = new HttpClient();
+    var cad = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{s.Value.Email}:{s.Value.Password}"));
+    c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",cad);
+    var cc = new BTCPayServerClient(new Uri(s.Value.Url),c);
+    return cc;
 });
 builder.Services.AddHostedService<HitWorker>();
-builder.Services.AddTransient<IPaymentService, BTCPaymentService>();
+
 builder.Services.AddTransient<IAffiliateLinkService, AffiliateLinkService>();
 builder.Services.AddTransient<ISponsoredLinkService, SponsoredLinkService>();
 builder.Services.AddTransient<IStatsLinkService, StatsLinkService>();
@@ -78,8 +83,8 @@ app.MapGet("/stats/sponsored/{linkId}", async (string linkId, IStatsLinkService 
 //Fund sponsored link
 app.MapPost("/fund", async (FundSponsoredLink funLinkId, FundSponsoredLinkValidator validator, ISponsoredLinkService service) =>
 {
-    try
-    {
+    // try
+    // {
         if (funLinkId == null) return Results.BadRequest();
         var validationResult = await validator.ValidateAsync(funLinkId);
         if (!validationResult.IsValid)
@@ -89,12 +94,12 @@ app.MapPost("/fund", async (FundSponsoredLink funLinkId, FundSponsoredLinkValida
         var result = await service.FundSponsoredLink(funLinkId);
         return Results.Ok(result);
 
-    }
-    catch (System.Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-        return Results.Problem();
-    }
+    // }
+    // catch (System.Exception ex)
+    // {
+    //     Console.WriteLine(ex.Message);
+    //     return Results.Problem();
+    // }
 
 });
 
