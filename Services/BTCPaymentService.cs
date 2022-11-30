@@ -60,7 +60,9 @@ public class BTCPaymentService : IPaymentService
         switch (btcpayEvent!)
         {
             case InvoiceSettled ev:
-             _logger.LogInformation($"Metadata-Amount: {ev.MetaData.Amount}");
+             var invoiceData = await _client.GetInvoice(_settings.Value.StoreId,ev.InvoiceId);
+             var pay = invoiceData.Metadata.ToObject<PaymentTransaction>();
+             _logger.LogInformation($"Amount:{invoiceData.Amount} PaymentId:{pay!.Id} ");
             break;            
             default:
             _logger.LogInformation(btcpayEvent?.ToString());

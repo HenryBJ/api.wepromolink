@@ -33,7 +33,5 @@ public class InvoiceSettled: BTCPayEventBase
 
     [JsonPropertyName("overPaid")]
     public bool OverPaid { get; set; }
-
-    [JsonPropertyName("metadata")]
-    public dynamic MetaData { get; set; }
+    
 }
