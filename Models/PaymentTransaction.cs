@@ -1,3 +1,6 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace WePromoLink.Models;
 
 public class PaymentTransaction
@@ -11,6 +14,9 @@ public class PaymentTransaction
     public int EmailModelId { get; set; }
     public string Status { get; set; }
     public string? PaymentLink { get; set; }
+
+    [JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime CreatedAt { get; set; }
+    [JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime? ExpiredAt { get; set; }
 }
