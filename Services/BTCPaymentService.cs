@@ -6,6 +6,7 @@ using BTCPayServer.Client.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json.Linq;
+using WePromoLink.DTO.BTCPay;
 using WePromoLink.Models;
 using WePromoLink.Settings;
 using static BTCPayServer.Client.Models.InvoiceDataBase;
@@ -15,7 +16,6 @@ namespace WePromoLink.Services;
 public class BTCPaymentService : IPaymentService
 {
     private readonly BTCPayServerClient _client;
-    private const string INVOICE_URL = "{0}/api/v1/stores/{1}/invoices";
     private readonly IOptions<BTCPaySettings> _settings;
     private readonly ILogger<BTCPaymentService> _logger;
 
@@ -38,13 +38,13 @@ public class BTCPaymentService : IPaymentService
 
             JsonElement data = JsonSerializer.Deserialize<JsonElement>(json);    
             string event_type = getEventType(data);
-             _logger.LogInformation($"Received BTCPay event: {event_type}"); 
+            //  _logger.LogInformation($"Received BTCPay event: {event_type}"); 
              try
              {
                 Type? type = Type.GetType($"WePromoLink.DTO.BTCPay.{event_type}");
                 if(type == null) throw new Exception("BTCPay event invalid");
                 var btcpayEvent = data.Deserialize(type);
-                _logger.LogInformation(btcpayEvent?.ToString());
+                await ProcessEvent(btcpayEvent);
                 // await _mediator.Publish(new WebHookNotification{Event = btcpayEvent as BTCPayEventBase});
              }
              catch (System.Exception ex)
@@ -52,6 +52,20 @@ public class BTCPaymentService : IPaymentService
                 _logger.LogWarning($"Parsing {event_type} error: {ex.Message}");
              }
         } 
+    }
+
+    private async Task ProcessEvent(object? btcpayEvent)
+    {
+        if(btcpayEvent == null) return;
+        switch (btcpayEvent!)
+        {
+            case InvoiceSettled ev:
+             _logger.LogInformation($"Metadata-Amount: {ev.MetaData.Amount}");
+            break;            
+            default:
+            _logger.LogInformation(btcpayEvent?.ToString());
+            break;
+        }
     }
 
     private async Task<bool> VerifyEvent(StringValues btcpay_sig, Stream stream)
