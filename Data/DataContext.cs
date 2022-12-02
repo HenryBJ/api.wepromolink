@@ -50,7 +50,6 @@ public class DataContext:DbContext
         {
             entity.HasKey(e=>e.Id);
             entity.Property(e=>e.Budget).HasPrecision(10,8);
-            entity.Property(e=>e.RemainBudget).HasPrecision(10,8);
             entity.Property(e=>e.EPM).HasPrecision(10,8);
         });
     }    

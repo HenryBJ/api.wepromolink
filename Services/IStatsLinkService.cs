@@ -1,3 +1,5 @@
+using WePromoLink.DTO;
+
 namespace WePromoLink.Services;
 
 public interface IStatsLinkService 

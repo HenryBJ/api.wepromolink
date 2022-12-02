@@ -11,7 +11,6 @@ public class SponsoredLinkModel
     public string Url { get; set; }
     public string? ImageUrl { get; set; }
     public decimal Budget { get; set; }
-    public decimal RemainBudget { get; set; }
     public decimal EPM { get; set; }
     public DateTime? LastClick { get; set; }
     public DateTime? LastShared { get; set; }

@@ -42,7 +42,6 @@ public class SponsoredLinkService : ISponsoredLinkService
             ImageUrl = link.ImageUrl,
             Title = link.Title!,
             Description = link.Description,
-            RemainBudget = 0,
             Url = link.Url!
         };
 
@@ -104,7 +103,7 @@ public class SponsoredLinkService : ISponsoredLinkService
         .Take(cant)
         .Select(e => new SponsoredLink
         {
-            Budget = e.RemainBudget,
+            Budget = e.Budget,
             EPM = e.EPM,
             Id = e.ExternalId,
             ImageUrl = e.ImageUrl,

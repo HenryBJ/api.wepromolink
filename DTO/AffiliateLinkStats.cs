@@ -1,4 +1,4 @@
-namespace WePromoLink;
+namespace WePromoLink.DTO;
 
 public class AffiliateLinkStats
 {
@@ -9,6 +9,6 @@ public class AffiliateLinkStats
     public decimal TotalEarned { get; set; }
     public decimal TotalWithdraw { get; set; }
     public decimal Available { get; set; }
-    public DateTime LastClick { get; set; }
-    public DateTime LastUpdated { get; set; }
+    public DateTime? LastClick { get; set; }
+    public DateTime? LastUpdated { get; set; }
 }

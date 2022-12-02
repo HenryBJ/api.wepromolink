@@ -12,5 +12,7 @@ public class BTCPaySettings
     public string APIKey { get; set; }
     public string Url { get; set; }
     public string ReturnUrl { get; set; }
+    public string BTCAddress { get; set; }
+    public decimal Fee { get; set; }
 
 }

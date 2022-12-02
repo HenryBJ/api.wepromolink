@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WePromoLink.Data;
 
@@ -11,9 +12,10 @@ using WePromoLink.Data;
 namespace WePromoLink.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221202143740_PaymentCompletedAt")]
+    partial class PaymentCompletedAt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,7 +172,7 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("EmailModelId")
+                    b.Property<int>("EmailModelId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("ExpiredAt")
@@ -180,9 +182,6 @@ namespace WePromoLink.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("PaymentLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PayoutId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SponsoredLinkId")
@@ -241,6 +240,10 @@ namespace WePromoLink.Migrations
 
                     b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("RemainBudget")
+                        .HasPrecision(10, 8)
+                        .HasColumnType("decimal(10,8)");
 
                     b.Property<string>("Title")
                         .IsRequired()

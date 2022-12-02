@@ -7,10 +7,12 @@ namespace WePromoLink.Services;
 public class AffiliateLinkService : IAffiliateLinkService
 {
     private readonly DataContext _db;
+     private readonly HitQueue _queue;
 
-    public AffiliateLinkService(DataContext ctx)
+    public AffiliateLinkService(DataContext ctx, HitQueue queue)
     {
         _db = ctx;
+        _queue = queue;
     }
 
     public async Task<object> CreateAffiliateLink(CreateAffiliateLink affLink, HttpContext ctx)
@@ -18,7 +20,7 @@ public class AffiliateLinkService : IAffiliateLinkService
         var sponsoredLink = await _db.SponsoredLinks.Where(e=>e.ExternalId == affLink.SponsoredLinkId).SingleOrDefaultAsync(); 
         if(sponsoredLink == null) throw new Exception("Sponsored link not found");
 
-        var email = await _db.Emails.Where(e=>e.Email.ToLower() == affLink.Email.ToLower()).SingleOrDefaultAsync();
+        var email = await _db.Emails.Where(e=>e.Email.ToLower() == affLink.Email!.ToLower()).SingleOrDefaultAsync();
         if(email == null)
         {
             email = new EmailModel
@@ -47,8 +49,14 @@ public class AffiliateLinkService : IAffiliateLinkService
         return new {id=externalId, link=$"{ctx.Request.Scheme}://{ctx.Request.Host}/{externalId}"};
     }
 
-    public Task<string> HitAffiliateLink(HitAffiliate hit)
+    public async Task<string> HitAffiliateLink(HitAffiliate hit)
     {
-        throw new NotImplementedException();
+       var affiliateLink = await _db.AffiliateLinks.Where(e=>e.ExternalId == hit.AffLinkId)
+       .Include(e=>e.SponsoredLink)
+       .SingleOrDefaultAsync();
+
+       if(affiliateLink == null) throw new Exception("Affiliate link not found");
+       _queue.Item = hit; // Add for forward processing 
+       return affiliateLink.SponsoredLink.Url;
     }
 }

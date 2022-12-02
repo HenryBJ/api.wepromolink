@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using BTCPayServer.Client;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Polly;
 using WePromoLink;
@@ -22,6 +23,7 @@ builder.Services.AddScoped<SponsoredLinkValidator>();
 builder.Services.AddScoped<AffiliateLinkValidator>();
 builder.Services.AddScoped<FundSponsoredLinkValidator>();
 builder.Services.AddSingleton<HitQueue>();
+builder.Services.AddMemoryCache();
 builder.Services.AddTransient<IPaymentService, BTCPaymentService>();
 builder.Services.AddScoped<BTCPayServerClient>(x =>
 {
@@ -83,8 +85,8 @@ app.MapGet("/stats/sponsored/{linkId}", async (string linkId, IStatsLinkService 
 //Fund sponsored link
 app.MapPost("/fund", async (FundSponsoredLink funLinkId, FundSponsoredLinkValidator validator, ISponsoredLinkService service) =>
 {
-    // try
-    // {
+    try
+    {
         if (funLinkId == null) return Results.BadRequest();
         var validationResult = await validator.ValidateAsync(funLinkId);
         if (!validationResult.IsValid)
@@ -94,12 +96,12 @@ app.MapPost("/fund", async (FundSponsoredLink funLinkId, FundSponsoredLinkValida
         var result = await service.FundSponsoredLink(funLinkId);
         return Results.Ok(result);
 
-    // }
-    // catch (System.Exception ex)
-    // {
-    //     Console.WriteLine(ex.Message);
-    //     return Results.Problem();
-    // }
+    }
+    catch (System.Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return Results.Problem();
+    }
 
 });
 
