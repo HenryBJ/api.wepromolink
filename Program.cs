@@ -48,7 +48,7 @@ app.UseCors("MyCORSPolicy");
 
 InitializeDataBase(app);
 
-app.MapGet("/", () => "WePromoLink API v1.0.1");
+app.MapGet("/", () => "WePromoLink API v1.0.2");
 
 // List sponsored links
 app.MapGet("/links", async (int? page, ISponsoredLinkService service) =>

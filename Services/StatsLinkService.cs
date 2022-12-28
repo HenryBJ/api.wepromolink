@@ -46,6 +46,16 @@ public class StatsLinkService : IStatsLinkService
         return result;
     }
 
+    private async Task<T?> CheckMax<T>(IQueryable<T> query) 
+    {
+        int c = await query.CountAsync();
+        if(c > 0)
+        {
+            return await query.MaxAsync();
+        }
+        return default(T);
+    }
+
     public async Task<SponsoredLinkStats> SponsoredLinkStats(string sponsoredId)
     {
 
@@ -54,17 +64,25 @@ public class StatsLinkService : IStatsLinkService
             var sponsored = await _db.SponsoredLinks.Where(e => e.ExternalId == sponsoredId).SingleOrDefaultAsync();
             if (sponsored == null) throw new Exception("Sponsored link not found");
 
+            var lastClick = await CheckMax(_db.AffiliateLinks.Where(e => e.SponsoredLinkModelId == sponsored.Id).Select(e => e.LastClick));
+            var lastShared = await CheckMax(_db.AffiliateLinks.Where(e => e.SponsoredLinkModelId == sponsored.Id).Select(e => (DateTime?)e.CreatedAt));
+            var lastUpdated = await CheckMax(_db.AffiliateLinks.Where(e => e.SponsoredLinkModelId == sponsored.Id).Select(e => e.LastUpdated));
+            var shared = await _db.AffiliateLinks.Where(e => e.SponsoredLinkModelId == sponsored.Id).CountAsync();
+            var validClicks = await _db.HitAffiliates.Where(e => e.AffiliateLink.SponsoredLinkModelId == sponsored.Id).CountAsync();
+            var totalClicks = await _db.HitAffiliates.Where(e => e.AffiliateLink.SponsoredLinkModelId == sponsored.Id).Select(e => e.Counter).SumAsync();
+            var spend = await _db.PaymentTransactions.Where(e => e.Title == "HIT" && e.SponsoredLinkId == sponsored.Id).Select(e => e.Amount).SumAsync();
+
             result = new SponsoredLinkStats
             {
                 RemainBudget = sponsored.Budget,
                 LinkId = sponsoredId,
-                LastClick = await _db.AffiliateLinks.Where(e => e.SponsoredLinkModelId == sponsored.Id).Select(e => e.LastClick).MaxAsync(),
-                LastShared = await _db.AffiliateLinks.Where(e => e.SponsoredLinkModelId == sponsored.Id).Select(e => e.CreatedAt).MaxAsync(),
-                LastUpdated = await _db.AffiliateLinks.Where(e => e.SponsoredLinkModelId == sponsored.Id).Select(e => e.LastUpdated).MaxAsync(),
-                Shared = await _db.AffiliateLinks.Where(e => e.SponsoredLinkModelId == sponsored.Id).CountAsync(),
-                ValidClicks = await _db.HitAffiliates.Where(e => e.AffiliateLink.SponsoredLinkModelId == sponsored.Id).CountAsync(),
-                TotalClicks = await _db.HitAffiliates.Where(e => e.AffiliateLink.SponsoredLinkModelId == sponsored.Id).Select(e => e.Counter).SumAsync(),
-                Spend = await _db.PaymentTransactions.Where(e => e.Title == "HIT" && e.SponsoredLinkId == sponsored.Id).Select(e => e.Amount).SumAsync()
+                LastClick = lastClick,
+                LastShared = lastShared,
+                LastUpdated = lastUpdated,
+                Shared = shared,
+                ValidClicks = validClicks,
+                TotalClicks = totalClicks,
+                Spend = spend
             };
             _cache.Set<SponsoredLinkStats>(sponsoredId, result, TimeSpan.FromMinutes(CACHE_EXPIRATION_MIN));
         }
