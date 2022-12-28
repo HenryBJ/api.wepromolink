@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WePromoLink.Data;
+using WePromoLink.DTO;
 using WePromoLink.Models;
 
 namespace WePromoLink.Services;
@@ -8,11 +9,13 @@ public class AffiliateLinkService : IAffiliateLinkService
 {
     private readonly DataContext _db;
      private readonly HitQueue _queue;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AffiliateLinkService(DataContext ctx, HitQueue queue)
+    public AffiliateLinkService(DataContext ctx, HitQueue queue, IHttpContextAccessor httpContextAccessor)
     {
         _db = ctx;
         _queue = queue;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<object> CreateAffiliateLink(CreateAffiliateLink affLink, HttpContext ctx)
@@ -55,8 +58,34 @@ public class AffiliateLinkService : IAffiliateLinkService
        .Include(e=>e.SponsoredLink)
        .SingleOrDefaultAsync();
 
-       if(affiliateLink == null) throw new Exception("Affiliate link not found");
+       if(affiliateLink == null) throw new Exception($"Affiliate link not found: {hit.AffLinkId}");
        _queue.Item = hit; // Add for forward processing 
        return affiliateLink.SponsoredLink.Url;
+    }
+
+    public async Task<AffLinkList> ListAffiliateLinks(int? page)
+    {
+        AffLinkList list = new AffLinkList();
+        int cant = 50;
+        page = page ?? 1;
+        page = page <= 0 ? 1 : page;
+
+        list.AffLinks = await _db.AffiliateLinks
+        .Include(e=>e.SponsoredLink)
+        .OrderByDescending(e => e.CreatedAt)
+        .Skip((page.Value! - 1) * cant)
+        .Take(cant)
+        .Select(e => new AffLink
+        {
+            Available = e.Available,
+            Id = e.ExternalId,
+            ImageUrl = e.SponsoredLink.ImageUrl,
+            Title = $"affiliate: {e.SponsoredLink.Title}",
+            Url = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/{e.ExternalId}"
+        })
+        .ToListAsync();
+        list.Page = page.Value!;
+        list.TotalPages = ((await _db.SponsoredLinks.CountAsync()) / cant) + 1;
+        return list;
     }
 }

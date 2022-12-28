@@ -37,6 +37,7 @@ builder.Services.AddScoped<BTCPayServerClient>(x =>
 });
 builder.Services.AddHostedService<HitWorker>();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IAffiliateLinkService, AffiliateLinkService>();
 builder.Services.AddTransient<ISponsoredLinkService, SponsoredLinkService>();
 builder.Services.AddTransient<IStatsLinkService, StatsLinkService>();
@@ -47,7 +48,7 @@ app.UseCors("MyCORSPolicy");
 
 InitializeDataBase(app);
 
-app.MapGet("/", () => "WePromoLink API v1.0");
+app.MapGet("/", () => "WePromoLink API v1.0.1");
 
 // List sponsored links
 app.MapGet("/links", async (int? page, ISponsoredLinkService service) =>
@@ -55,6 +56,21 @@ app.MapGet("/links", async (int? page, ISponsoredLinkService service) =>
     try
     {
         var results = await service.ListSponsoredLinks(page);
+        return Results.Ok(results);
+    }
+    catch (System.Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return Results.Problem();
+    }
+});
+
+// List afiliate links
+app.MapGet("/afflinks", async (int? page, IAffiliateLinkService service) =>
+{
+    try
+    {
+        var results = await service.ListAffiliateLinks(page);
         return Results.Ok(results);
     }
     catch (System.Exception ex)
@@ -144,7 +160,7 @@ app.MapPost("/afflink", async (CreateAffiliateLink link, HttpContext ctx, Affili
     return Results.Ok(result);
 });
 
-// Access to affiliate links
+// Access to affiliate links (HIT)
 app.MapGet("/{afflink}", async (string afflink, HttpContext ctx, IAffiliateLinkService service) =>
 {
     if (String.IsNullOrEmpty(afflink)) return Results.BadRequest();
@@ -163,6 +179,7 @@ app.MapPost("/webhook", async (HttpContext ctx, IPaymentService service) =>
     await service.HandleWebHook(ctx);
     return Results.Ok();
 });
+
 
 app.Run();
 

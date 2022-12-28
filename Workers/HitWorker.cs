@@ -13,11 +13,9 @@ public class HitWorker : BackgroundService
 
     public HitWorker(HitQueue queue, IServiceScopeFactory fac, ILogger<HitWorker> logger)
     {
-        using (var scope = fac.CreateScope())
-        {
-            var s = scope.ServiceProvider.GetRequiredService<DataContext>();
-            _db = s;
-        }
+        var scope = fac.CreateScope();
+        var s = scope.ServiceProvider.GetRequiredService<DataContext>();
+        _db = s;
         _queue = queue;
         _logger = logger;
     }
@@ -48,6 +46,7 @@ public class HitWorker : BackgroundService
             {
                 hit.Counter++;
                 hit.LastHitAt = DateTime.UtcNow;
+                _db.HitAffiliates.Update(hit);
                 await _db.SaveChangesAsync();
             }
             else
@@ -84,22 +83,22 @@ public class HitWorker : BackgroundService
 
         decimal amount = affiliate.SponsoredLink.EPM / 1000;
         var sponsored = affiliate.SponsoredLink;
-        
-        if(sponsored.Budget == 0) return;
+
+        if (sponsored.Budget == 0) return;
 
         if (sponsored.Budget >= amount)
         {
             sponsored.Budget -= amount;
-            affiliate.Available+=amount;
-            affiliate.TotalEarned+=amount;
-        } 
+            affiliate.Available += amount;
+            affiliate.TotalEarned += amount;
+        }
         else
-        if(sponsored.Budget > 0)
+        if (sponsored.Budget > 0)
         {
             amount = sponsored.Budget;
             sponsored.Budget = 0;
-            affiliate.Available+=amount;
-            affiliate.TotalEarned+=amount;
+            affiliate.Available += amount;
+            affiliate.TotalEarned += amount;
         }
 
         var transaction = new PaymentTransaction
