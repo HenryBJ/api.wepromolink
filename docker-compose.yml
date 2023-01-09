@@ -5,7 +5,6 @@ services:
   website:
     image: cod4it/wepromolink:1.0
     ports:
-      - "80:80"
       - "443:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

@@ -15,7 +15,6 @@ WORKDIR /app
 COPY --from=build-env "/app/out" .
 
 # Expose ports
-EXPOSE 80/tcp
 EXPOSE 443/tcp
 
 
