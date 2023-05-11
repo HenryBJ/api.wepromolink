@@ -1,164 +1,93 @@
 using System.Net.Http.Headers;
 using System.Text;
 using BTCPayServer.Client;
+using FirebaseAdmin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Polly;
 using WePromoLink;
 using WePromoLink.Data;
-using WePromoLink.DTO;
 using WePromoLink.Services;
 using WePromoLink.Settings;
 using WePromoLink.Validators;
 using WePromoLink.Workers;
-
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Stripe;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
+
+FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile(builder.Configuration["FirebaseAdmin:Path"])
+});
+
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
+builder.Services.AddControllers();
 builder.Services.Configure<BTCPaySettings>(builder.Configuration.GetSection("BTCPay"));
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
-builder.Services.AddScoped<SponsoredLinkValidator>();
+builder.Services.AddScoped<CampaignValidator>();
 builder.Services.AddScoped<AffiliateLinkValidator>();
 builder.Services.AddScoped<FundSponsoredLinkValidator>();
 builder.Services.AddSingleton<HitQueue>();
+builder.Services.AddSingleton<WebHookEventQueue>();
 builder.Services.AddMemoryCache();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IPaymentService, BTCPaymentService>();
 builder.Services.AddScoped<BTCPayServerClient>(x =>
 {
     var s = x.GetRequiredService<IOptions<BTCPaySettings>>();
-    
+
     HttpClient c = new HttpClient();
     var cad = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{s.Value.Email}:{s.Value.Password}"));
-    c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",cad);
-    var cc = new BTCPayServerClient(new Uri(s.Value.Url),c);
+    c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", cad);
+    var cc = new BTCPayServerClient(new Uri(s.Value.Url), c);
     return cc;
 });
 builder.Services.AddHostedService<HitWorker>();
+builder.Services.AddHostedService<WebHookWorker>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IAffiliateLinkService, AffiliateLinkService>();
-builder.Services.AddTransient<ISponsoredLinkService, SponsoredLinkService>();
+builder.Services.AddTransient<ICampaignService, CampaignService>();
+builder.Services.AddTransient<IDataService, DataService>();
+builder.Services.AddTransient<IPricingService, PricingService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<StripeService>();
 builder.Services.AddTransient<IStatsLinkService, StatsLinkService>();
 builder.Services.AddCors(e => e.AddPolicy("MyCORSPolicy", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+
+// firebase auth
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(opt =>
+{
+    opt.Authority = builder.Configuration["Jwt:Firebase:ValidIssuer"];
+    opt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Firebase:ValidIssuer"],
+        ValidAudience = builder.Configuration["Jwt:Firebase:ValidAudience"]
+    };
+});
+
 var app = builder.Build();
 
 app.UseCors("MyCORSPolicy");
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 InitializeDataBase(app);
 
-app.MapGet("/", () => "WePromoLink API v1.0.2");
+app.MapGet("/", () => "WePromoLink API v1.0.3 - 29/04/2023");
 
-// List sponsored links
-app.MapGet("/links", async (int? page, ISponsoredLinkService service) =>
-{
-    try
-    {
-        var results = await service.ListSponsoredLinks(page);
-        return Results.Ok(results);
-    }
-    catch (System.Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-        return Results.Problem();
-    }
-});
-
-// List afiliate links
-app.MapGet("/afflinks", async (int? page, IAffiliateLinkService service) =>
-{
-    try
-    {
-        var results = await service.ListAffiliateLinks(page);
-        return Results.Ok(results);
-    }
-    catch (System.Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-        return Results.Problem();
-    }
-});
-
-// Get Stats for affiliate link
-app.MapGet("/stats/affiliate/{afflinkId}", async (string afflinkId, IStatsLinkService service) =>
-{
-    if (String.IsNullOrEmpty(afflinkId)) return Results.BadRequest();
-    var result = await service.AffiliateLinkStats(afflinkId);
-    return Results.Ok(result);
-});
-
-
-// Get Stats for sponsored link
-app.MapGet("/stats/sponsored/{linkId}", async (string linkId, IStatsLinkService service) =>
-{
-    if (String.IsNullOrEmpty(linkId)) return Results.BadRequest();
-    var result = await service.SponsoredLinkStats(linkId);
-    return Results.Ok(result);
-
-});
-
-//Fund sponsored link
-app.MapPost("/fund", async (FundSponsoredLink funLinkId, FundSponsoredLinkValidator validator, ISponsoredLinkService service) =>
-{
-    try
-    {
-        if (funLinkId == null) return Results.BadRequest();
-        var validationResult = await validator.ValidateAsync(funLinkId);
-        if (!validationResult.IsValid)
-        {
-            return Results.ValidationProblem(validationResult.ToDictionary());
-        }
-        var result = await service.FundSponsoredLink(funLinkId);
-        return Results.Ok(result);
-
-    }
-    catch (System.Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-        return Results.Problem();
-    }
-
-});
-
-//Create sponsored link
-app.MapPost("/link", async (CreateSponsoredLink link, SponsoredLinkValidator validator, ISponsoredLinkService service) =>
-{
-    if (link == null) return Results.BadRequest();
-
-    var validationResult = await validator.ValidateAsync(link);
-    if (!validationResult.IsValid)
-    {
-        return Results.ValidationProblem(validationResult.ToDictionary());
-    }
-    var result = await service.CreateSponsoredLink(link);
-    return Results.Ok(result);
-
-});
-
-//Create affiliate link
-app.MapPost("/afflink", async (CreateAffiliateLink link, HttpContext ctx, AffiliateLinkValidator validator, IAffiliateLinkService service) =>
-{
-    if (link == null) return Results.BadRequest();
-
-    var validationResult = await validator.ValidateAsync(link);
-    if (!validationResult.IsValid)
-    {
-        return Results.ValidationProblem(validationResult.ToDictionary());
-    }
-    object result;
-    try
-    {
-        result = await service.CreateAffiliateLink(link, ctx);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-        return Results.Problem(ex.Message);
-    }
-
-    return Results.Ok(result);
-});
 
 // Access to affiliate links (HIT)
 app.MapGet("/{afflink}", async (string afflink, HttpContext ctx, IAffiliateLinkService service) =>
@@ -174,13 +103,13 @@ app.MapGet("/{afflink}", async (string afflink, HttpContext ctx, IAffiliateLinkS
 });
 
 //BTCPay webhook
-app.MapPost("/webhook", async (HttpContext ctx, IPaymentService service) =>
-{
-    await service.HandleWebHook(ctx);
-    return Results.Ok();
-});
+// app.MapPost("/webhook", async (HttpContext ctx, IPaymentService service) =>
+// {
+//     await service.HandleWebHook(ctx);
+//     return Results.Ok();
+// });
 
-
+app.MapControllers();
 app.Run();
 
 

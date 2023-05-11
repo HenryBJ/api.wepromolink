@@ -76,41 +76,41 @@ public class BTCPaymentService : IPaymentService
 
     private async Task ProcessPayment(InvoiceData invoiceData, PaymentTransaction pay)
     {
-        try
-        {
-            var fee = _settings.Value.Fee;
-            var commition = invoiceData.Amount * fee;
-            var remaining = invoiceData.Amount - commition;
-            using var transaction = await _bd.Database.BeginTransactionAsync();
+        // try
+        // {
+        //     var fee = _settings.Value.Fee;
+        //     var commition = invoiceData.Amount * fee;
+        //     var remaining = invoiceData.Amount - commition;
+        //     using var transaction = await _bd.Database.BeginTransactionAsync();
 
-            pay.Amount = remaining;
-            pay.CompletedAt = DateTime.UtcNow;
-            pay.Status = "COMPLETED";
+        //     pay.Amount = remaining;
+        //     pay.CompletedAt = DateTime.UtcNow;
+        //     pay.Status = "COMPLETED";
 
-            PaymentTransaction feepay = new PaymentTransaction
-            {
-                Title = "FEE",
-                Amount = commition,
-                Status = "PENDING",
-                CreatedAt = DateTime.UtcNow,
-                IsDeposit = false,
-                EmailModelId = pay.EmailModelId,
-                SponsoredLinkId = pay.SponsoredLinkId,
-                AffiliateLinkId = pay.AffiliateLinkId
-            };
+        //     PaymentTransaction feepay = new PaymentTransaction
+        //     {
+        //         Title = "FEE",
+        //         Amount = commition,
+        //         Status = "PENDING",
+        //         CreatedAt = DateTime.UtcNow,
+        //         IsDeposit = false,
+        //         EmailModelId = pay.EmailModelId,
+        //         SponsoredLinkId = pay.SponsoredLinkId,
+        //         AffiliateLinkId = pay.AffiliateLinkId
+        //     };
 
-            _bd.PaymentTransactions.Update(pay);
-            await _bd.PaymentTransactions.AddAsync(feepay);
-            await _bd.SaveChangesAsync();
-            await transaction.CommitAsync();
-            // TODO: here add notification
+        //     _bd.PaymentTransactions.Update(pay);
+        //     await _bd.PaymentTransactions.AddAsync(feepay);
+        //     await _bd.SaveChangesAsync();
+        //     await transaction.CommitAsync();
+        //     // TODO: here add notification
 
-        }
-        catch (System.Exception ex)
-        {
+        // }
+        // catch (System.Exception ex)
+        // {
 
-            throw;
-        }
+        //     throw;
+        // }
 
     }
 

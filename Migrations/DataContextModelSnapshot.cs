@@ -22,16 +22,11 @@ namespace WePromoLink.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("WePromoLink.HitAffiliateModel", b =>
+            modelBuilder.Entity("WePromoLink.HitModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("AffiliateLinkModelId")
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Counter")
                         .HasColumnType("int");
@@ -57,6 +52,9 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("LastHitAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("MapImageUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -65,153 +63,133 @@ namespace WePromoLink.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AffiliateLinkModelId");
+                    b.HasIndex("LinkModelId");
 
-                    b.ToTable("HitAffiliates");
+                    b.ToTable("Hits");
                 });
 
-            modelBuilder.Entity("WePromoLink.Models.AffiliateLinkModel", b =>
+            modelBuilder.Entity("WePromoLink.Models.AvailableModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<decimal>("Available")
-                        .HasPrecision(10, 8)
-                        .HasColumnType("decimal(10,8)");
-
-                    b.Property<string>("BTCAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("EmailModelId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ExternalId")
-                        .IsRequired()
+                    b.Property<string>("Etag")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Group")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastClick")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SponsoredLinkModelId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Threshold")
-                        .HasPrecision(10, 8)
-                        .HasColumnType("decimal(10,8)");
-
-                    b.Property<decimal>("TotalEarned")
-                        .HasPrecision(10, 8)
-                        .HasColumnType("decimal(10,8)");
-
-                    b.Property<decimal>("TotalWithdraw")
-                        .HasPrecision(10, 8)
-                        .HasColumnType("decimal(10,8)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmailModelId");
-
-                    b.HasIndex("SponsoredLinkModelId");
-
-                    b.ToTable("AffiliateLinks");
-                });
-
-            modelBuilder.Entity("WePromoLink.Models.EmailModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Emails");
-                });
-
-            modelBuilder.Entity("WePromoLink.Models.PaymentTransaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("AffiliateLinkId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(10, 8)
-                        .HasColumnType("decimal(10,8)");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("EmailModelId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsDeposit")
-                        .HasColumnType("bit");
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("PaymentLink")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
 
-                    b.Property<string>("PayoutId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("SponsoredLinkId")
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("Availables");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.BadgetModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Campaign")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Clicks")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Title")
+                    b.Property<int>("Deposit")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Link")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Notification")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Withdraw")
+                        .HasColumnType("int");
+
+                    b.Property<string>("flag")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentTransactions");
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("Badgets");
                 });
 
-            modelBuilder.Entity("WePromoLink.Models.SponsoredLinkModel", b =>
+            modelBuilder.Entity("WePromoLink.Models.BudgetModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("Budgets");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.CampaignModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Budget")
-                        .HasPrecision(10, 8)
-                        .HasColumnType("decimal(10,8)");
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -220,18 +198,21 @@ namespace WePromoLink.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("EPM")
-                        .HasPrecision(10, 8)
-                        .HasColumnType("decimal(10,8)");
-
-                    b.Property<int>("EmailModelId")
-                        .HasColumnType("int");
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
 
                     b.Property<string>("ExternalId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastClick")
                         .HasColumnType("datetime2");
@@ -242,6 +223,9 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -250,50 +234,3464 @@ namespace WePromoLink.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("EmailModelId");
+                    b.HasIndex("ExternalId");
 
-                    b.ToTable("SponsoredLinks");
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("Campaigns");
                 });
 
-            modelBuilder.Entity("WePromoLink.HitAffiliateModel", b =>
+            modelBuilder.Entity("WePromoLink.Models.ClickLastWeekOnLinksUserModel", b =>
                 {
-                    b.HasOne("WePromoLink.Models.AffiliateLinkModel", "AffiliateLink")
-                        .WithMany()
-                        .HasForeignKey("AffiliateLinkModelId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("ClickLastWeekOnLinksUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksLastWeekOnCampaignModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId")
+                        .IsUnique();
+
+                    b.ToTable("ClicksLastWeekOnCampaigns");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksLastWeekOnCampaignUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("ClicksLastWeekOnCampaignUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksLastWeekOnLinkModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkModelId")
+                        .IsUnique();
+
+                    b.ToTable("ClicksLastWeekOnLinks");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnCampaignModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId")
+                        .IsUnique();
+
+                    b.ToTable("ClicksTodayOnCampaigns");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnCampaignUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("ClicksTodayOnCampaignUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnLinkModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkModelId")
+                        .IsUnique();
+
+                    b.ToTable("ClicksTodayOnLinks");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnLinksUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("ClicksTodayOnLinksUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.EarnLastWeekOnLinkModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkModelId")
+                        .IsUnique();
+
+                    b.ToTable("EarnLastWeekOnLinks");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.EarnLastWeekUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("EarnLastWeekUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.EarnTodayOnLinkModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkModelId")
+                        .IsUnique();
+
+                    b.ToTable("EarnTodayOnLinks");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.EarnTodayUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("EarnTodayUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.GenericEventModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GenericEvent");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnCampaignModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryClicksByCountriesOnCampaigns");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnCampaignUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryClicksByCountriesOnCampaignUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnLinkModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryClicksByCountriesOnLinks");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnLinkUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryClicksByCountriesOnLinkUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnCampaignModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryClicksOnCampaigns");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnCampaignUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryClicksOnCampaignUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinkModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryClicksOnLinkModels");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinksUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryClicksOnLinksUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinkUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkModelId");
+
+                    b.ToTable("HistoryClicksOnLinkUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnSharesUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryClicksOnSharesUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryEarnByCountriesOnLinkModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("X0")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X1")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X2")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X3")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X4")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X5")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X6")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X7")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X8")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X9")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryEarnByCountriesOnLinks");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryEarnByCountriesUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("X0")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X1")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X2")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X3")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X4")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X5")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X6")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X7")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X8")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X9")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryEarnByCountriesUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryEarnOnLinkModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("X0")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X1")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X2")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X3")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X4")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X5")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X6")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X7")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X8")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X9")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LinkModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryEarnOnLinks");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryEarnOnLinksUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("X0")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X1")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X2")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X3")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X4")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X5")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X6")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X7")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X8")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("X9")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistoryEarnOnLinksUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistorySharedByUsersOnCampaignModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistorySharedByUsersOnCampaigns");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistorySharedByUsersUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistorySharedByUsersUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistorySharedOnCampaignModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("L0")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L1")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L2")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L3")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L4")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L5")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L6")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L7")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L8")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("L9")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("X0")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X2")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X3")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X4")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X5")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X6")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X7")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X8")
+                        .HasColumnType("int");
+
+                    b.Property<int>("X9")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId")
+                        .IsUnique();
+
+                    b.ToTable("HistorySharedOnCampaigns");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.LinkModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("LastClick")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId");
+
+                    b.HasIndex("ExternalId");
+
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("Links");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.LockedModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("Lockeds");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.NotificationModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExternalId");
+
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.PaymentTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<Guid?>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid?>("LinkModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Metadata")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId");
+
+                    b.HasIndex("ExternalId");
+
+                    b.HasIndex("LinkModelId");
+
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("PaymentTransactions");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.PayoutInfoModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BCTAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DebitCard")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PayoutType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Paypal")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Stripe")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("WireBankAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WireBankName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WireBranch")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WireIban")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WireName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WireSwiftorBic")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("wireRouting")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("PayoutInfos");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.PayoutStatModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("PayoutStats");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ProfitModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("Profits");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SharedLastWeekOnCampaignModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId")
+                        .IsUnique();
+
+                    b.ToTable("SharedLastWeekOnCampaigns");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SharedLastWeekUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("SharedLastWeekUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SharedTodayOnCampaignModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CampaignModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignModelId")
+                        .IsUnique();
+
+                    b.ToTable("SharedTodayOnCampaigns");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SharedTodayUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Etag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("MaxAge")
+                        .HasColumnType("time");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("SharedTodayUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SubscriptionModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CanceledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsCanceled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsExpired")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastPayment")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("NextPayment")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SubscriptionPlanModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExternalId");
+
+                    b.HasIndex("SubscriptionPlanModelId");
+
+                    b.ToTable("Subscriptions");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SubscriptionPlanModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Annually")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<string>("AnnualyPaymantLink")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AnnualyProductId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ContainAds")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("DepositFee")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("Discount")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Metadata")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Monthly")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<string>("MonthlyPaymantLink")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MonthlyProductId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PayoutFee")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("PayoutMinimun")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<string>("Tag")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExternalId");
+
+                    b.ToTable("SubscriptionPlans");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("78caea83-fd1e-4945-b353-656c1dac833b"),
+                            Annually = 244m,
+                            AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
+                            AnnualyProductId = "prod_NpuAflpfqloJa9",
+                            ContainAds = false,
+                            DepositFee = 0m,
+                            Discount = 15m,
+                            ExternalId = "WCb1yfH1bJhw",
+                            Monthly = 24m,
+                            MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
+                            MonthlyProductId = "prod_NpnKrvEvvWJtqG",
+                            Order = 2,
+                            PaymentMethod = "mastercard, visa, stripe",
+                            PayoutFee = 0m,
+                            PayoutMinimun = 50m,
+                            Tag = "Popular",
+                            Title = "Professional"
+                        },
+                        new
+                        {
+                            Id = new Guid("49c1e687-61b4-4e01-b264-f744b821534b"),
+                            Annually = 0m,
+                            AnnualyPaymantLink = "",
+                            AnnualyProductId = "",
+                            ContainAds = true,
+                            DepositFee = 9m,
+                            Discount = 0m,
+                            ExternalId = "j_L41bzqdiwu",
+                            Monthly = 0m,
+                            MonthlyPaymantLink = "",
+                            MonthlyProductId = "",
+                            Order = 1,
+                            PaymentMethod = "bitcoin",
+                            PayoutFee = 9m,
+                            PayoutMinimun = 100m,
+                            Tag = "",
+                            Title = "Community"
+                        });
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.UserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BlockageCause")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FirebaseId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Fullname")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSubscribed")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("SubscriptionModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ThumbnailImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExternalId");
+
+                    b.HasIndex("SubscriptionModelId")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("WePromoLink.HitModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithMany("Hits")
+                        .HasForeignKey("LinkModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AffiliateLink");
+                    b.Navigation("Link");
                 });
 
-            modelBuilder.Entity("WePromoLink.Models.AffiliateLinkModel", b =>
+            modelBuilder.Entity("WePromoLink.Models.AvailableModel", b =>
                 {
-                    b.HasOne("WePromoLink.Models.EmailModel", "Email")
-                        .WithMany()
-                        .HasForeignKey("EmailModelId");
-
-                    b.HasOne("WePromoLink.Models.SponsoredLinkModel", "SponsoredLink")
-                        .WithMany()
-                        .HasForeignKey("SponsoredLinkModelId")
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("Available")
+                        .HasForeignKey("WePromoLink.Models.AvailableModel", "UserModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Email");
-
-                    b.Navigation("SponsoredLink");
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WePromoLink.Models.SponsoredLinkModel", b =>
+            modelBuilder.Entity("WePromoLink.Models.BadgetModel", b =>
                 {
-                    b.HasOne("WePromoLink.Models.EmailModel", "Email")
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
                         .WithMany()
-                        .HasForeignKey("EmailModelId")
+                        .HasForeignKey("UserModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Email");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.BudgetModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("Budget")
+                        .HasForeignKey("WePromoLink.Models.BudgetModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.CampaignModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithMany("Campaigns")
+                        .HasForeignKey("UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClickLastWeekOnLinksUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("ClickLastWeekOnLinksUser")
+                        .HasForeignKey("WePromoLink.Models.ClickLastWeekOnLinksUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksLastWeekOnCampaignModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithOne("ClicksLastWeekOnCampaign")
+                        .HasForeignKey("WePromoLink.Models.ClicksLastWeekOnCampaignModel", "CampaignModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksLastWeekOnCampaignUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("ClicksLastWeekOnCampaignUser")
+                        .HasForeignKey("WePromoLink.Models.ClicksLastWeekOnCampaignUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksLastWeekOnLinkModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithOne("ClicksLastWeekOnLink")
+                        .HasForeignKey("WePromoLink.Models.ClicksLastWeekOnLinkModel", "LinkModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Link");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnCampaignModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithOne("ClicksTodayOnCampaign")
+                        .HasForeignKey("WePromoLink.Models.ClicksTodayOnCampaignModel", "CampaignModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnCampaignUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("ClicksTodayOnCampaignUser")
+                        .HasForeignKey("WePromoLink.Models.ClicksTodayOnCampaignUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnLinkModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithOne("ClicksTodayOnLink")
+                        .HasForeignKey("WePromoLink.Models.ClicksTodayOnLinkModel", "LinkModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Link");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnLinksUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("ClicksTodayOnLinksUser")
+                        .HasForeignKey("WePromoLink.Models.ClicksTodayOnLinksUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.EarnLastWeekOnLinkModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithOne("EarnLastWeekOnLink")
+                        .HasForeignKey("WePromoLink.Models.EarnLastWeekOnLinkModel", "LinkModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Link");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.EarnLastWeekUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("EarnLastWeekUser")
+                        .HasForeignKey("WePromoLink.Models.EarnLastWeekUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.EarnTodayOnLinkModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithOne("EarnTodayOnLink")
+                        .HasForeignKey("WePromoLink.Models.EarnTodayOnLinkModel", "LinkModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Link");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.EarnTodayUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("EarnTodayUser")
+                        .HasForeignKey("WePromoLink.Models.EarnTodayUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnCampaignModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithOne("HistoryClicksByCountriesOnCampaign")
+                        .HasForeignKey("WePromoLink.Models.HistoryClicksByCountriesOnCampaignModel", "CampaignModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnCampaignUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("HistoryClicksByCountriesOnCampaignUser")
+                        .HasForeignKey("WePromoLink.Models.HistoryClicksByCountriesOnCampaignUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnLinkModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithOne("HistoryClicksByCountriesOnLink")
+                        .HasForeignKey("WePromoLink.Models.HistoryClicksByCountriesOnLinkModel", "LinkModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Link");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnLinkUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("HistoryClicksByCountriesOnLinkUser")
+                        .HasForeignKey("WePromoLink.Models.HistoryClicksByCountriesOnLinkUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnCampaignModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithOne("HistoryClicksOnCampaign")
+                        .HasForeignKey("WePromoLink.Models.HistoryClicksOnCampaignModel", "CampaignModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnCampaignUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("HistoryClicksOnCampaignUser")
+                        .HasForeignKey("WePromoLink.Models.HistoryClicksOnCampaignUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinkModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", null)
+                        .WithOne("HistoryClicksOnLink")
+                        .HasForeignKey("WePromoLink.Models.HistoryClicksOnLinkModel", "LinkModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinksUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("HistoryClicksOnLinksUser")
+                        .HasForeignKey("WePromoLink.Models.HistoryClicksOnLinksUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinkUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithMany()
+                        .HasForeignKey("LinkModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Link");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnSharesUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("HistoryClicksOnSharesUser")
+                        .HasForeignKey("WePromoLink.Models.HistoryClicksOnSharesUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryEarnByCountriesOnLinkModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithOne("HistoryEarnByCountriesOnLink")
+                        .HasForeignKey("WePromoLink.Models.HistoryEarnByCountriesOnLinkModel", "LinkModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Link");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryEarnByCountriesUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("HistoryEarnByCountriesUser")
+                        .HasForeignKey("WePromoLink.Models.HistoryEarnByCountriesUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryEarnOnLinkModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithOne("HistoryEarnOnLink")
+                        .HasForeignKey("WePromoLink.Models.HistoryEarnOnLinkModel", "LinkModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Link");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistoryEarnOnLinksUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("HistoryEarnOnLinksUser")
+                        .HasForeignKey("WePromoLink.Models.HistoryEarnOnLinksUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistorySharedByUsersOnCampaignModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithOne("HistorySharedByUsersOnCampaign")
+                        .HasForeignKey("WePromoLink.Models.HistorySharedByUsersOnCampaignModel", "CampaignModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistorySharedByUsersUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("HistorySharedByUsersUser")
+                        .HasForeignKey("WePromoLink.Models.HistorySharedByUsersUserModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.HistorySharedOnCampaignModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithOne("HistorySharedOnCampaign")
+                        .HasForeignKey("WePromoLink.Models.HistorySharedOnCampaignModel", "CampaignModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.LinkModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithMany("Links")
+                        .HasForeignKey("CampaignModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithMany("Links")
+                        .HasForeignKey("UserModelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.LockedModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("Locked")
+                        .HasForeignKey("WePromoLink.Models.LockedModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.NotificationModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.PaymentTransaction", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithMany("Transactions")
+                        .HasForeignKey("CampaignModelId");
+
+                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
+                        .WithMany("Transactions")
+                        .HasForeignKey("LinkModelId");
+
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithMany("Transactions")
+                        .HasForeignKey("UserModelId");
+
+                    b.Navigation("Campaign");
+
+                    b.Navigation("Link");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.PayoutInfoModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.PayoutStatModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("PayoutStat")
+                        .HasForeignKey("WePromoLink.Models.PayoutStatModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ProfitModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("Profit")
+                        .HasForeignKey("WePromoLink.Models.ProfitModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SharedLastWeekOnCampaignModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithOne("SharedLastWeekOnCampaign")
+                        .HasForeignKey("WePromoLink.Models.SharedLastWeekOnCampaignModel", "CampaignModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SharedLastWeekUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SharedTodayOnCampaignModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithOne("SharedTodayOnCampaignModel")
+                        .HasForeignKey("WePromoLink.Models.SharedTodayOnCampaignModel", "CampaignModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SharedTodayUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SubscriptionModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.SubscriptionPlanModel", "SubscriptionPlan")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("SubscriptionPlanModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubscriptionPlan");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.UserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.SubscriptionModel", "Subscription")
+                        .WithOne("User")
+                        .HasForeignKey("WePromoLink.Models.UserModel", "SubscriptionModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subscription");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.CampaignModel", b =>
+                {
+                    b.Navigation("ClicksLastWeekOnCampaign")
+                        .IsRequired();
+
+                    b.Navigation("ClicksTodayOnCampaign")
+                        .IsRequired();
+
+                    b.Navigation("HistoryClicksByCountriesOnCampaign")
+                        .IsRequired();
+
+                    b.Navigation("HistoryClicksOnCampaign")
+                        .IsRequired();
+
+                    b.Navigation("HistorySharedByUsersOnCampaign")
+                        .IsRequired();
+
+                    b.Navigation("HistorySharedOnCampaign")
+                        .IsRequired();
+
+                    b.Navigation("Links");
+
+                    b.Navigation("SharedLastWeekOnCampaign")
+                        .IsRequired();
+
+                    b.Navigation("SharedTodayOnCampaignModel")
+                        .IsRequired();
+
+                    b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.LinkModel", b =>
+                {
+                    b.Navigation("ClicksLastWeekOnLink")
+                        .IsRequired();
+
+                    b.Navigation("ClicksTodayOnLink")
+                        .IsRequired();
+
+                    b.Navigation("EarnLastWeekOnLink")
+                        .IsRequired();
+
+                    b.Navigation("EarnTodayOnLink")
+                        .IsRequired();
+
+                    b.Navigation("HistoryClicksByCountriesOnLink")
+                        .IsRequired();
+
+                    b.Navigation("HistoryClicksOnLink")
+                        .IsRequired();
+
+                    b.Navigation("HistoryEarnByCountriesOnLink")
+                        .IsRequired();
+
+                    b.Navigation("HistoryEarnOnLink")
+                        .IsRequired();
+
+                    b.Navigation("Hits");
+
+                    b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SubscriptionModel", b =>
+                {
+                    b.Navigation("User")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SubscriptionPlanModel", b =>
+                {
+                    b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.UserModel", b =>
+                {
+                    b.Navigation("Available")
+                        .IsRequired();
+
+                    b.Navigation("Budget")
+                        .IsRequired();
+
+                    b.Navigation("Campaigns");
+
+                    b.Navigation("ClickLastWeekOnLinksUser")
+                        .IsRequired();
+
+                    b.Navigation("ClicksLastWeekOnCampaignUser")
+                        .IsRequired();
+
+                    b.Navigation("ClicksTodayOnCampaignUser")
+                        .IsRequired();
+
+                    b.Navigation("ClicksTodayOnLinksUser")
+                        .IsRequired();
+
+                    b.Navigation("EarnLastWeekUser")
+                        .IsRequired();
+
+                    b.Navigation("EarnTodayUser")
+                        .IsRequired();
+
+                    b.Navigation("HistoryClicksByCountriesOnCampaignUser")
+                        .IsRequired();
+
+                    b.Navigation("HistoryClicksByCountriesOnLinkUser")
+                        .IsRequired();
+
+                    b.Navigation("HistoryClicksOnCampaignUser")
+                        .IsRequired();
+
+                    b.Navigation("HistoryClicksOnLinksUser")
+                        .IsRequired();
+
+                    b.Navigation("HistoryClicksOnSharesUser")
+                        .IsRequired();
+
+                    b.Navigation("HistoryEarnByCountriesUser")
+                        .IsRequired();
+
+                    b.Navigation("HistoryEarnOnLinksUser")
+                        .IsRequired();
+
+                    b.Navigation("HistorySharedByUsersUser")
+                        .IsRequired();
+
+                    b.Navigation("Links");
+
+                    b.Navigation("Locked")
+                        .IsRequired();
+
+                    b.Navigation("Notifications");
+
+                    b.Navigation("PayoutStat")
+                        .IsRequired();
+
+                    b.Navigation("Profit")
+                        .IsRequired();
+
+                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }

@@ -35,88 +35,88 @@ public class HitWorker : BackgroundService
 
     private async Task ProcessHit(HitAffiliate item)
     {
-        try
-        {
-            using var dbtrans = _db.Database.BeginTransaction();
-            var origin = item.Origin?.ToString();
-            int afflinkId = await _db.AffiliateLinks.Where(e => e.ExternalId == item.AffLinkId).Select(e => e.Id).SingleOrDefaultAsync();
-            var hit = await _db.HitAffiliates.Where(e => e.AffiliateLinkModelId == afflinkId && e.Origin == origin).SingleOrDefaultAsync();
+        // try
+        // {
+        //     using var dbtrans = _db.Database.BeginTransaction();
+        //     var origin = item.Origin?.ToString();
+        //     int afflinkId = await _db.AffiliateLinks.Where(e => e.ExternalId == item.AffLinkId).Select(e => e.Id).SingleOrDefaultAsync();
+        //     var hit = await _db.HitAffiliates.Where(e => e.AffiliateLinkModelId == afflinkId && e.Origin == origin).SingleOrDefaultAsync();
 
-            if (hit != null)
-            {
-                hit.Counter++;
-                hit.LastHitAt = DateTime.UtcNow;
-                _db.HitAffiliates.Update(hit);
-                await _db.SaveChangesAsync();
-            }
-            else
-            {
-                HitAffiliateModel model = new HitAffiliateModel
-                {
-                    AffiliateLinkModelId = afflinkId,
-                    Counter = 1,
-                    CreatedAt = DateTime.UtcNow,
-                    IsGeolocated = false,
-                    LastHitAt = DateTime.UtcNow,
-                    FirstHitAt = DateTime.UtcNow,
-                    Origin = origin
-                };
-                _db.HitAffiliates.Add(model);
-                await ProcessPaymentTransaction(model);
-                await _db.SaveChangesAsync();
-            }
-            dbtrans.Commit();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-        }
+        //     if (hit != null)
+        //     {
+        //         hit.Counter++;
+        //         hit.LastHitAt = DateTime.UtcNow;
+        //         _db.HitAffiliates.Update(hit);
+        //         await _db.SaveChangesAsync();
+        //     }
+        //     else
+        //     {
+        //         HitAffiliateModel model = new HitAffiliateModel
+        //         {
+        //             AffiliateLinkModelId = afflinkId,
+        //             Counter = 1,
+        //             CreatedAt = DateTime.UtcNow,
+        //             IsGeolocated = false,
+        //             LastHitAt = DateTime.UtcNow,
+        //             FirstHitAt = DateTime.UtcNow,
+        //             Origin = origin
+        //         };
+        //         _db.HitAffiliates.Add(model);
+        //         await ProcessPaymentTransaction(model);
+        //         await _db.SaveChangesAsync();
+        //     }
+        //     dbtrans.Commit();
+        // }
+        // catch (System.Exception ex)
+        // {
+        //     _logger.LogError(ex.Message);
+        // }
     }
 
-    private async Task ProcessPaymentTransaction(HitAffiliateModel model)
+    private async Task ProcessPaymentTransaction(HitModel model)
     {
-        var affiliate = await _db.AffiliateLinks.Where(e => e.Id == model.AffiliateLinkModelId)
-        .Include(e => e.SponsoredLink)
-        .SingleOrDefaultAsync();
+        // var affiliate = await _db.AffiliateLinks.Where(e => e.Id == model.AffiliateLinkModelId)
+        // .Include(e => e.Campaign)
+        // .SingleOrDefaultAsync();
 
-        if (affiliate == null) throw new Exception("Affiliate link not found");
+        // if (affiliate == null) throw new Exception("Affiliate link not found");
 
-        decimal amount = affiliate.SponsoredLink.EPM / 1000;
-        var sponsored = affiliate.SponsoredLink;
+        // decimal amount = affiliate.Campaign.EPM / 1000;
+        // var sponsored = affiliate.Campaign;
 
-        if (sponsored.Budget == 0) return;
+        // if (sponsored.Budget == 0) return;
 
-        if (sponsored.Budget >= amount)
-        {
-            sponsored.Budget -= amount;
-            affiliate.Available += amount;
-            affiliate.TotalEarned += amount;
-        }
-        else
-        if (sponsored.Budget > 0)
-        {
-            amount = sponsored.Budget;
-            sponsored.Budget = 0;
-            affiliate.Available += amount;
-            affiliate.TotalEarned += amount;
-        }
+        // if (sponsored.Budget >= amount)
+        // {
+        //     sponsored.Budget -= amount;
+        //     affiliate.Available += amount;
+        //     affiliate.TotalEarned += amount;
+        // }
+        // else
+        // if (sponsored.Budget > 0)
+        // {
+        //     amount = sponsored.Budget;
+        //     sponsored.Budget = 0;
+        //     affiliate.Available += amount;
+        //     affiliate.TotalEarned += amount;
+        // }
 
-        var transaction = new PaymentTransaction
-        {
-            AffiliateLinkId = affiliate.Id,
-            SponsoredLinkId = sponsored.Id,
-            Amount = amount,
-            CompletedAt = DateTime.UtcNow,
-            CreatedAt = DateTime.UtcNow,
-            IsDeposit = false,
-            Status = "COMPLETED",
-            Title = "HIT",
-            EmailModelId = affiliate.EmailModelId
-        };
+        // var transaction = new PaymentTransaction
+        // {
+        //     AffiliateLinkId = affiliate.Id,
+        //     SponsoredLinkId = sponsored.Id,
+        //     Amount = amount,
+        //     CompletedAt = DateTime.UtcNow,
+        //     CreatedAt = DateTime.UtcNow,
+        //     IsDeposit = false,
+        //     Status = "COMPLETED",
+        //     Title = "HIT",
+        //     EmailModelId = affiliate.EmailModelId
+        // };
 
-        _db.AffiliateLinks.Update(affiliate);
-        _db.SponsoredLinks.Update(sponsored);
-        await _db.PaymentTransactions.AddAsync(transaction);
-        await _db.SaveChangesAsync().ConfigureAwait(false);
+        // _db.AffiliateLinks.Update(affiliate);
+        // _db.Campaigns.Update(sponsored);
+        // await _db.PaymentTransactions.AddAsync(transaction);
+        // await _db.SaveChangesAsync().ConfigureAwait(false);
     }
 }
