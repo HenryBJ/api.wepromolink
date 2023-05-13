@@ -1,6 +1,8 @@
+using WePromoLink.Interfaces;
+
 namespace WePromoLink.Models;
 
-public class EarnLastWeekUserModel: StatsBaseModel
+public class EarnLastWeekUserModel: StatsBaseModel, IHasValue<decimal>
 {
     public Guid Id { get; set; }
     public virtual UserModel User { get; set; }

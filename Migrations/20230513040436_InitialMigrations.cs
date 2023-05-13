@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WePromoLink.Migrations
 {
-    public partial class initialMigration : Migration
+    public partial class InitialMigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -1575,12 +1575,12 @@ namespace WePromoLink.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("49c1e687-61b4-4e01-b264-f744b821534b"), 0m, "", "", true, 9m, 0m, "j_L41bzqdiwu", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                values: new object[] { new Guid("4067cdee-3657-4f74-acd3-adc7a4ba182a"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "nV-FvYAYM5rc", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("78caea83-fd1e-4945-b353-656c1dac833b"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "WCb1yfH1bJhw", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
+                values: new object[] { new Guid("4560de15-3078-4c85-a672-b38d396692f1"), 0m, "", "", true, 9m, 0m, "RsaCZ1zvDRzT", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Availables_UserModelId",
@@ -1864,7 +1864,8 @@ namespace WePromoLink.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_SharedLastWeekUsers_UserModelId",
                 table: "SharedLastWeekUsers",
-                column: "UserModelId");
+                column: "UserModelId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_SharedTodayOnCampaigns_CampaignModelId",
@@ -1875,7 +1876,8 @@ namespace WePromoLink.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_SharedTodayUsers_UserModelId",
                 table: "SharedTodayUsers",
-                column: "UserModelId");
+                column: "UserModelId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubscriptionPlans_ExternalId",

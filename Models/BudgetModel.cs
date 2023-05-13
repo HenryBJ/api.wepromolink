@@ -1,6 +1,8 @@
+using WePromoLink.Interfaces;
+
 namespace WePromoLink.Models;
 
-public class BudgetModel: StatsBaseModel
+public class BudgetModel: StatsBaseModel, IHasValue<decimal>
 {
     public Guid Id { get; set; }
     public UserModel User { get; set; }

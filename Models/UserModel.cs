@@ -24,6 +24,8 @@ public class UserModel
     public LockedModel Locked { get; set; }
     public PayoutStatModel PayoutStat { get; set; }
     public ProfitModel Profit { get; set; }
+    public SharedTodayUserModel SharedToday {get; set;}
+    public SharedLastWeekUserModel SharedLastWeek { get; set; }
     public ClickLastWeekOnLinksUserModel ClickLastWeekOnLinksUser { get; set; }
     public ClicksLastWeekOnCampaignUserModel ClicksLastWeekOnCampaignUser { get; set; }
     public ClicksTodayOnCampaignUserModel ClicksTodayOnCampaignUser { get; set; }

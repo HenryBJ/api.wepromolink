@@ -38,6 +38,8 @@ public class UserService : IUserService
             CustomerId = user.CustomerId,
             Available = new AvailableModel(),
             Budget = new BudgetModel(),
+            SharedToday = new SharedTodayUserModel(),
+            SharedLastWeek = new SharedLastWeekUserModel(),
             ClickLastWeekOnLinksUser = new ClickLastWeekOnLinksUserModel(),
             ClicksLastWeekOnCampaignUser = new ClicksLastWeekOnCampaignUserModel(),
             ClicksTodayOnCampaignUser = new ClicksTodayOnCampaignUserModel(),

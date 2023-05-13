@@ -1,6 +1,8 @@
+using WePromoLink.Interfaces;
+
 namespace WePromoLink.Models;
 
-public class SharedTodayUserModel: StatsBaseModel
+public class SharedTodayUserModel: StatsBaseModel, IHasValue<int>
 {
     public Guid Id { get; set; }
     public virtual UserModel User { get; set; }

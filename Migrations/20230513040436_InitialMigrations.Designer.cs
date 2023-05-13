@@ -12,8 +12,8 @@ using WePromoLink.Data;
 namespace WePromoLink.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230510030658_initialMigration")]
-    partial class initialMigration
+    [Migration("20230513040436_InitialMigrations")]
+    partial class InitialMigrations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -2731,7 +2731,8 @@ namespace WePromoLink.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserModelId");
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
 
                     b.ToTable("SharedLastWeekUsers");
                 });
@@ -2800,7 +2801,8 @@ namespace WePromoLink.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserModelId");
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
 
                     b.ToTable("SharedTodayUsers");
                 });
@@ -2930,14 +2932,14 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("78caea83-fd1e-4945-b353-656c1dac833b"),
+                            Id = new Guid("4067cdee-3657-4f74-acd3-adc7a4ba182a"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             ContainAds = false,
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "WCb1yfH1bJhw",
+                            ExternalId = "nV-FvYAYM5rc",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
@@ -2950,14 +2952,14 @@ namespace WePromoLink.Migrations
                         },
                         new
                         {
-                            Id = new Guid("49c1e687-61b4-4e01-b264-f744b821534b"),
+                            Id = new Guid("4560de15-3078-4c85-a672-b38d396692f1"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             ContainAds = true,
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "j_L41bzqdiwu",
+                            ExternalId = "RsaCZ1zvDRzT",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",
@@ -3503,8 +3505,8 @@ namespace WePromoLink.Migrations
             modelBuilder.Entity("WePromoLink.Models.SharedLastWeekUserModel", b =>
                 {
                     b.HasOne("WePromoLink.Models.UserModel", "User")
-                        .WithMany()
-                        .HasForeignKey("UserModelId")
+                        .WithOne("SharedLastWeek")
+                        .HasForeignKey("WePromoLink.Models.SharedLastWeekUserModel", "UserModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -3525,8 +3527,8 @@ namespace WePromoLink.Migrations
             modelBuilder.Entity("WePromoLink.Models.SharedTodayUserModel", b =>
                 {
                     b.HasOne("WePromoLink.Models.UserModel", "User")
-                        .WithMany()
-                        .HasForeignKey("UserModelId")
+                        .WithOne("SharedToday")
+                        .HasForeignKey("WePromoLink.Models.SharedTodayUserModel", "UserModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -3691,6 +3693,12 @@ namespace WePromoLink.Migrations
                         .IsRequired();
 
                     b.Navigation("Profit")
+                        .IsRequired();
+
+                    b.Navigation("SharedLastWeek")
+                        .IsRequired();
+
+                    b.Navigation("SharedToday")
                         .IsRequired();
 
                     b.Navigation("Transactions");
