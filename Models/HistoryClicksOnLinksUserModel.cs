@@ -1,6 +1,6 @@
 namespace WePromoLink.Models;
 
-public class HistoryClicksOnLinksUserModel:HistoryStatsBaseModel<int>
+public class HistoryClicksOnLinksUserModel:HistoryStatsBaseModel<int, DateTime>
 {
     public Guid Id { get; set; }
     public virtual UserModel User { get; set; }
@@ -18,15 +18,15 @@ public class HistoryClicksOnLinksUserModel:HistoryStatsBaseModel<int>
         X7 = 0;
         X8 = 0;
         X9 = 0;
-        L0 = DateTime.UtcNow.DayOfWeek.ToString();
-        L1 = DateTime.UtcNow.AddDays(1).DayOfWeek.ToString();
-        L2 = DateTime.UtcNow.AddDays(2).DayOfWeek.ToString();
-        L3 = DateTime.UtcNow.AddDays(3).DayOfWeek.ToString();
-        L4 = DateTime.UtcNow.AddDays(4).DayOfWeek.ToString();
-        L5 = DateTime.UtcNow.AddDays(5).DayOfWeek.ToString();
-        L6 = DateTime.UtcNow.AddDays(6).DayOfWeek.ToString();
-        L7 = DateTime.UtcNow.AddDays(7).DayOfWeek.ToString();
-        L8 = DateTime.UtcNow.AddDays(8).DayOfWeek.ToString();
-        L9 = DateTime.UtcNow.AddDays(9).DayOfWeek.ToString();        
+        L0 = DateTime.UtcNow.AddDays(-9);
+        L1 = DateTime.UtcNow.AddDays(-8);
+        L2 = DateTime.UtcNow.AddDays(-7);
+        L3 = DateTime.UtcNow.AddDays(-6);
+        L4 = DateTime.UtcNow.AddDays(-5);
+        L5 = DateTime.UtcNow.AddDays(-4);
+        L6 = DateTime.UtcNow.AddDays(-3);
+        L7 = DateTime.UtcNow.AddDays(-2);
+        L8 = DateTime.UtcNow.AddDays(-1);
+        L9 = DateTime.UtcNow;        
     }
 }

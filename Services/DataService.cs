@@ -1,16 +1,9 @@
-using FirebaseAdmin.Auth;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Stripe;
 using WePromoLink.Data;
 using WePromoLink.DTO;
 using WePromoLink.Interfaces;
 using WePromoLink.Models;
-using WePromoLink.Settings;
 
 namespace WePromoLink.Services;
 
@@ -24,7 +17,7 @@ public class DataService : IDataService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    private IResult AddCacheHistoricalData<T, R>(T result) where T : HistoryStatsBaseModel<R>
+    private IResult AddCacheHistoricalData<T, R, L>(T result) where T : HistoryStatsBaseModel<R,L>
     {
         if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("If-None-Match", out StringValues requestETagValues))
         {
@@ -42,28 +35,28 @@ public class DataService : IDataService
             MaxAge = result.MaxAge!.Value
         };
         _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-        return Results.Ok(ConvertToHistoricalData<T, R>(result));
+        return Results.Ok(ConvertToHistoricalData<T, R, L>(result));
     }
 
-    private HistoricalData<R> ConvertToHistoricalData<T, R>(T result) where T : HistoryStatsBaseModel<R>
+    private HistoricalData<R> ConvertToHistoricalData<T, R, L>(T result) where T : HistoryStatsBaseModel<R,L>
     {
         var item = new HistoricalData<R>();
         item.DataLabels = new List<string>();
         item.DataLabels.Add("Data");
         item.Labels = new List<string>();
-        item.Labels.Add(result.L0 ?? "");
-        item.Labels.Add(result.L1 ?? "");
-        item.Labels.Add(result.L2 ?? "");
-        item.Labels.Add(result.L3 ?? "");
-        item.Labels.Add(result.L4 ?? "");
-        item.Labels.Add(result.L5 ?? "");
-        item.Labels.Add(result.L6 ?? "");
-        item.Labels.Add(result.L7 ?? "");
-        item.Labels.Add(result.L8 ?? "");
-        item.Labels.Add(result.L9 ?? "");
+        item.Labels.Add(result?.L0?.ToString() ?? "");
+        item.Labels.Add(result?.L1?.ToString() ?? "");
+        item.Labels.Add(result?.L2?.ToString() ?? "");
+        item.Labels.Add(result?.L3?.ToString() ?? "");
+        item.Labels.Add(result?.L4?.ToString() ?? "");
+        item.Labels.Add(result?.L5?.ToString() ?? "");
+        item.Labels.Add(result?.L6?.ToString() ?? "");
+        item.Labels.Add(result?.L7?.ToString() ?? "");
+        item.Labels.Add(result?.L8?.ToString() ?? "");
+        item.Labels.Add(result?.L9?.ToString() ?? "");
         item.Data = new List<List<R>>();
         item.Data.Add(new List<R>{
-            result.X0!,
+            result!.X0!,
             result.X1!,
             result.X2!,
             result.X3!,
@@ -206,7 +199,63 @@ public class DataService : IDataService
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksOnLinksUser).SingleOrDefaultAsync();
-        if (user != null) return AddCacheHistoricalData<HistoryClicksOnLinksUserModel, int>(user.HistoryClicksOnLinksUser);
+        if (user != null) return AddCacheHistoricalData<HistoryClicksOnLinksUserModel, int, DateTime>(user.HistoryClicksOnLinksUser);
+        return Results.NotFound();
+    }
+
+    public async Task<IResult> GetHistoricalEarnOnLinks()
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryEarnOnLinksUser).SingleOrDefaultAsync();
+        if (user != null) return AddCacheHistoricalData<HistoryEarnOnLinksUserModel, decimal, DateTime>(user.HistoryEarnOnLinksUser);
+        return Results.NotFound();
+    }
+
+    public async Task<IResult> GetHistoricalClickOnCampaigns()
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksOnCampaignUser).SingleOrDefaultAsync();
+        if (user != null) return AddCacheHistoricalData<HistoryClicksOnCampaignUserModel, int, DateTime>(user.HistoryClicksOnCampaignUser);
+        return Results.NotFound();
+    }
+
+    public async Task<IResult> GetHistoricalClickOnShares()
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksOnSharesUser).SingleOrDefaultAsync();
+        if (user != null) return AddCacheHistoricalData<HistoryClicksOnSharesUserModel, int, DateTime>(user.HistoryClicksOnSharesUser);
+        return Results.NotFound();
+    }
+
+    public async Task<IResult> GetHistoricalClickByCountriesOnLinks()
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksByCountriesOnLinkUser).SingleOrDefaultAsync();
+        if (user != null) return AddCacheHistoricalData<HistoryClicksByCountriesOnLinkUserModel, int, string>(user.HistoryClicksByCountriesOnLinkUser);
+        return Results.NotFound();
+    }
+
+    public async Task<IResult> GetHistoricalEarnByCountries()
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryEarnByCountriesUser).SingleOrDefaultAsync();
+        if (user != null) return AddCacheHistoricalData<HistoryEarnByCountriesUserModel, decimal, string>(user.HistoryEarnByCountriesUser);
+        return Results.NotFound();
+    }
+
+    public async Task<IResult> GetHistoricalClickByCountriesOnCampaigns()
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksByCountriesOnCampaignUser).SingleOrDefaultAsync();
+        if (user != null) return AddCacheHistoricalData<HistoryClicksByCountriesOnCampaignUserModel, int, string>(user.HistoryClicksByCountriesOnCampaignUser);
+        return Results.NotFound();
+    }
+
+    public async Task<IResult> GetHistoricalSharedByUsers()
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistorySharedByUsersUser).SingleOrDefaultAsync();
+        if (user != null) return AddCacheHistoricalData<HistorySharedByUsersUserModel, int, string>(user.HistorySharedByUsersUser);
         return Results.NotFound();
     }
 }

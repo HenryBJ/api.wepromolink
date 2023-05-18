@@ -198,7 +198,7 @@ public class DataController : ControllerBase
             return Results.Problem();
         }
     }
-// From here below
+    // From here below
 
     [HttpGet]
     [Authorize]
@@ -242,6 +242,119 @@ public class DataController : ControllerBase
         try
         {
             return await _service.GetHistoricalClickOnLinks();
+        }
+        catch (System.Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Results.Problem();
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historicalearnonlink")]
+    public async Task<IResult> GetHistoricalEarnOnLinks()
+    {
+        try
+        {
+            return await _service.GetHistoricalEarnOnLinks();
+        }
+        catch (System.Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Results.Problem();
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historicalclickoncampaigns")]
+    public async Task<IResult> GetHistoricalClickOnCampaigns()
+    {
+        try
+        {
+            return await _service.GetHistoricalClickOnCampaigns();
+        }
+        catch (System.Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Results.Problem();
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historicalclickonshares")]
+    public async Task<IResult> GetHistoricalClickOnShares()
+    {
+        try
+        {
+            return await _service.GetHistoricalClickOnShares();
+        }
+        catch (System.Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Results.Problem();
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historicalclickbycountriesonlinks")]
+    public async Task<IResult> GetHistoricalClickByCountriesOnLinks()
+    {
+        try
+        {
+            return await _service.GetHistoricalClickByCountriesOnLinks();
+        }
+        catch (System.Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Results.Problem();
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historicalearnbycountries")]
+    public async Task<IResult> GetHistoricalEarnByCountries()
+    {
+        try
+        {
+            return await _service.GetHistoricalEarnByCountries();
+        }
+        catch (System.Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Results.Problem();
+        }
+    }
+
+
+    [HttpGet]
+    [Authorize]
+    [Route("historicalclickbycountriesoncampaigns")]
+    public async Task<IResult> GetHistoricalClickByCountriesOnCampaigns()
+    {
+        try
+        {
+            return await _service.GetHistoricalClickByCountriesOnCampaigns();
+        }
+        catch (System.Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Results.Problem();
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historicalsharedbyusers")]
+    public async Task<IResult> GetHistoricalSharedByUser()
+    {
+        try
+        {
+            return await _service.GetHistoricalSharedByUsers();
         }
         catch (System.Exception ex)
         {

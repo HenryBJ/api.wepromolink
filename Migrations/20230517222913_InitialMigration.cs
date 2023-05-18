@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WePromoLink.Migrations
 {
-    public partial class InitialMigrations : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -467,16 +467,16 @@ namespace WePromoLink.Migrations
                     X7 = table.Column<int>(type: "int", nullable: false),
                     X8 = table.Column<int>(type: "int", nullable: false),
                     X9 = table.Column<int>(type: "int", nullable: false),
-                    L0 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L9 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    L0 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L1 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L2 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L3 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L4 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L5 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L6 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L7 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L8 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L9 = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -511,16 +511,16 @@ namespace WePromoLink.Migrations
                     X7 = table.Column<int>(type: "int", nullable: false),
                     X8 = table.Column<int>(type: "int", nullable: false),
                     X9 = table.Column<int>(type: "int", nullable: false),
-                    L0 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L9 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    L0 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L1 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L2 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L3 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L4 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L5 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L6 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L7 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L8 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L9 = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -555,16 +555,16 @@ namespace WePromoLink.Migrations
                     X7 = table.Column<int>(type: "int", nullable: false),
                     X8 = table.Column<int>(type: "int", nullable: false),
                     X9 = table.Column<int>(type: "int", nullable: false),
-                    L0 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L9 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    L0 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L1 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L2 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L3 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L4 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L5 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L6 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L7 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L8 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L9 = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -643,16 +643,16 @@ namespace WePromoLink.Migrations
                     X7 = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     X8 = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     X9 = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
-                    L0 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L9 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    L0 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L1 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L2 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L3 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L4 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L5 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L6 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L7 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L8 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L9 = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1003,16 +1003,16 @@ namespace WePromoLink.Migrations
                     X7 = table.Column<int>(type: "int", nullable: false),
                     X8 = table.Column<int>(type: "int", nullable: false),
                     X9 = table.Column<int>(type: "int", nullable: false),
-                    L0 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L9 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    L0 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L1 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L2 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L3 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L4 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L5 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L6 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L7 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L8 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L9 = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1091,16 +1091,16 @@ namespace WePromoLink.Migrations
                     X7 = table.Column<int>(type: "int", nullable: false),
                     X8 = table.Column<int>(type: "int", nullable: false),
                     X9 = table.Column<int>(type: "int", nullable: false),
-                    L0 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L9 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    L0 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L1 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L2 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L3 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L4 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L5 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L6 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L7 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L8 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L9 = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1352,16 +1352,16 @@ namespace WePromoLink.Migrations
                     X7 = table.Column<int>(type: "int", nullable: false),
                     X8 = table.Column<int>(type: "int", nullable: false),
                     X9 = table.Column<int>(type: "int", nullable: false),
-                    L0 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L9 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    L0 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L1 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L2 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L3 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L4 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L5 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L6 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L7 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L8 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L9 = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1396,16 +1396,16 @@ namespace WePromoLink.Migrations
                     X7 = table.Column<int>(type: "int", nullable: false),
                     X8 = table.Column<int>(type: "int", nullable: false),
                     X9 = table.Column<int>(type: "int", nullable: false),
-                    L0 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L9 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    L0 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L1 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L2 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L3 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L4 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L5 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L6 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L7 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L8 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L9 = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1484,16 +1484,16 @@ namespace WePromoLink.Migrations
                     X7 = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     X8 = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     X9 = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
-                    L0 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    L9 = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    L0 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L1 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L2 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L3 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L4 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L5 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L6 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L7 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L8 = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    L9 = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1575,12 +1575,12 @@ namespace WePromoLink.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("4067cdee-3657-4f74-acd3-adc7a4ba182a"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "nV-FvYAYM5rc", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
+                values: new object[] { new Guid("16faf161-0a94-41ee-a152-87743881716f"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "BIrsuGNeKR0N", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("4560de15-3078-4c85-a672-b38d396692f1"), 0m, "", "", true, 9m, 0m, "RsaCZ1zvDRzT", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                values: new object[] { new Guid("6a3a1af0-aae5-4b9d-93ea-0fefb3b18c86"), 0m, "", "", true, 9m, 0m, "0ex2ahdHZjz9", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Availables_UserModelId",

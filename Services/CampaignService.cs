@@ -7,6 +7,8 @@ using WePromoLink.Data;
 using WePromoLink.DTO;
 using WePromoLink.Models;
 using WePromoLink.Settings;
+using WePromoLink;
+using WePromoLink.Enums;
 
 namespace WePromoLink.Services;
 
@@ -15,36 +17,120 @@ public class CampaignService : ICampaignService
     private readonly IPaymentService _client;
     private readonly IOptions<BTCPaySettings> _options;
     private readonly DataContext _db;
-    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, IPaymentService client)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILogger<CampaignService> _logger;
+    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, IPaymentService client, IHttpContextAccessor httpContextAccessor, ILogger<CampaignService> logger)
     {
         _db = db;
         _options = options;
         _client = client;
+        _httpContextAccessor = httpContextAccessor;
+        _logger = logger;
     }
 
     public async Task<string> CreateCampaign(Campaign campaign)
     {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
+
+        if (user == null) throw new Exception("User does not exits");
+        if (user.Available.Value < campaign.Budget) throw new Exception("Insufficient balance");
+        if(!user.IsSubscribed) throw new Exception("Subscription is not active");
+        if(user.IsBlocked) throw new Exception("User is blocked");
+
+        var externalId = await Nanoid.Nanoid.GenerateAsync(size: 12);
+        var available = user.Available;
+
         var item = new CampaignModel
         {
+            Id = Guid.NewGuid(),
             Budget = campaign.Budget,
             CreatedAt = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow,
             Description = campaign.Description,
             EPM = campaign.EPM,
-            ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+            ExternalId = externalId,
             ImageUrl = campaign.ImageUrl,
             Title = campaign.Title,
-            Url = campaign.Url
+            Url = campaign.Url,
+            IsArchived = false,
+            IsBlocked = false,
+            SharedLastWeekOnCampaign = new SharedLastWeekOnCampaignModel(),
+            Status = campaign.Budget >= 10,
+            SharedTodayOnCampaignModel = new SharedTodayOnCampaignModel(),
+            UserModelId = user.Id,
+            ClicksLastWeekOnCampaign = new ClicksLastWeekOnCampaignModel(),
+            ClicksTodayOnCampaign = new ClicksTodayOnCampaignModel(),
+            HistoryClicksByCountriesOnCampaign = new HistoryClicksByCountriesOnCampaignModel(),
+            HistoryClicksOnCampaign = new HistoryClicksOnCampaignModel(),
+            HistorySharedByUsersOnCampaign = new HistorySharedByUsersOnCampaignModel(),
+            HistorySharedOnCampaign = new HistorySharedOnCampaignModel()
         };
 
-        return "ok"; // for testing
+        using (var transaction = _db.Database.BeginTransaction())
+        {
+            try
+            {
+                // Validate Available balance    
+                available.Value = available.Value - campaign.Budget;
+                _db.Availables.Update(available);
+                await _db.SaveChangesAsync();
+                if (available.Value < 0) throw new Exception("Negative balance");
 
-        // Asignarle el usuario que mando a crear la campaign
+                // Add Campaign
+                await _db.Campaigns.AddAsync(item);
+                await _db.SaveChangesAsync();
 
-        // Validar que de verdad se le pueda asignar ese budget
-        
-        // Asignarle el budget
+                // Create Payment Transaction
+                var paymentTrans = new PaymentTransaction
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = campaign.Budget, 
+                    CampaignModelId = item.Id,
+                    CompletedAt = DateTime.UtcNow.AddSeconds(1),
+                    CreatedAt = DateTime.UtcNow,
+                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                    Status = TransactionStatusEnum.Completed,
+                    Title = $"Campaign {item.Title} created",
+                    TransactionType = TransactionTypeEnum.CreateCampaign,
+                    UserModelId = user.Id
+                };
+                await _db.PaymentTransactions.AddAsync(paymentTrans);
+                await _db.SaveChangesAsync();
 
-        // Generar una transaccion de : Creacion de campaign si el budget es > 0
+                //Create a Notification
+                var noti = new NotificationModel {
+                    Id = Guid.NewGuid(),
+                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                    Status = NotificationStatusEnum.Unread,
+                    UserModelId = user.Id,
+                    Title = "Campaign created",
+                    Message = $"Your campaign called '{item.Title}' has been successfully created. It has been assigned a budget of {campaign.Budget.ToString("0.00")} USD. You have {available.Value.ToString("0.00")} USD remaining in your account to create more campaigns.",
+                };
+                await _db.Notifications.AddAsync(noti);
+                await _db.SaveChangesAsync();
+
+                //Create generic event
+                var gEvent = new GenericEventModel {
+                     Id = Guid.NewGuid(),
+                     CreatedAt = DateTime.UtcNow,
+                     EventType = "INFO",
+                     Message = $"{user.Fullname} created campaign {campaign.Title} with {campaign.Budget} USD, balance remaining {available.Value} USD",
+                     Source = "WePromoLink"
+                };
+                await _db.GenericEvent.AddAsync(gEvent);
+                await _db.SaveChangesAsync();
+
+                transaction.Commit();
+                return externalId;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                transaction.Rollback();
+                throw new Exception("Invalid Data");
+            }
+        }
 
     }
 

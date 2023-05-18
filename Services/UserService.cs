@@ -48,11 +48,11 @@ public class UserService : IUserService
             EarnTodayUser = new EarnTodayUserModel(),
             HistoryClicksByCountriesOnCampaignUser = new HistoryClicksByCountriesOnCampaignUserModel(),
             HistoryClicksByCountriesOnLinkUser = new HistoryClicksByCountriesOnLinkUserModel(),
-            HistoryClicksOnCampaignUser = new HistoryClicksOnCampaignUserModel(),
-            HistoryClicksOnLinksUser = new HistoryClicksOnLinksUserModel(),
-            HistoryClicksOnSharesUser = new HistoryClicksOnSharesUserModel(),
+            HistoryClicksOnCampaignUser = new HistoryClicksOnCampaignUserModel(), //done
+            HistoryClicksOnLinksUser = new HistoryClicksOnLinksUserModel(), // done
+            HistoryClicksOnSharesUser = new HistoryClicksOnSharesUserModel(), //done
             HistoryEarnByCountriesUser = new HistoryEarnByCountriesUserModel(),
-            HistoryEarnOnLinksUser = new HistoryEarnOnLinksUserModel(),
+            HistoryEarnOnLinksUser = new HistoryEarnOnLinksUserModel(), //done
             HistorySharedByUsersUser = new HistorySharedByUsersUserModel(),
             Locked = new LockedModel(),
             PayoutStat = new PayoutStatModel(),

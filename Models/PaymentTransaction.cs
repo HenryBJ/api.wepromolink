@@ -15,8 +15,8 @@ public class PaymentTransaction
     public Guid? CampaignModelId { get; set; }
     public string Title { get; set; }
     public decimal Amount { get; set; }
-    public string TransactionType { get; set; }
-    public string Status { get; set; }
+    public string TransactionType { get; set; } // See TransactionTypeEnum
+    public string Status { get; set; } // See TransactionStatusEnum
     public string? Metadata { get; set; }
 
     public DateTime CreatedAt { get; set; }

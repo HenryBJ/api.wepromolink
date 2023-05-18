@@ -1,6 +1,6 @@
 namespace WePromoLink.Models;
 
-public class HistoryClicksByCountriesOnLinkModel:HistoryStatsBaseModel<int>
+public class HistoryClicksByCountriesOnLinkModel:HistoryStatsBaseModel<int, string>
 {
     public Guid Id { get; set; }
     public virtual LinkModel Link { get; set; }

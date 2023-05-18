@@ -49,7 +49,7 @@ public class CampaignController : ControllerBase
             var validationResult = await _validator.ValidateAsync(campaign);
             if (!validationResult.IsValid)
             {
-                return Results.ValidationProblem(validationResult.ToDictionary());
+                return Results.BadRequest(validationResult.ToDictionary());
             }
 
             var result = await _campaignService.CreateCampaign(campaign);

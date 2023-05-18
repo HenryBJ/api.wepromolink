@@ -1094,35 +1094,35 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("L0")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L0")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L1")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L1")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L2")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L3")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L3")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L4")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L4")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L5")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L5")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L6")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L6")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L7")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L7")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L8")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L8")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L9")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L9")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -1186,35 +1186,35 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("L0")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L0")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L1")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L1")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L2")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L3")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L3")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L4")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L4")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L5")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L5")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L6")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L6")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L7")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L7")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L8")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L8")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L9")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L9")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -1281,35 +1281,35 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("L0")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L0")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L1")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L1")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L2")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L3")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L3")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L4")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L4")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L5")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L5")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L6")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L6")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L7")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L7")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L8")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L8")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L9")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L9")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -1376,35 +1376,35 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("L0")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L0")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L1")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L1")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L2")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L3")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L3")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L4")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L4")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L5")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L5")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L6")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L6")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L7")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L7")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L8")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L8")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L9")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L9")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -1471,35 +1471,35 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("L0")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L0")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L1")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L1")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L2")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L3")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L3")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L4")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L4")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L5")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L5")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L6")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L6")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L7")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L7")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L8")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L8")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L9")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L9")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -1565,35 +1565,35 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("L0")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L0")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L1")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L1")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L2")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L3")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L3")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L4")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L4")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L5")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L5")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L6")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L6")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L7")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L7")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L8")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L8")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L9")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L9")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -1870,35 +1870,35 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("L0")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L0")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L1")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L1")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L2")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L3")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L3")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L4")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L4")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L5")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L5")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L6")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L6")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L7")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L7")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L8")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L8")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L9")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L9")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -1975,35 +1975,35 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("L0")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L0")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L1")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L1")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L2")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L3")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L3")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L4")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L4")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L5")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L5")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L6")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L6")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L7")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L7")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L8")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L8")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L9")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L9")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -2273,35 +2273,35 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("L0")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L0")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L1")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L1")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L2")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L2")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L3")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L3")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L4")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L4")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L5")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L5")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L6")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L6")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L7")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L7")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L8")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L8")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("L9")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("L9")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("LastModified")
                         .HasColumnType("datetime2");
@@ -2930,14 +2930,14 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("4067cdee-3657-4f74-acd3-adc7a4ba182a"),
+                            Id = new Guid("16faf161-0a94-41ee-a152-87743881716f"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             ContainAds = false,
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "nV-FvYAYM5rc",
+                            ExternalId = "BIrsuGNeKR0N",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
@@ -2950,14 +2950,14 @@ namespace WePromoLink.Migrations
                         },
                         new
                         {
-                            Id = new Guid("4560de15-3078-4c85-a672-b38d396692f1"),
+                            Id = new Guid("6a3a1af0-aae5-4b9d-93ea-0fefb3b18c86"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             ContainAds = true,
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "RsaCZ1zvDRzT",
+                            ExternalId = "0ex2ahdHZjz9",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",

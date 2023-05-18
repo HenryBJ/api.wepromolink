@@ -19,4 +19,11 @@ public interface IDataService
     Task<IResult> GetSharedToday();
     Task<IResult> GetSharedLastWeek();
     Task<IResult> GetHistoricalClickOnLinks();
+    Task<IResult> GetHistoricalEarnOnLinks();
+    Task<IResult> GetHistoricalClickOnCampaigns();
+    Task<IResult> GetHistoricalClickOnShares();
+    Task<IResult> GetHistoricalClickByCountriesOnLinks();
+    Task<IResult> GetHistoricalEarnByCountries();
+    Task<IResult> GetHistoricalClickByCountriesOnCampaigns();
+    Task<IResult> GetHistoricalSharedByUsers();
 }
