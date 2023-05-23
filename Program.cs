@@ -30,6 +30,10 @@ var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddControllers();
 builder.Services.Configure<BTCPaySettings>(builder.Configuration.GetSection("BTCPay"));
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 2000;
+}); //Remplazar por Redis cuando se use microservicios
 builder.Services.AddScoped<CampaignValidator>();
 builder.Services.AddScoped<AffiliateLinkValidator>();
 builder.Services.AddScoped<FundSponsoredLinkValidator>();

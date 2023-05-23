@@ -14,51 +14,129 @@ public class CampaignController : ControllerBase
 
     private readonly ICampaignService _campaignService;
     private readonly CampaignValidator _validator;
+    private readonly ILogger<CampaignController> _logger;
 
-    public CampaignController(ICampaignService campaignService, CampaignValidator validator, IHttpContextAccessor httpContextAccessor)
+    public CampaignController(ICampaignService campaignService, CampaignValidator validator, IHttpContextAccessor httpContextAccessor, ILogger<CampaignController> logger)
     {
         _campaignService = campaignService;
         _validator = validator;
+        _logger = logger;
     }
 
     [HttpGet]
     [Authorize]
-    [Route("all/{page=1}/{cant=50}/{filter=''}")]
-    public async Task<IResult> GetAll(int? page, int? cant, string? filter)
+    [Route("all/{page=1}/{cant=25}/{filter?}")]
+    public async Task<IActionResult> GetAll(int? page, int? cant, string? filter)
     {
         try
         {
             var results = await _campaignService.GetAll(page, cant, filter);
-            return Results.Ok(results);
+            return new OkObjectResult(results);
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("detail/{id}")]
+    public async Task<IActionResult> GetDetails(string id)
+    {
+        try
+        {
+            var results = await _campaignService.GetDetails(id);
+            return new OkObjectResult(results);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpPost]
     [Authorize]
     [Route("create")]
-    public async Task<IResult> Create(Campaign campaign)
+    public async Task<IActionResult> Create(Campaign campaign)
     {
-        if (campaign == null) return Results.BadRequest();
+        if (campaign == null) return BadRequest();
         try
         {
             var validationResult = await _validator.ValidateAsync(campaign);
             if (!validationResult.IsValid)
             {
-                return Results.BadRequest(validationResult.ToDictionary());
+                return BadRequest(validationResult.ToDictionary());
             }
 
             var result = await _campaignService.CreateCampaign(campaign);
-            return Results.Ok(result);
+            return Ok(result);
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
+
+    [HttpPut]
+    [Authorize]
+    [Route("edit/{id}")]
+    public async Task<IActionResult> Edit(string id, [FromBody] Campaign campaign)
+    {
+        if (campaign == null || string.IsNullOrEmpty(id)) return BadRequest();
+        try
+        {
+            var validationResult = await _validator.ValidateAsync(campaign);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.ToDictionary());
+            }
+
+            await _campaignService.Edit(id, campaign);
+            return Ok();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete]
+    [Authorize]
+    [Route("delete/{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        try
+        {
+            await _campaignService.Delete(id);
+            return Ok();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("publish/{id}/{status}")]
+    public async Task<IActionResult> Publish(string id, bool status)
+    {
+        try
+        {
+            await _campaignService.Publish(id, status);
+            return Ok();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return BadRequest(ex.Message);
+        }
+    }
+    
 }

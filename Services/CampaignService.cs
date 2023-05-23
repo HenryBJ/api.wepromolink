@@ -9,6 +9,8 @@ using WePromoLink.Models;
 using WePromoLink.Settings;
 using WePromoLink;
 using WePromoLink.Enums;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WePromoLink.Services;
 
@@ -19,13 +21,15 @@ public class CampaignService : ICampaignService
     private readonly DataContext _db;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<CampaignService> _logger;
-    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, IPaymentService client, IHttpContextAccessor httpContextAccessor, ILogger<CampaignService> logger)
+    private readonly IMemoryCache _cache;
+    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, IPaymentService client, IHttpContextAccessor httpContextAccessor, ILogger<CampaignService> logger, IMemoryCache cache)
     {
         _db = db;
         _options = options;
         _client = client;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
+        _cache = cache;
     }
 
     public async Task<string> CreateCampaign(Campaign campaign)
@@ -35,8 +39,8 @@ public class CampaignService : ICampaignService
 
         if (user == null) throw new Exception("User does not exits");
         if (user.Available.Value < campaign.Budget) throw new Exception("Insufficient balance");
-        if(!user.IsSubscribed) throw new Exception("Subscription is not active");
-        if(user.IsBlocked) throw new Exception("User is blocked");
+        if (!user.IsSubscribed) throw new Exception("Subscription is not active");
+        if (user.IsBlocked) throw new Exception("User is blocked");
 
         var externalId = await Nanoid.Nanoid.GenerateAsync(size: 12);
         var available = user.Available;
@@ -73,6 +77,7 @@ public class CampaignService : ICampaignService
             {
                 // Validate Available balance    
                 available.Value = available.Value - campaign.Budget;
+                available.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
                 _db.Availables.Update(available);
                 await _db.SaveChangesAsync();
                 if (available.Value < 0) throw new Exception("Negative balance");
@@ -85,7 +90,7 @@ public class CampaignService : ICampaignService
                 var paymentTrans = new PaymentTransaction
                 {
                     Id = Guid.NewGuid(),
-                    Amount = campaign.Budget, 
+                    Amount = campaign.Budget,
                     CampaignModelId = item.Id,
                     CompletedAt = DateTime.UtcNow.AddSeconds(1),
                     CreatedAt = DateTime.UtcNow,
@@ -99,24 +104,26 @@ public class CampaignService : ICampaignService
                 await _db.SaveChangesAsync();
 
                 //Create a Notification
-                var noti = new NotificationModel {
+                var noti = new NotificationModel
+                {
                     Id = Guid.NewGuid(),
                     ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
                     Status = NotificationStatusEnum.Unread,
                     UserModelId = user.Id,
                     Title = "Campaign created",
-                    Message = $"Your campaign called '{item.Title}' has been successfully created. It has been assigned a budget of {campaign.Budget.ToString("0.00")} USD. You have {available.Value.ToString("0.00")} USD remaining in your account to create more campaigns.",
+                    Message = $"Your campaign called '{item.Title}' has been successfully created. It has been assigned a budget of {campaign.Budget.ToString("0.00")} USD. You have {available.Value.ToString("0.00")} USD remaining in your account.",
                 };
                 await _db.Notifications.AddAsync(noti);
                 await _db.SaveChangesAsync();
 
                 //Create generic event
-                var gEvent = new GenericEventModel {
-                     Id = Guid.NewGuid(),
-                     CreatedAt = DateTime.UtcNow,
-                     EventType = "INFO",
-                     Message = $"{user.Fullname} created campaign {campaign.Title} with {campaign.Budget} USD, balance remaining {available.Value} USD",
-                     Source = "WePromoLink"
+                var gEvent = new GenericEventModel
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.UtcNow,
+                    EventType = "INFO",
+                    Message = $"{user.Fullname} created campaign {campaign.Title} with {campaign.Budget} USD, balance remaining {available.Value} USD",
+                    Source = "WePromoLink"
                 };
                 await _db.GenericEvent.AddAsync(gEvent);
                 await _db.SaveChangesAsync();
@@ -134,91 +141,218 @@ public class CampaignService : ICampaignService
 
     }
 
-    // public async Task<string> CreateSponsoredLink(CreateSponsoredLink link)
-    // {
-
-    //     // FirebaseAuth auth = FirebaseAuth.DefaultInstance;
-    //     // auth.GetUserAsync() .GetUserByEmailAsync(email);
-
-
-    //     var email = _db.Emails.Where(e => e.Email.ToLower() == link.Email!.ToLower()).SingleOrDefault();
-    //     if (email == null)
-    //     {
-    //         email = new EmailModel { CreatedAt = DateTime.UtcNow, Email = link.Email!.ToLower() };
-    //         _db.Emails.Add(email);
-    //         await _db.SaveChangesAsync();
-    //     }
-
-    //     string externalId = await Nanoid.Nanoid.GenerateAsync(size: 12);
-
-    //     CampaignModel slink = new CampaignModel
-    //     {
-    //         ExternalId = externalId,
-    //         Budget = 0,
-    //         CreatedAt = DateTime.UtcNow,
-    //         EmailModelId = email.Id,
-    //         EPM = link.EPM,
-    //         ImageUrl = link.ImageUrl,
-    //         Title = link.Title!,
-    //         Description = link.Description,
-    //         Url = link.Url!
-    //     };
-
-    //     _db.Campaigns.Add(slink);
-    //     await _db.SaveChangesAsync();
-
-    //     return externalId;
-    // }
-
-    // public async Task<string> FundSponsoredLink(FundSponsoredLink fundLink)
-    // {
-    //     using (var dbTrans = _db.Database.BeginTransaction())
-    //     {
-    //         var email = await _db.Emails.Where(e => e.Email.ToLower() == fundLink.Email!.ToLower()).SingleOrDefaultAsync();
-    //         if (email == null)
-    //         {
-    //             email = new EmailModel { CreatedAt = DateTime.UtcNow, Email = fundLink.Email!.ToLower() };
-    //             _db.Emails.Add(email);
-    //             await _db.SaveChangesAsync();
-    //         }
-
-    //         var slink = await _db.Campaigns.Where(e => e.ExternalId == fundLink.SponsoredLinkId).SingleOrDefaultAsync();
-    //         if (slink == null) throw new Exception("Sponsored link not found");
-
-    //         PaymentTransaction pay = new PaymentTransaction
-    //         {
-    //             Title = "DEPOSIT BTC",
-    //             SponsoredLinkId = slink.Id,
-    //             Amount = fundLink.Amount,
-    //             CreatedAt = DateTime.UtcNow,
-    //             ExpiredAt = DateTime.UtcNow.AddHours(5),
-    //             EmailModelId = email.Id,
-    //             IsDeposit = true,
-    //             Status = "PENDING"
-    //         };
-    //         _db.PaymentTransactions.Add(pay);
-    //         await _db.SaveChangesAsync();
-
-    //         string link = await _client.CreateInvoice(pay);
-    //         if(String.IsNullOrEmpty(link)) throw new Exception("Empty or null link");
-    //         pay.PaymentLink = link;
-    //         await _db.SaveChangesAsync();
-    //         await dbTrans.CommitAsync();
-    //         return link ;
-    //     }
-
-    // }
-
-    public async Task<MyCampaignList> GetAll(int? page, int? cant, string? filter = "")
+    public async Task Delete(string id)
     {
+        if (string.IsNullOrEmpty(id)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
+        if (user == null) throw new Exception("User no found");
+        if(user.IsBlocked) throw new Exception("User is blocked");
+        if(!user.IsSubscribed) throw new Exception("User is not subscribed");
+
+        var campaignModel = await _db.Campaigns.Where(e => e.ExternalId == id).SingleOrDefaultAsync();
+        if (campaignModel == null) throw new Exception("Campaign does not exits");
+        if (campaignModel.IsArchived) throw new Exception("Campaign deleted");
+        var available = user.Available;
+
+        using (var transaction = _db.Database.BeginTransaction())
+        {
+            try
+            {
+                if (campaignModel.Budget > 0)
+                {
+                    available.Value += campaignModel.Budget;
+                    available.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
+                    _db.Availables.Update(available);
+                    await _db.SaveChangesAsync();
+
+                    // Create Payment Transaction
+                    var paymentTrans = new PaymentTransaction
+                    {
+                        Id = Guid.NewGuid(),
+                        Amount = campaignModel.Budget,
+                        CampaignModelId = campaignModel.Id,
+                        CompletedAt = DateTime.UtcNow.AddSeconds(1),
+                        CreatedAt = DateTime.UtcNow,
+                        ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                        Status = TransactionStatusEnum.Completed,
+                        Title = $"Campaign {campaignModel.Title} deleted",
+                        TransactionType = TransactionTypeEnum.DeleteCampaign,
+                        UserModelId = user.Id
+                    };
+                    await _db.PaymentTransactions.AddAsync(paymentTrans);
+                    await _db.SaveChangesAsync();
+                }
+
+                campaignModel.IsArchived = true;
+                campaignModel.Budget = 0;
+                campaignModel.Status = false;
+                _db.Campaigns.Update(campaignModel);
+                await _db.SaveChangesAsync();
+
+                //Create a Notification
+                var noti = new NotificationModel
+                {
+                    Id = Guid.NewGuid(),
+                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                    Status = NotificationStatusEnum.Unread,
+                    UserModelId = user.Id,
+                    Title = "Campaign deleted",
+                    Message = $"Your campaign called '{campaignModel.Title}' has been deleted, remaining campaign budget has been added to the available balance",
+                };
+                await _db.Notifications.AddAsync(noti);
+                await _db.SaveChangesAsync();
+
+                //Create generic event
+                var gEvent = new GenericEventModel
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.UtcNow,
+                    EventType = "INFO",
+                    Message = $"{user.Fullname} delete campaign {campaignModel.Title} with {campaignModel.Budget} USD",
+                    Source = "WePromoLink"
+                };
+                await _db.GenericEvent.AddAsync(gEvent);
+                await _db.SaveChangesAsync();
+
+                transaction.Commit();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                transaction.Rollback();
+                throw new Exception("Invalid Data");
+            }
+        }
+    }
+
+    public async Task Edit(string id, Campaign campaign)
+    {
+        if (string.IsNullOrEmpty(id)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
+        if (user == null) throw new Exception("User no found");
+        if(user.IsBlocked) throw new Exception("User is blocked");
+        if(!user.IsSubscribed) throw new Exception("User is not subscribed");
+
+        var campaignModel = await _db.Campaigns.Where(e => e.ExternalId == id).SingleOrDefaultAsync();
+        if (campaignModel == null) throw new Exception("Campaign does not exits");
+        if (campaignModel.IsArchived) throw new Exception("Campaing deleted");
+        var oldbudget = campaignModel.Budget;
+        var available = user.Available;
+
+        using (var transaction = _db.Database.BeginTransaction())
+        {
+            try
+            {
+                // Validate Available balance    
+                available.Value = available.Value + campaignModel.Budget - campaign.Budget;
+                available.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
+                _db.Availables.Update(available);
+                await _db.SaveChangesAsync();
+                if (available.Value < 0) throw new Exception("Negative balance");
+
+                // Edit Campaign
+                campaignModel.Budget = campaign.Budget;
+                campaignModel.LastUpdated = DateTime.UtcNow;
+                campaignModel.Description = campaign.Description;
+                campaignModel.EPM = campaign.EPM;
+                campaignModel.ImageUrl = campaign.ImageUrl;
+                campaignModel.Title = campaign.Title;
+                campaignModel.Url = campaign.Url;
+                _db.Campaigns.Update(campaignModel);
+                await _db.SaveChangesAsync();
+
+                if (oldbudget != campaignModel.Budget)
+                {
+                    // Create Payment Transaction
+                    var paymentTrans = new PaymentTransaction
+                    {
+                        Id = Guid.NewGuid(),
+                        Amount = campaign.Budget,
+                        CampaignModelId = campaignModel.Id,
+                        CompletedAt = DateTime.UtcNow.AddSeconds(1),
+                        CreatedAt = DateTime.UtcNow,
+                        ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                        Status = TransactionStatusEnum.Completed,
+                        Title = $"Campaign {campaign.Title} edited",
+                        TransactionType = TransactionTypeEnum.EditCampaign,
+                        UserModelId = user.Id
+                    };
+                    await _db.PaymentTransactions.AddAsync(paymentTrans);
+                    await _db.SaveChangesAsync();
+
+
+                    //Create a Notification
+                    var noti = new NotificationModel
+                    {
+                        Id = Guid.NewGuid(),
+                        ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                        Status = NotificationStatusEnum.Unread,
+                        UserModelId = user.Id,
+                        Title = "Campaign edited",
+                        Message = $"Your campaign called '{campaign.Title}' has been successfully edited. It has been assigned a new budget of {campaign.Budget.ToString("0.00")} USD. You have {available.Value.ToString("0.00")} USD remaining in your account.",
+                    };
+                    await _db.Notifications.AddAsync(noti);
+                    await _db.SaveChangesAsync();
+                }
+
+                //Create generic event
+                var gEvent = new GenericEventModel
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.UtcNow,
+                    EventType = "INFO",
+                    Message = $"{user.Fullname} edited campaign {campaign.Title} with {campaign.Budget} USD, balance remaining {available.Value} USD",
+                    Source = "WePromoLink"
+                };
+                await _db.GenericEvent.AddAsync(gEvent);
+                await _db.SaveChangesAsync();
+
+                transaction.Commit();
+            }
+            catch (System.Exception ex)
+            {
+                transaction.Rollback();
+                _logger.LogError(ex.Message);
+                throw new Exception("Error editing campaing");
+            }
+        }
+
+    }
+
+    public async Task<IActionResult> Explore(int page)
+    {
+        throw new NotImplementedException();
+    }
+
+ 
+    public async Task<MyCampaignList> GetAll(int? page, int? cant, string? filter)
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
         MyCampaignList list = new MyCampaignList();
         page = page ?? 1;
         page = page <= 0 ? 1 : page;
+        cant = cant ?? 25;
 
-        cant = cant ?? 50;
-        filter = filter ?? "";
+        var counter = await _db.Campaigns
+        .Where(e => e.UserModelId == userId)
+        .Where(e => e.IsArchived == false)
+        .CountAsync();
 
-        list.Items = await _db.Campaigns
+        var query = _db.Campaigns
+        .Where(e => e.UserModelId == userId)
+        .Where(e => e.IsArchived == false);
+
+        if (!string.IsNullOrEmpty(filter))
+        {
+            query = query.Where(e => e.Title.ToLower().Contains(filter.ToLower()));
+        }
+
+        list.Items = await query
         .OrderByDescending(e => e.CreatedAt)
         .Skip((page.Value! - 1) * cant!.Value)
         .Take(cant!.Value)
@@ -236,7 +370,56 @@ public class CampaignService : ICampaignService
         })
         .ToListAsync();
         list.Pagination.Page = page.Value!;
-        list.Pagination.TotalPages = ((await _db.Campaigns.CountAsync()) / cant!.Value) + 1;
+        list.Pagination.TotalPages = (counter / cant!.Value) + 1;
+        list.Pagination.Cant = list.Items.Count;
         return list;
+    }
+
+    public async Task<CampaignDetail> GetDetails(string id)
+    {
+        if (string.IsNullOrEmpty(id)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.ExternalId == id).Select(e => new CampaignDetail
+        {
+            Budget = e.Budget,
+            Description = e.Description,
+            EPM = e.EPM,
+            Id = e.ExternalId,
+            ImageUrl = e.ImageUrl,
+            Status = e.Status,
+            Title = e.Title,
+            Url = e.Url,
+            LastClick = e.LastClick,
+            LastShared = e.LastShared
+        }).SingleOrDefaultAsync();
+
+        if (campaign == null) throw new Exception("Campaign does not exits");
+        return campaign;
+    }
+
+    public async Task Publish(string campaignId, bool toStatus)
+    {
+        if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
+        if (user == null) throw new Exception("User no found");
+        if(user.IsBlocked) throw new Exception("User is blocked");
+        if(!user.IsSubscribed) throw new Exception("User is not subscribed");
+
+        var campaignModel = await _db.Campaigns.Where(e => e.ExternalId == campaignId).SingleOrDefaultAsync();
+        if (campaignModel == null) throw new Exception("Campaign does not exits");
+        if (campaignModel.IsArchived) throw new Exception("Campaing deleted");
+
+        if(toStatus)
+        {
+            if(campaignModel.Budget <= (campaignModel.EPM/1000)) throw new Exception("Insufficient budget");
+        } 
+        
+        campaignModel.Status = toStatus;
+        _db.Campaigns.Update(campaignModel);
+        await _db.SaveChangesAsync();
     }
 }

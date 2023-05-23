@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using WePromoLink.Data;
@@ -17,15 +18,15 @@ public class DataService : IDataService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    private IResult AddCacheHistoricalData<T, R, L>(T result) where T : HistoryStatsBaseModel<R,L>
+    private IActionResult AddCacheHistoricalData<T, R, L>(T result) where T : HistoryStatsBaseModel<R, L>
     {
         if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("If-None-Match", out StringValues requestETagValues))
         {
             if (requestETagValues[0] == result.Etag)
             {
                 _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-                _httpContextAccessor.HttpContext.Response.StatusCode = 304;
-                return null;
+                //_httpContextAccessor.HttpContext.Response.StatusCode = 304;
+                return new StatusCodeResult(304);
             }
         }
 
@@ -35,10 +36,10 @@ public class DataService : IDataService
             MaxAge = result.MaxAge!.Value
         };
         _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-        return Results.Ok(ConvertToHistoricalData<T, R, L>(result));
+        return new OkObjectResult(ConvertToHistoricalData<T, R, L>(result));
     }
 
-    private HistoricalData<R> ConvertToHistoricalData<T, R, L>(T result) where T : HistoryStatsBaseModel<R,L>
+    private HistoricalData<R> ConvertToHistoricalData<T, R, L>(T result) where T : HistoryStatsBaseModel<R, L>
     {
         var item = new HistoricalData<R>();
         item.DataLabels = new List<string>();
@@ -70,15 +71,15 @@ public class DataService : IDataService
         return item;
     }
 
-    private IResult AddCache<T, R>(T result) where T : StatsBaseModel, IHasValue<R>
+    private IActionResult AddCache<T, R>(T result) where T : StatsBaseModel, IHasValue<R>
     {
         if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("If-None-Match", out StringValues requestETagValues))
         {
             if (requestETagValues[0] == result.Etag)
             {
                 _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-                _httpContextAccessor.HttpContext.Response.StatusCode = 304;
-                return null;
+                // _httpContextAccessor.HttpContext.Response.StatusCode = 304;
+                return new StatusCodeResult(304);
             }
         }
 
@@ -88,174 +89,288 @@ public class DataService : IDataService
             MaxAge = result.MaxAge!.Value
         };
         _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-        return Results.Ok(result.Value);
+        return new OkObjectResult(result.Value);
     }
 
-    public async Task<IResult> GetAvailable()
+    public async Task<IActionResult> GetAvailable()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
         if (user != null) return AddCache<AvailableModel, decimal>(user.Available);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetBudget()
+    public async Task<IActionResult> GetBudget()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Budget).SingleOrDefaultAsync();
         if (user != null) return AddCache<BudgetModel, decimal>(user.Budget);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetLocked()
+    public async Task<IActionResult> GetLocked()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Locked).SingleOrDefaultAsync();
         if (user != null) return AddCache<LockedModel, decimal>(user.Locked);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetPayoutStats()
+    public async Task<IActionResult> GetPayoutStats()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.PayoutStat).SingleOrDefaultAsync();
         if (user != null) return AddCache<PayoutStatModel, decimal>(user.PayoutStat);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetProfit()
+    public async Task<IActionResult> GetProfit()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Profit).SingleOrDefaultAsync();
         if (user != null) return AddCache<ProfitModel, decimal>(user.Profit);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetEarnToday()
+    public async Task<IActionResult> GetEarnToday()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.EarnTodayUser).SingleOrDefaultAsync();
         if (user != null) return AddCache<EarnTodayUserModel, decimal>(user.EarnTodayUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetEarnLastWeek()
+    public async Task<IActionResult> GetEarnLastWeek()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.EarnLastWeekUser).SingleOrDefaultAsync();
         if (user != null) return AddCache<EarnLastWeekUserModel, decimal>(user.EarnLastWeekUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetClickTodayOnLinks()
+    public async Task<IActionResult> GetClickTodayOnLinks()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.ClicksTodayOnLinksUser).SingleOrDefaultAsync();
         if (user != null) return AddCache<ClicksTodayOnLinksUserModel, int>(user.ClicksTodayOnLinksUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetClickLastWeekOnLinks()
+    public async Task<IActionResult> GetClickLastWeekOnLinks()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.ClickLastWeekOnLinksUser).SingleOrDefaultAsync();
         if (user != null) return AddCache<ClickLastWeekOnLinksUserModel, int>(user.ClickLastWeekOnLinksUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetClickTodayOnCampaigns()
+    public async Task<IActionResult> GetClickTodayOnCampaigns()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.ClicksTodayOnCampaignUser).SingleOrDefaultAsync();
         if (user != null) return AddCache<ClicksTodayOnCampaignUserModel, int>(user.ClicksTodayOnCampaignUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetClickLastWeekOnCampaigns()
+    public async Task<IActionResult> GetClickLastWeekOnCampaigns()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.ClicksLastWeekOnCampaignUser).SingleOrDefaultAsync();
         if (user != null) return AddCache<ClicksLastWeekOnCampaignUserModel, int>(user.ClicksLastWeekOnCampaignUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetSharedToday()
+    public async Task<IActionResult> GetSharedToday()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.SharedToday).SingleOrDefaultAsync();
         if (user != null) return AddCache<SharedTodayUserModel, int>(user.SharedToday);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetSharedLastWeek()
+    public async Task<IActionResult> GetSharedLastWeek()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.SharedLastWeek).SingleOrDefaultAsync();
         if (user != null) return AddCache<SharedLastWeekUserModel, int>(user.SharedLastWeek);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetHistoricalClickOnLinks()
+    public async Task<IActionResult> GetHistoricalClickOnLinks()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksOnLinksUser).SingleOrDefaultAsync();
         if (user != null) return AddCacheHistoricalData<HistoryClicksOnLinksUserModel, int, DateTime>(user.HistoryClicksOnLinksUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetHistoricalEarnOnLinks()
+    public async Task<IActionResult> GetHistoricalEarnOnLinks()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryEarnOnLinksUser).SingleOrDefaultAsync();
         if (user != null) return AddCacheHistoricalData<HistoryEarnOnLinksUserModel, decimal, DateTime>(user.HistoryEarnOnLinksUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetHistoricalClickOnCampaigns()
+    public async Task<IActionResult> GetHistoricalClickOnCampaigns()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksOnCampaignUser).SingleOrDefaultAsync();
         if (user != null) return AddCacheHistoricalData<HistoryClicksOnCampaignUserModel, int, DateTime>(user.HistoryClicksOnCampaignUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetHistoricalClickOnShares()
+    public async Task<IActionResult> GetHistoricalClickOnShares()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksOnSharesUser).SingleOrDefaultAsync();
         if (user != null) return AddCacheHistoricalData<HistoryClicksOnSharesUserModel, int, DateTime>(user.HistoryClicksOnSharesUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetHistoricalClickByCountriesOnLinks()
+    public async Task<IActionResult> GetHistoricalClickByCountriesOnLinks()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksByCountriesOnLinkUser).SingleOrDefaultAsync();
         if (user != null) return AddCacheHistoricalData<HistoryClicksByCountriesOnLinkUserModel, int, string>(user.HistoryClicksByCountriesOnLinkUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetHistoricalEarnByCountries()
+    public async Task<IActionResult> GetHistoricalEarnByCountries()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryEarnByCountriesUser).SingleOrDefaultAsync();
         if (user != null) return AddCacheHistoricalData<HistoryEarnByCountriesUserModel, decimal, string>(user.HistoryEarnByCountriesUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetHistoricalClickByCountriesOnCampaigns()
+    public async Task<IActionResult> GetHistoricalClickByCountriesOnCampaigns()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistoryClicksByCountriesOnCampaignUser).SingleOrDefaultAsync();
         if (user != null) return AddCacheHistoricalData<HistoryClicksByCountriesOnCampaignUserModel, int, string>(user.HistoryClicksByCountriesOnCampaignUser);
-        return Results.NotFound();
+        return new NotFoundResult();
     }
 
-    public async Task<IResult> GetHistoricalSharedByUsers()
+    public async Task<IActionResult> GetHistoricalSharedByUsers()
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.HistorySharedByUsersUser).SingleOrDefaultAsync();
         if (user != null) return AddCacheHistoricalData<HistorySharedByUsersUserModel, int, string>(user.HistorySharedByUsersUser);
-        return Results.NotFound();
+        return new NotFoundResult();
+    }
+
+    // Campaigns
+
+    public async Task<IActionResult> GetClicksLastWeekOnCampaign(string campaignId)
+    {
+        if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.UserModelId == userId && e.ExternalId == campaignId)
+        .Include(e => e.ClicksLastWeekOnCampaign).SingleOrDefaultAsync();
+
+        if (campaign == null) return new NotFoundResult();
+        return AddCache<ClicksLastWeekOnCampaignModel, int>(campaign.ClicksLastWeekOnCampaign);
+    }
+
+    public async Task<IActionResult> GetClicksTodayOnCampaign(string campaignId)
+    {
+        if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.UserModelId == userId && e.ExternalId == campaignId)
+        .Include(e => e.ClicksTodayOnCampaign).SingleOrDefaultAsync();
+
+        if (campaign == null) return new NotFoundResult();
+        return AddCache<ClicksTodayOnCampaignModel, int>(campaign.ClicksTodayOnCampaign);
+    }
+
+    public async Task<IActionResult> GetHistoryClicksByCountriesOnCampaign(string campaignId)
+    {
+        if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.UserModelId == userId && e.ExternalId == campaignId)
+        .Include(e => e.HistoryClicksByCountriesOnCampaign).SingleOrDefaultAsync();
+
+        if (campaign == null) return new NotFoundResult();
+        return AddCacheHistoricalData<HistoryClicksByCountriesOnCampaignModel, int, string>(campaign.HistoryClicksByCountriesOnCampaign);
+    }
+
+    public async Task<IActionResult> GetHistoryClicksOnCampaign(string campaignId)
+    {
+        if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.UserModelId == userId && e.ExternalId == campaignId)
+        .Include(e => e.HistoryClicksOnCampaign).SingleOrDefaultAsync();
+
+        if (campaign == null) return new NotFoundResult();
+        return AddCacheHistoricalData<HistoryClicksOnCampaignModel, int, DateTime>(campaign.HistoryClicksOnCampaign);
+    }
+
+    public async Task<IActionResult> GetHistorySharedByUsersOnCampaign(string campaignId)
+    {
+        if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.UserModelId == userId && e.ExternalId == campaignId)
+        .Include(e => e.HistorySharedByUsersOnCampaign).SingleOrDefaultAsync();
+
+        if (campaign == null) return new NotFoundResult();
+        return AddCacheHistoricalData<HistorySharedByUsersOnCampaignModel, int, string>(campaign.HistorySharedByUsersOnCampaign);
+    }
+
+    public async Task<IActionResult> GetHistorySharedOnCampaign(string campaignId)
+    {
+        if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.UserModelId == userId && e.ExternalId == campaignId)
+        .Include(e => e.HistorySharedOnCampaign).SingleOrDefaultAsync();
+
+        if (campaign == null) return new NotFoundResult();
+        return AddCacheHistoricalData<HistorySharedOnCampaignModel, int, DateTime>(campaign.HistorySharedOnCampaign);
+    }
+
+    public async Task<IActionResult> GetSharedLastWeekOnCampaign(string campaignId)
+    {
+        if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.UserModelId == userId && e.ExternalId == campaignId)
+        .Include(e => e.SharedLastWeekOnCampaign).SingleOrDefaultAsync();
+
+        if (campaign == null) return new NotFoundResult();
+        return AddCache<SharedLastWeekOnCampaignModel, int>(campaign.SharedLastWeekOnCampaign);
+    }
+
+    public async Task<IActionResult> GetSharedTodayOnCampaignModel(string campaignId)
+    {
+        if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.UserModelId == userId && e.ExternalId == campaignId)
+        .Include(e => e.SharedTodayOnCampaignModel).SingleOrDefaultAsync();
+
+        if (campaign == null) return new NotFoundResult();
+        return AddCache<SharedTodayOnCampaignModel, int>(campaign.SharedTodayOnCampaignModel);
     }
 }

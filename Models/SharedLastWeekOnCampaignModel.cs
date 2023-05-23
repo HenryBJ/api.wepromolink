@@ -1,6 +1,8 @@
+using WePromoLink.Interfaces;
+
 namespace WePromoLink.Models;
 
-public class SharedLastWeekOnCampaignModel: StatsBaseModel
+public class SharedLastWeekOnCampaignModel: StatsBaseModel, IHasValue<int>
 {
     public Guid Id { get; set; }
     public virtual CampaignModel Campaign { get; set; }

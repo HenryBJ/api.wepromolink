@@ -13,18 +13,20 @@ public class DataController : ControllerBase
 {
     private readonly IDataService _service;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILogger<DataController> _logger;
 
-    public DataController(IHttpContextAccessor httpContextAccessor, IDataService service)
+    public DataController(IHttpContextAccessor httpContextAccessor, IDataService service, ILogger<DataController> logger)
     {
         _httpContextAccessor = httpContextAccessor;
         _service = service;
+        _logger = logger;
     }
 
 
     [HttpGet]
     [Authorize]
     [Route("available")]
-    public async Task<IResult> GetAvailable()
+    public async Task<IActionResult> GetAvailable()
     {
         try
         {
@@ -32,15 +34,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("budget")]
-    public async Task<IResult> GetBudget()
+    public async Task<IActionResult> GetBudget()
     {
         try
         {
@@ -48,15 +50,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("locked")]
-    public async Task<IResult> GetLocked()
+    public async Task<IActionResult> GetLocked()
     {
         try
         {
@@ -64,15 +66,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("payout")]
-    public async Task<IResult> GetPayout()
+    public async Task<IActionResult> GetPayout()
     {
         try
         {
@@ -80,15 +82,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("profit")]
-    public async Task<IResult> GetProfit()
+    public async Task<IActionResult> GetProfit()
     {
         try
         {
@@ -96,15 +98,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("earntoday")]
-    public async Task<IResult> GetEarnToday()
+    public async Task<IActionResult> GetEarnToday()
     {
         try
         {
@@ -112,8 +114,8 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
@@ -121,7 +123,7 @@ public class DataController : ControllerBase
     [HttpGet]
     [Authorize]
     [Route("earnlastweek")]
-    public async Task<IResult> GetEarnLastWeek()
+    public async Task<IActionResult> GetEarnLastWeek()
     {
         try
         {
@@ -129,15 +131,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("clickstodayonlinks")]
-    public async Task<IResult> GetClickTodayOnLinks()
+    public async Task<IActionResult> GetClickTodayOnLinks()
     {
         try
         {
@@ -145,15 +147,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("clickslastweekonlinks")]
-    public async Task<IResult> GetClickLastWeekOnLinks()
+    public async Task<IActionResult> GetClickLastWeekOnLinks()
     {
         try
         {
@@ -161,15 +163,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("clickstodayoncampaigns")]
-    public async Task<IResult> GetClickTodayOnCampaigns()
+    public async Task<IActionResult> GetClickTodayOnCampaigns()
     {
         try
         {
@@ -177,8 +179,8 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
@@ -186,7 +188,7 @@ public class DataController : ControllerBase
     [HttpGet]
     [Authorize]
     [Route("clickslastweekoncampaigns")]
-    public async Task<IResult> GetClickLastWeekOnCampaigns()
+    public async Task<IActionResult> GetClickLastWeekOnCampaigns()
     {
         try
         {
@@ -194,8 +196,8 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
     // From here below
@@ -203,7 +205,7 @@ public class DataController : ControllerBase
     [HttpGet]
     [Authorize]
     [Route("sharedtoday")]
-    public async Task<IResult> GetSharedToday()
+    public async Task<IActionResult> GetSharedToday()
     {
         try
         {
@@ -211,8 +213,8 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
@@ -220,7 +222,7 @@ public class DataController : ControllerBase
     [HttpGet]
     [Authorize]
     [Route("sharedlastweek")]
-    public async Task<IResult> GetSharedLastWeek()
+    public async Task<IActionResult> GetSharedLastWeek()
     {
         try
         {
@@ -228,8 +230,8 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
@@ -237,7 +239,7 @@ public class DataController : ControllerBase
     [HttpGet]
     [Authorize]
     [Route("historicalclicksonlink")]
-    public async Task<IResult> GetHistoricalClickOnLinks()
+    public async Task<IActionResult> GetHistoricalClickOnLinks()
     {
         try
         {
@@ -245,15 +247,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("historicalearnonlink")]
-    public async Task<IResult> GetHistoricalEarnOnLinks()
+    public async Task<IActionResult> GetHistoricalEarnOnLinks()
     {
         try
         {
@@ -261,15 +263,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("historicalclickoncampaigns")]
-    public async Task<IResult> GetHistoricalClickOnCampaigns()
+    public async Task<IActionResult> GetHistoricalClickOnCampaigns()
     {
         try
         {
@@ -277,15 +279,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("historicalclickonshares")]
-    public async Task<IResult> GetHistoricalClickOnShares()
+    public async Task<IActionResult> GetHistoricalClickOnShares()
     {
         try
         {
@@ -293,15 +295,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("historicalclickbycountriesonlinks")]
-    public async Task<IResult> GetHistoricalClickByCountriesOnLinks()
+    public async Task<IActionResult> GetHistoricalClickByCountriesOnLinks()
     {
         try
         {
@@ -309,15 +311,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("historicalearnbycountries")]
-    public async Task<IResult> GetHistoricalEarnByCountries()
+    public async Task<IActionResult> GetHistoricalEarnByCountries()
     {
         try
         {
@@ -325,8 +327,8 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
@@ -334,7 +336,7 @@ public class DataController : ControllerBase
     [HttpGet]
     [Authorize]
     [Route("historicalclickbycountriesoncampaigns")]
-    public async Task<IResult> GetHistoricalClickByCountriesOnCampaigns()
+    public async Task<IActionResult> GetHistoricalClickByCountriesOnCampaigns()
     {
         try
         {
@@ -342,15 +344,15 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpGet]
     [Authorize]
     [Route("historicalsharedbyusers")]
-    public async Task<IResult> GetHistoricalSharedByUser()
+    public async Task<IActionResult> GetHistoricalSharedByUser()
     {
         try
         {
@@ -358,8 +360,138 @@ public class DataController : ControllerBase
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    // Campaigns
+
+    [HttpGet]
+    [Authorize]
+    [Route("clickslastweekoncampaign/{id}")]
+    public async Task<IActionResult> GetClicksLastWeekOnCampaign(string id)
+    {
+        try
+        {
+            return await _service.GetClicksLastWeekOnCampaign(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("clickstodayoncampaign/{id}")]
+    public async Task<IActionResult> GetClicksTodayOnCampaign(string id)
+    {
+        try
+        {
+            return await _service.GetClicksTodayOnCampaign(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historyclicksbycountriesoncampaign/{id}")]
+    public async Task<IActionResult> GetHistoryClicksByCountriesOnCampaign(string id)
+    {
+        try
+        {
+            return await _service.GetHistoryClicksByCountriesOnCampaign(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historyclicksoncampaign/{id}")]
+    public async Task<IActionResult> GetHistoryClicksOnCampaign(string id)
+    {
+        try
+        {
+            return await _service.GetHistoryClicksOnCampaign(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historysharedbyusersoncampaign/{id}")]
+    public async Task<IActionResult> GetHistorySharedByUsersOnCampaign(string id)
+    {
+        try
+        {
+            return await _service.GetHistorySharedByUsersOnCampaign(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historysharedoncampaign/{id}")]
+    public async Task<IActionResult> GetHistorySharedOnCampaign(string id)
+    {
+        try
+        {
+            return await _service.GetHistorySharedOnCampaign(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("sharedlastweekoncampaign/{id}")]
+    public async Task<IActionResult> GetSharedLastWeekOnCampaign(string id)
+    {
+        try
+        {
+            return await _service.GetSharedLastWeekOnCampaign(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("sharedtodayoncampaignmodel/{id}")]
+    public async Task<IActionResult> GetSharedTodayOnCampaignModel(string id)
+    {
+        try
+        {
+            return await _service.GetSharedTodayOnCampaignModel(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
