@@ -125,8 +125,6 @@ public class DataContext : DbContext
         .OnDelete(DeleteBehavior.Restrict);
         });
 
-
-
         builder.Entity<SubscriptionPlanModel>(entity =>
         {
             entity.HasKey(e => e.Id);

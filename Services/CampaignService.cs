@@ -11,6 +11,8 @@ using WePromoLink;
 using WePromoLink.Enums;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System.Net;
 
 namespace WePromoLink.Services;
 
@@ -45,36 +47,38 @@ public class CampaignService : ICampaignService
         var externalId = await Nanoid.Nanoid.GenerateAsync(size: 12);
         var available = user.Available;
 
-        var item = new CampaignModel
-        {
-            Id = Guid.NewGuid(),
-            Budget = campaign.Budget,
-            CreatedAt = DateTime.UtcNow,
-            LastUpdated = DateTime.UtcNow,
-            Description = campaign.Description,
-            EPM = campaign.EPM,
-            ExternalId = externalId,
-            ImageUrl = campaign.ImageUrl,
-            Title = campaign.Title,
-            Url = campaign.Url,
-            IsArchived = false,
-            IsBlocked = false,
-            SharedLastWeekOnCampaign = new SharedLastWeekOnCampaignModel(),
-            Status = campaign.Budget >= 10,
-            SharedTodayOnCampaignModel = new SharedTodayOnCampaignModel(),
-            UserModelId = user.Id,
-            ClicksLastWeekOnCampaign = new ClicksLastWeekOnCampaignModel(),
-            ClicksTodayOnCampaign = new ClicksTodayOnCampaignModel(),
-            HistoryClicksByCountriesOnCampaign = new HistoryClicksByCountriesOnCampaignModel(),
-            HistoryClicksOnCampaign = new HistoryClicksOnCampaignModel(),
-            HistorySharedByUsersOnCampaign = new HistorySharedByUsersOnCampaignModel(),
-            HistorySharedOnCampaign = new HistorySharedOnCampaignModel()
-        };
+
 
         using (var transaction = _db.Database.BeginTransaction())
         {
             try
             {
+                var item = new CampaignModel
+                {
+                    Id = Guid.NewGuid(),
+                    Budget = campaign.Budget,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdated = DateTime.UtcNow,
+                    Description = campaign.Description,
+                    EPM = campaign.EPM,
+                    ExternalId = externalId,
+                    ImageUrl = campaign.ImageUrl,
+                    Title = campaign.Title,
+                    Url = campaign.Url,
+                    IsArchived = false,
+                    IsBlocked = false,
+                    SharedLastWeekOnCampaign = new SharedLastWeekOnCampaignModel(),
+                    Status = campaign.Budget >= 10,
+                    SharedTodayOnCampaignModel = new SharedTodayOnCampaignModel(),
+                    UserModelId = user.Id,
+                    ClicksLastWeekOnCampaign = new ClicksLastWeekOnCampaignModel(),
+                    ClicksTodayOnCampaign = new ClicksTodayOnCampaignModel(),
+                    HistoryClicksByCountriesOnCampaign = new HistoryClicksByCountriesOnCampaignModel(),
+                    HistoryClicksOnCampaign = new HistoryClicksOnCampaignModel(),
+                    HistorySharedByUsersOnCampaign = new HistorySharedByUsersOnCampaignModel(),
+                    HistorySharedOnCampaign = new HistorySharedOnCampaignModel()
+                };
+
                 // Validate Available balance    
                 available.Value = available.Value - campaign.Budget;
                 available.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
@@ -147,8 +151,8 @@ public class CampaignService : ICampaignService
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
         if (user == null) throw new Exception("User no found");
-        if(user.IsBlocked) throw new Exception("User is blocked");
-        if(!user.IsSubscribed) throw new Exception("User is not subscribed");
+        if (user.IsBlocked) throw new Exception("User is blocked");
+        if (!user.IsSubscribed) throw new Exception("User is not subscribed");
 
         var campaignModel = await _db.Campaigns.Where(e => e.ExternalId == id).SingleOrDefaultAsync();
         if (campaignModel == null) throw new Exception("Campaign does not exits");
@@ -232,8 +236,8 @@ public class CampaignService : ICampaignService
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
         if (user == null) throw new Exception("User no found");
-        if(user.IsBlocked) throw new Exception("User is blocked");
-        if(!user.IsSubscribed) throw new Exception("User is not subscribed");
+        if (user.IsBlocked) throw new Exception("User is blocked");
+        if (!user.IsSubscribed) throw new Exception("User is not subscribed");
 
         var campaignModel = await _db.Campaigns.Where(e => e.ExternalId == id).SingleOrDefaultAsync();
         if (campaignModel == null) throw new Exception("Campaign does not exits");
@@ -321,12 +325,88 @@ public class CampaignService : ICampaignService
 
     }
 
-    public async Task<IActionResult> Explore(int page)
+    public async Task<IActionResult> Explore(int offset, int limit, long timestamp)
     {
-        throw new NotImplementedException();
+        string cacheKey = $"campaigns_{offset}_{limit}_{timestamp}";
+        string cacheKeyETag = $"etag_{offset}_{limit}_{timestamp}";
+
+        // Comprueba el encabezado If-None-Match
+        var requestHeaders = _httpContextAccessor.HttpContext.Request.Headers;
+
+        if (requestHeaders.ContainsKey("If-None-Match") &&
+            _cache.TryGetValue(cacheKeyETag, out string storedETag) &&
+            requestHeaders["If-None-Match"] == storedETag)
+        {
+            // Devuelve un encabezado de respuesta 304 Not Modified
+            return new StatusCodeResult((int)HttpStatusCode.NotModified);
+        }
+
+        // Comprueba si los datos están en caché
+        if (_cache.TryGetValue(cacheKey, out List<CampaignCard> campaigns))
+        {
+            // Si los datos están en caché, los devuelve directamente
+            return new OkObjectResult(campaigns);
+        }
+
+        // Los datos no están en caché, realiza la consulta en la base de datos
+        if (timestamp == 0)
+        {
+            campaigns = await _db.Campaigns
+            .OrderByDescending(c => c.LastUpdated)
+            .Skip(offset)
+            .Take(limit)
+            .Select(e => new CampaignCard
+            {
+                AutorName = e.User.Fullname,
+                AutorImageUrl = e.User.ThumbnailImageUrl,
+                Description = e.Description,
+                EPM = e.EPM,
+                Id = e.ExternalId,
+                Title = e.Title,
+                ImageUrl = e.ImageUrl,
+                LastModified = new DateTimeOffset(e.LastUpdated!.Value).ToUnixTimeMilliseconds()
+            })
+            .ToListAsync();
+        }
+        else
+        {
+            var last_timestamp = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).UtcDateTime;
+            campaigns = await _db.Campaigns
+            .Include(e => e.User)
+            .Where(e => e.LastUpdated <= last_timestamp)
+            .Where(e => !e.IsArchived)
+            .OrderByDescending(c => c.LastUpdated)
+            .Skip(offset)
+            .Take(limit)
+            .Select(e => new CampaignCard
+            {
+                AutorName = e.User.Fullname,
+                AutorImageUrl = e.User.ThumbnailImageUrl,
+                Description = e.Description,
+                EPM = e.EPM,
+                Id = e.ExternalId,
+                Title = e.Title,
+                ImageUrl = e.ImageUrl,
+                LastModified = new DateTimeOffset(e.LastUpdated!.Value).ToUnixTimeMilliseconds()
+            })
+            .ToListAsync();
+        }
+
+        if (timestamp != 0)
+        {
+            // Agrega los datos a la caché
+            _cache.Set(cacheKey, campaigns, new MemoryCacheEntryOptions { Size = 1 });
+
+            string newETag = await Nanoid.Nanoid.GenerateAsync(size: 12);
+            _httpContextAccessor.HttpContext.Response.Headers["ETag"] = newETag;
+            _cache.Set(cacheKeyETag, newETag, new MemoryCacheEntryOptions { Size = 1 }); // Almacena el nuevo ETag en la caché
+        }
+
+        // Devuelve los datos obtenidos
+        return new OkObjectResult(campaigns);
     }
 
- 
+
     public async Task<MyCampaignList> GetAll(int? page, int? cant, string? filter)
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
@@ -406,18 +486,19 @@ public class CampaignService : ICampaignService
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
         if (user == null) throw new Exception("User no found");
-        if(user.IsBlocked) throw new Exception("User is blocked");
-        if(!user.IsSubscribed) throw new Exception("User is not subscribed");
+        if (user.IsBlocked) throw new Exception("User is blocked");
+        if (!user.IsSubscribed) throw new Exception("User is not subscribed");
 
         var campaignModel = await _db.Campaigns.Where(e => e.ExternalId == campaignId).SingleOrDefaultAsync();
         if (campaignModel == null) throw new Exception("Campaign does not exits");
         if (campaignModel.IsArchived) throw new Exception("Campaing deleted");
 
-        if(toStatus)
+        if (toStatus)
         {
-            if(campaignModel.Budget <= (campaignModel.EPM/1000)) throw new Exception("Insufficient budget");
-        } 
-        
+            if (campaignModel.Budget <= (campaignModel.EPM / 1000)) throw new Exception("Insufficient budget");
+        }
+
+
         campaignModel.Status = toStatus;
         _db.Campaigns.Update(campaignModel);
         await _db.SaveChangesAsync();

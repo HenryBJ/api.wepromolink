@@ -2930,14 +2930,14 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("16faf161-0a94-41ee-a152-87743881716f"),
+                            Id = new Guid("e8bcc161-3969-41e9-a585-217fd8290381"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             ContainAds = false,
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "BIrsuGNeKR0N",
+                            ExternalId = "npeGjb0o78zo",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
@@ -2950,14 +2950,14 @@ namespace WePromoLink.Migrations
                         },
                         new
                         {
-                            Id = new Guid("6a3a1af0-aae5-4b9d-93ea-0fefb3b18c86"),
+                            Id = new Guid("9b69dc4b-de2e-4b92-ad3a-2b59dc239ba9"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             ContainAds = true,
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "0ex2ahdHZjz9",
+                            ExternalId = "SR8xSHlDUtwg",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",

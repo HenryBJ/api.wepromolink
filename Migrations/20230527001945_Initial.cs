@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WePromoLink.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -1575,12 +1575,12 @@ namespace WePromoLink.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("16faf161-0a94-41ee-a152-87743881716f"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "BIrsuGNeKR0N", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
+                values: new object[] { new Guid("9b69dc4b-de2e-4b92-ad3a-2b59dc239ba9"), 0m, "", "", true, 9m, 0m, "SR8xSHlDUtwg", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("6a3a1af0-aae5-4b9d-93ea-0fefb3b18c86"), 0m, "", "", true, 9m, 0m, "0ex2ahdHZjz9", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                values: new object[] { new Guid("e8bcc161-3969-41e9-a585-217fd8290381"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "npeGjb0o78zo", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Availables_UserModelId",

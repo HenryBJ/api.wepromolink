@@ -57,6 +57,22 @@ public class CampaignController : ControllerBase
         }
     }
 
+    [HttpGet]
+    [Authorize]
+    [Route("explore/{offset}/{limit}/{timestamp}")]
+    public async Task<IActionResult> Explore(int offset, int limit, long timestamp)
+    {
+        try
+        {
+            return await _campaignService.Explore(offset, limit, timestamp);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
     [HttpPost]
     [Authorize]
     [Route("create")]
@@ -138,5 +154,5 @@ public class CampaignController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-    
+
 }

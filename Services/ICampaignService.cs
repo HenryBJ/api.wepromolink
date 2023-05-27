@@ -11,7 +11,7 @@ public interface ICampaignService
     Task Edit(string id, Campaign campaign);
     Task Delete(string id);
     Task Publish(string campaignId, bool toStatus);
-    Task<IActionResult> Explore(int page);
+    Task<IActionResult> Explore(int offset, int limit, long timestamp);
 
 
     // Task<string> FundSponsoredLink(FundSponsoredLink fundLink);
