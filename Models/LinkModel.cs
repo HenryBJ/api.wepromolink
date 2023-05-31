@@ -5,6 +5,7 @@ public class LinkModel
 {
     public Guid Id { get; set; }
     public UserModel User { get; set; }
+    public string Url { get; set; }
     public Guid UserModelId { get; set; }
     public CampaignModel Campaign { get; set; }
     public Guid CampaignModelId { get; set; }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WePromoLink.Services;
 using WePromoLink.Validators;
@@ -8,14 +9,14 @@ namespace WePromoLink.Controllers;
 [Route("[controller]")]
 public class LinkController : ControllerBase
 {
-    private readonly IAffiliateLinkService _affiliateLinkService;
+    private readonly ILinkService _linkService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly AffiliateLinkValidator _validator;
-    public LinkController(IAffiliateLinkService affiliateLinkService,AffiliateLinkValidator validator, IHttpContextAccessor httpContextAccessor)
+    private readonly ILogger<LinkController> _logger;
+    public LinkController(ILinkService affiliateLinkService, IHttpContextAccessor httpContextAccessor, ILogger<LinkController> logger)
     {
-        _affiliateLinkService = affiliateLinkService;
-        _validator = validator;
+        _linkService = affiliateLinkService;
         _httpContextAccessor = httpContextAccessor;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -25,7 +26,7 @@ public class LinkController : ControllerBase
         try
         {
             // List afiliate links
-            var results = await _affiliateLinkService.ListAffiliateLinks(page);
+            var results = await _linkService.ListAffiliateLinks(page);
             return Results.Ok(results);
         }
         catch (System.Exception ex)
@@ -36,27 +37,20 @@ public class LinkController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     [Route("create")]
-    public async Task<IResult> CreateAffLink(CreateAffiliateLink link)
+    public async Task<IActionResult> Create([FromBody] string campaignId)
     {
-        // if (link == null) return Results.BadRequest();
-
-        // var validationResult = await _validator.ValidateAsync(link);
-        // if (!validationResult.IsValid)
-        // {
-        //     return Results.ValidationProblem(validationResult.ToDictionary());
-        // }
-        // object result;
-        // try
-        // {
-        //     result = await _affiliateLinkService.CreateAffiliateLink(link, _httpContextAccessor.HttpContext!);
-        // }
-        // catch (Exception ex)
-        // {
-        //     Console.WriteLine(ex.Message);
-        //     return Results.Problem(ex.Message);
-        // }
-
-        return Results.Ok();//return Results.Ok(result);
+        if (string.IsNullOrEmpty(campaignId)) return BadRequest();
+        try
+        {
+            var result = await _linkService.Create(campaignId);
+            return Ok(result);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return BadRequest(ex.Message);
+        }
     }
 }

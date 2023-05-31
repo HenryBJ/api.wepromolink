@@ -2372,6 +2372,10 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("UserModelId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2930,14 +2934,14 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e8bcc161-3969-41e9-a585-217fd8290381"),
+                            Id = new Guid("3f052450-17e3-48b8-b048-8bfbc8780280"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             ContainAds = false,
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "npeGjb0o78zo",
+                            ExternalId = "-riPtgCg-9R4",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
@@ -2950,14 +2954,14 @@ namespace WePromoLink.Migrations
                         },
                         new
                         {
-                            Id = new Guid("9b69dc4b-de2e-4b92-ad3a-2b59dc239ba9"),
+                            Id = new Guid("fc59e949-dbdd-4e87-802b-cfdd691e61b3"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             ContainAds = true,
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "SR8xSHlDUtwg",
+                            ExternalId = "Ka6iP6dyoL17",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",

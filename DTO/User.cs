@@ -8,5 +8,6 @@ public class User
     public string? CustomerId { get; set; }
     public Guid? SubscriptionPlanModelId { get; set; }
     public string ProductId { get; set; }
+    public string PhotoUrl { get; set; }
 
 }

@@ -35,7 +35,6 @@ builder.Services.AddMemoryCache(options =>
     options.SizeLimit = 2000;
 }); //Remplazar por Redis cuando se use microservicios
 builder.Services.AddScoped<CampaignValidator>();
-builder.Services.AddScoped<AffiliateLinkValidator>();
 builder.Services.AddScoped<FundSponsoredLinkValidator>();
 builder.Services.AddSingleton<HitQueue>();
 builder.Services.AddSingleton<WebHookEventQueue>();
@@ -56,7 +55,7 @@ builder.Services.AddHostedService<HitWorker>();
 builder.Services.AddHostedService<WebHookWorker>();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddTransient<IAffiliateLinkService, AffiliateLinkService>();
+builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<ICampaignService, CampaignService>();
 builder.Services.AddTransient<IDataService, DataService>();
 builder.Services.AddTransient<IPricingService, PricingService>();
@@ -94,7 +93,7 @@ app.MapGet("/", () => "WePromoLink API v1.0.3 - 29/04/2023");
 
 
 // Access to affiliate links (HIT)
-app.MapGet("/{afflink}", async (string afflink, HttpContext ctx, IAffiliateLinkService service) =>
+app.MapGet("/{afflink}", async (string afflink, HttpContext ctx, ILinkService service) =>
 {
     if (String.IsNullOrEmpty(afflink)) return Results.BadRequest();
     var url = await service.HitAffiliateLink(new HitAffiliate

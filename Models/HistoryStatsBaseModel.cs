@@ -1,6 +1,6 @@
 namespace WePromoLink.Models;
 
-public abstract class HistoryStatsBaseModel<T,R>:StatsBaseModel 
+public abstract class HistoryStatsBaseModel<T, R> : StatsBaseModel
 {
     public string? Title { get; set; }
     public T? X0 { get; set; }
@@ -23,5 +23,5 @@ public abstract class HistoryStatsBaseModel<T,R>:StatsBaseModel
     public R? L7 { get; set; }
     public R? L8 { get; set; }
     public R? L9 { get; set; }
-    
+
 }

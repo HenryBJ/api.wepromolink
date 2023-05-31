@@ -19,5 +19,6 @@ public class SignUpData
 
     [StringLength(500)]
     public string? SubscriptionPlanId { get; set; }
+    public string? PhotoUrl { get; set; }
     
 }

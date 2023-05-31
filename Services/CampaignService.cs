@@ -352,6 +352,7 @@ public class CampaignService : ICampaignService
         if (timestamp == 0)
         {
             campaigns = await _db.Campaigns
+            .Where(e=>e.Status)
             .OrderByDescending(c => c.LastUpdated)
             .Skip(offset)
             .Take(limit)
@@ -373,6 +374,7 @@ public class CampaignService : ICampaignService
             var last_timestamp = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).UtcDateTime;
             campaigns = await _db.Campaigns
             .Include(e => e.User)
+            .Where(e=>e.Status)
             .Where(e => e.LastUpdated <= last_timestamp)
             .Where(e => !e.IsArchived)
             .OrderByDescending(c => c.LastUpdated)

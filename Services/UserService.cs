@@ -34,7 +34,7 @@ public class UserService : IUserService
             IsSubscribed = isSubscribed,
             ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
             CreatedAt = DateTime.UtcNow,
-            ThumbnailImageUrl = "",
+            ThumbnailImageUrl = user.PhotoUrl,
             CustomerId = user.CustomerId,
             Available = new AvailableModel(),
             Budget = new BudgetModel(),
@@ -58,6 +58,7 @@ public class UserService : IUserService
             PayoutStat = new PayoutStatModel(),
             Profit = new ProfitModel(),
             FirebaseId = firebaseId,
+
 
             Subscription = new SubscriptionModel
             {
@@ -151,6 +152,7 @@ public class UserService : IUserService
 
             await this.Create(new User
             {
+                PhotoUrl = data.PhotoUrl ?? "",
                 ProductId = "",
                 CustomerId = await Nanoid.Nanoid.GenerateAsync(size: 12),
                 Email = data.Email,

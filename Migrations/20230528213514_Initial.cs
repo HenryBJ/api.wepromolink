@@ -1118,6 +1118,7 @@ namespace WePromoLink.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CampaignModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExternalId = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -1575,12 +1576,12 @@ namespace WePromoLink.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("9b69dc4b-de2e-4b92-ad3a-2b59dc239ba9"), 0m, "", "", true, 9m, 0m, "SR8xSHlDUtwg", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                values: new object[] { new Guid("3f052450-17e3-48b8-b048-8bfbc8780280"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "-riPtgCg-9R4", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("e8bcc161-3969-41e9-a585-217fd8290381"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "npeGjb0o78zo", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
+                values: new object[] { new Guid("fc59e949-dbdd-4e87-802b-cfdd691e61b3"), 0m, "", "", true, 9m, 0m, "Ka6iP6dyoL17", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Availables_UserModelId",
