@@ -11,6 +11,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=https://+:443
+      - STRIPE__APIKEY=${Stripe__ApiKey}
+      - FEE=${Fee}
+      - CONNECTIONSTRINGS__DEFAULT=${ConnectionStrings__Default}
+      - BTCPAY__URL=${BTCPay__url}
+      - BTCPAY__STOREID=${BTCPay__storeId}
+      - BTCPAY__SECRET=${BTCPay__secret}
+      - BTCPAY__PASSWORD=${BTCPay__password}
+      - BTCPAY__EMAIL=${BTCPay__email}
+      - BTCPAY__APIKEY=${BTCPay__apikey}
+      - BTCADDRESS=${BTCAddress}
+      - FIREBASEADMIN__PATH=${FirebaseAdmin__Path}
     volumes:
       - /home/centos/wepromolink/Secrets:/root/.microsoft/usersecrets/310d3c99-f000-4003-b50b-bc06ded5b546/
       - /etc/letsencrypt/:/etc/letsencrypt/
