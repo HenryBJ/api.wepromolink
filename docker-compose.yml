@@ -11,5 +11,4 @@ services:
       - ASPNETCORE_URLS=https://+:443
     volumes:
       - /home/centos/wepromolink/Secrets:/root/.microsoft/usersecrets/310d3c99-f000-4003-b50b-bc06ded5b546/
-      - /home/centos/wepromolink/Secrets:/app/
       - /etc/letsencrypt/:/etc/letsencrypt/
