@@ -3,6 +3,8 @@ version: '3'
 services:
 
   website:
+    env_file:
+      - /home/centos/wepromolink/Secrets/secrets.env
     image: cod4it/wepromolink:1.0
     ports:
       - "443:443"
