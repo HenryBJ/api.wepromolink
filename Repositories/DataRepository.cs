@@ -14,18 +14,21 @@ public class DataRepository
 
     public async Task Update(HistorySharedByUsersOnCampaignModel model)
     {
-        var list = await _db.Campaigns
+        var campaign = await _db.Campaigns
+        .Include(e => e.User)
+        .Include(e => e.Links)
         .Where(e => e.Id == model.CampaignModelId)
-        .SelectMany(k => k.Links)
+        .SingleOrDefaultAsync();
+
+        var list = campaign!.Links
         .GroupBy(e => e.User)
         .Select(g => new
         {
             User = g.Key,
             LinkCount = g.Count()
-        })
-        .OrderByDescending(e => e.LinkCount)
+        }).OrderByDescending(e => e.LinkCount)
         .Take(10)
-        .ToListAsync();
+        .ToList();
 
         if (list.Count >= 1) { model.L0 = list[0].User.Fullname; model.X0 = list[0].LinkCount; } else { model.L0 = ""; }
         if (list.Count >= 2) { model.L1 = list[1].User.Fullname; model.X1 = list[1].LinkCount; } else { model.L1 = ""; }
@@ -46,14 +49,14 @@ public class DataRepository
 
     public async Task Update(HistorySharedOnCampaignModel model)
     {
-        DateTime currentDay = DateTime.Now.Date;
+        DateTime currentDay = DateTime.UtcNow;
         DateTime startDate = currentDay.AddDays(-9);
 
         var dates = Enumerable.Range(0, 10).Select(offset => startDate.AddDays(offset).Date);
 
         var list = dates.GroupJoin(_db.Links.Where(e => e.CampaignModelId == model.CampaignModelId),
-        date => date,
-        link => link.CreatedAt,
+        date => date.Date,
+        link => link.CreatedAt.Date,
         (date, links) => new
         {
             CreatedAt = date,
@@ -112,9 +115,16 @@ public class DataRepository
 
     public async Task Update(HistorySharedByUsersUserModel model)
     {
-        var list = await _db.Users
+        var user = await _db.Users
+        .Include(e => e.Campaigns)
+        .ThenInclude(e => e.Links)
+        .ThenInclude(e => e.User)
         .Where(e => e.Id == model.UserModelId)
-        .SelectMany(e => e.Campaigns.SelectMany(k => k.Links))
+        .FirstOrDefaultAsync();
+
+        var links = user!.Campaigns.SelectMany(e => e.Links).ToList();
+
+        var list = links
         .GroupBy(e => e.User)
         .Select(g => new
         {
@@ -123,7 +133,7 @@ public class DataRepository
         })
         .OrderByDescending(e => e.LinkCount)
         .Take(10)
-        .ToListAsync();
+        .ToList();
 
         if (list.Count >= 1) { model.L0 = list[0].User.Fullname; model.X0 = list[0].LinkCount; } else { model.L0 = ""; }
         if (list.Count >= 2) { model.L1 = list[1].User.Fullname; model.X1 = list[1].LinkCount; } else { model.L1 = ""; }
@@ -146,12 +156,17 @@ public class DataRepository
     {
         DateTime weekAgo = DateTime.UtcNow.AddDays(-7);
 
-        var sharedsLastWeek = await _db.Users
+        var user = await _db.Users
+        .Include(e => e.Campaigns)
+        .ThenInclude(e => e.Links)
         .Where(e => e.Id == model.UserModelId)
-        .SelectMany(e => e.Campaigns)
-        .SelectMany(e => e.Links)
+        .SingleOrDefaultAsync();
+
+        var links = user!.Campaigns.SelectMany(e => e.Links).ToList();
+
+        var sharedsLastWeek = links
         .Where(e => e.CreatedAt.Date >= weekAgo && e.CreatedAt.Date <= DateTime.UtcNow.Date)
-        .CountAsync();
+        .Count();
 
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;
@@ -163,12 +178,18 @@ public class DataRepository
 
     public async Task Update(SharedTodayUserModel model)
     {
-        var sharedsToday = await _db.Users
+
+        var user = await _db.Users
+        .Include(e => e.Campaigns)
+        .ThenInclude(e => e.Links)
         .Where(e => e.Id == model.UserModelId)
-        .SelectMany(e => e.Campaigns)
-        .SelectMany(e => e.Links)
+        .SingleOrDefaultAsync();
+
+        var links = user!.Campaigns.SelectMany(e => e.Links).ToList();
+
+        var sharedsToday = links
         .Where(e => e.CreatedAt.Date == DateTime.UtcNow.Date)
-        .CountAsync();
+        .Count();
 
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;

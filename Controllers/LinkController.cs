@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using WePromoLink.Services;
 using WePromoLink.Validators;
 
@@ -38,13 +39,13 @@ public class LinkController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    [Route("create")]
-    public async Task<IActionResult> Create([FromBody] string campaignId)
+    [Route("create/{id}")]
+    public async Task<IActionResult> Create(string id)
     {
-        if (string.IsNullOrEmpty(campaignId)) return BadRequest();
+        if (string.IsNullOrEmpty(id)) return BadRequest();
         try
         {
-            var result = await _linkService.Create(campaignId);
+            var result = await _linkService.Create(id);
             return Ok(result);
         }
         catch (System.Exception ex)
