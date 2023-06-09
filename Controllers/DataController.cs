@@ -495,5 +495,135 @@ public class DataController : ControllerBase
         }
     }
 
+    // Links
+
+    [HttpGet]
+    [Authorize]
+    [Route("clickslastweekonlink/{id}")]
+    public async Task<IActionResult> GetClicksLastWeekOnLink(string id)
+    {
+        try
+        {
+            return await _service.GetClicksLastWeekOnLink(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("clickstodayonlink/{id}")]
+    public async Task<IActionResult> GetClicksTodayOnLink(string id)
+    {
+        try
+        {
+            return await _service.GetClicksTodayOnLink(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("earnlastweekonlink/{id}")]
+    public async Task<IActionResult> GetEarnLastWeekOnLink(string id)
+    {
+        try
+        {
+            return await _service.GetEarnLastWeekOnLink(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("earntodayonlink/{id}")]
+    public async Task<IActionResult> GetEarnTodayOnLink(string id)
+    {
+        try
+        {
+            return await _service.GetEarnTodayOnLink(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historyclicksbycountriesonlink/{id}")]
+    public async Task<IActionResult> GetHistoryClicksByCountriesOnLink(string id)
+    {
+        try
+        {
+            return await _service.GetHistoryClicksByCountriesOnLink(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historyearnbycountriesonlink/{id}")]
+    public async Task<IActionResult> GetHistoryEarnByCountriesOnLink(string id)
+    {
+        try
+        {
+            return await _service.GetHistoryEarnByCountriesOnLink(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historyearnonlink/{id}")]
+    public async Task<IActionResult> GetHistoryEarnOnLink(string id)
+    {
+        try
+        {
+            return await _service.GetHistoryEarnOnLink(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("historyclicksonlink/{id}")]
+    public async Task<IActionResult> GetHistoryClicksOnLink(string id)
+    {
+        try
+        {
+            return await _service.GetHistoryClicksOnLink(id);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
 
 }

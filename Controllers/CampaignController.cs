@@ -25,7 +25,7 @@ public class CampaignController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    [Route("all/{page=1}/{cant=25}/{filter?}")]
+    [Route("all/{page=1}/{cant=15}/{filter?}")]
     public async Task<IActionResult> GetAll(int? page, int? cant, string? filter)
     {
         try

@@ -34,6 +34,10 @@ builder.Services.AddMemoryCache(options =>
 {
     options.SizeLimit = 2000;
 }); //Remplazar por Redis cuando se use microservicios
+builder.Services.AddScoped<IPStackService>(_=>
+{
+    return new IPStackService(builder.Configuration["IpStack:ApiKey"]);
+});
 builder.Services.AddScoped<CampaignValidator>();
 builder.Services.AddScoped<FundSponsoredLinkValidator>();
 builder.Services.AddSingleton<HitQueue>();
@@ -92,13 +96,13 @@ InitializeDataBase(app);
 app.MapGet("/", () => "WePromoLink API v1.0.3 - 29/04/2023");
 
 
-// Access to affiliate links (HIT)
-app.MapGet("/{afflink}", async (string afflink, HttpContext ctx, ILinkService service) =>
+// Access to link (HIT)
+app.MapGet("/{link}", async (string link, HttpContext ctx, ILinkService service) =>
 {
-    if (String.IsNullOrEmpty(afflink)) return Results.BadRequest();
-    var url = await service.HitAffiliateLink(new HitAffiliate
+    if (String.IsNullOrEmpty(link)) return Results.BadRequest();
+    var url = await service.HitLink(new Hit
     {
-        AffLinkId = afflink,
+        LinkId = link,
         Origin = ctx.Request.HttpContext.Connection.RemoteIpAddress,
         HitAt = DateTime.UtcNow
     });

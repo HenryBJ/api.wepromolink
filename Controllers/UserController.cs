@@ -12,25 +12,27 @@ namespace WePromoLink.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _service;
+    private readonly ILogger<UserController> _logger;
 
-    public UserController(IUserService service)
+    public UserController(IUserService service, ILogger<UserController> logger)
     {
         _service = service;
+        _logger = logger;
     }
 
     [HttpGet]
     [Route("exits/{email}")]
-    public async Task<IResult> Exits(string email)
+    public async Task<IActionResult> Exits(string email)
     {
         try
         {
             var results = await _service.Exits(email);
-            return Results.Ok(results);
+            return new OkObjectResult(results);
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
@@ -38,17 +40,17 @@ public class UserController : ControllerBase
     [Route("isblocked")]
     [Authorize]
     [ResponseCache(Duration = 600)]
-    public async Task<IResult> IsBlocked()
+    public async Task<IActionResult> IsBlocked()
     {
         try
         {
             var results = await _service.IsBlocked();
-            return Results.Ok(results);
+            return new OkObjectResult(results);
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
@@ -56,52 +58,52 @@ public class UserController : ControllerBase
     [Route("issubscribed")]
     [Authorize]
     [ResponseCache(Duration = 60)]
-    public async Task<IResult> IsSubscribed()
+    public async Task<IActionResult> IsSubscribed()
     {
         try
         {
             var results = await _service.IsSubscribed();
-            return Results.Ok(results);
+            return new OkObjectResult(results);
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
     [HttpPut]
     [Route("firebaseuid")]
-    public async Task<IResult> SetFirebaseUid([FromBody] dynamic request)
+    public async Task<IActionResult> SetFirebaseUid([FromBody] dynamic request)
     {
         try
         {
             string email = request.GetProperty("email").GetString();
             string uid = request.GetProperty("uid").GetString();
             await _service.SetFirebaseUid(email, uid);
-            return Results.Ok();
+            return new OkResult();
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 
 
     [HttpPost]
     [Route("signup")]
-    public async Task<IResult> SignUp([FromBody] SignUpData data)
+    public async Task<IActionResult> SignUp([FromBody] SignUpData data)
     {
         try
         {
             var response = await _service.SignUp(data);
-            return Results.Ok(response);
+            return new OkObjectResult(response);
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 

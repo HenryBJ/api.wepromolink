@@ -7,6 +7,7 @@ namespace WePromoLink.Data;
 public class DataContext : DbContext
 {
 
+    public virtual DbSet<GeoDataModel> GeoDatas { get; set; }
     public virtual DbSet<GenericEventModel> GenericEvent { get; set; }
     public virtual DbSet<BadgetModel> Badgets { get; set; }
     public virtual DbSet<PayoutInfoModel> PayoutInfos { get; set; }
@@ -74,6 +75,10 @@ public class DataContext : DbContext
     {
         base.OnModelCreating(builder);
 
+        builder.Entity<GeoDataModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
 
         builder.Entity<UserModel>(entity =>
         {

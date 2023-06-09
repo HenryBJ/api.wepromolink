@@ -21,19 +21,37 @@ public class LinkController : ControllerBase
     }
 
     [HttpGet]
-    [Route("all/{page=1}")]
-    public async Task<IResult> GetAll(int? page)
+    [Authorize]
+    [Route("all/{page=1}/{cant=15}/{filter?}")]
+    public async Task<IActionResult> GetAll(int? page, int? cant, string? filter)
     {
         try
         {
             // List afiliate links
-            var results = await _linkService.ListAffiliateLinks(page);
-            return Results.Ok(results);
+            var results = await _linkService.GetAll(page, cant, filter);
+            return new OkObjectResult(results);
         }
         catch (System.Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return Results.Problem();
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("detail/{id}")]
+    public async Task<IActionResult> GetDetails(string id)
+    {
+        try
+        {
+            var results = await _linkService.GetDetails(id);
+            return new OkObjectResult(results);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
 

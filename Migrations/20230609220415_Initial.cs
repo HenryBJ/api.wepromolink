@@ -25,6 +25,30 @@ namespace WePromoLink.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GeoDatas",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IP = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Continent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CountryCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Region = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RegionCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Zip = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    CountryFlagUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ISP = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GeoDatas", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SubscriptionPlans",
                 columns: table => new
                 {
@@ -1513,10 +1537,9 @@ namespace WePromoLink.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LinkModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GeoDataId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Origin = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Geolocation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsGeolocated = table.Column<bool>(type: "bit", nullable: false),
-                    MapImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FirstHitAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastHitAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Counter = table.Column<int>(type: "int", nullable: false),
@@ -1527,6 +1550,11 @@ namespace WePromoLink.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Hits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Hits_GeoDatas_GeoDataId",
+                        column: x => x.GeoDataId,
+                        principalTable: "GeoDatas",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Hits_Links_LinkModelId",
                         column: x => x.LinkModelId,
@@ -1576,12 +1604,12 @@ namespace WePromoLink.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("3f052450-17e3-48b8-b048-8bfbc8780280"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "-riPtgCg-9R4", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
+                values: new object[] { new Guid("70db5a80-8fdf-423d-bd45-03f5cdb712ad"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "L4aaxEB_lPKU", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("fc59e949-dbdd-4e87-802b-cfdd691e61b3"), 0m, "", "", true, 9m, 0m, "Ka6iP6dyoL17", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                values: new object[] { new Guid("71e6b3be-36b1-4bb3-ad73-8a1fc02fa470"), 0m, "", "", true, 9m, 0m, "bHzzuS8Tf7S6", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Availables_UserModelId",
@@ -1782,6 +1810,11 @@ namespace WePromoLink.Migrations
                 table: "HistorySharedOnCampaigns",
                 column: "CampaignModelId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Hits_GeoDataId",
+                table: "Hits",
+                column: "GeoDataId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Hits_LinkModelId",
@@ -2040,6 +2073,9 @@ namespace WePromoLink.Migrations
 
             migrationBuilder.DropTable(
                 name: "SharedTodayUsers");
+
+            migrationBuilder.DropTable(
+                name: "GeoDatas");
 
             migrationBuilder.DropTable(
                 name: "Links");

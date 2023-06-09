@@ -409,13 +409,13 @@ public class CampaignService : ICampaignService
     }
 
 
-    public async Task<MyCampaignList> GetAll(int? page, int? cant, string? filter)
+    public async Task<PaginationList<MyCampaign>> GetAll(int? page, int? cant, string? filter)
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
         if (userId == Guid.Empty) throw new Exception("User no found");
 
-        MyCampaignList list = new MyCampaignList();
+        PaginationList<MyCampaign> list = new PaginationList<MyCampaign>();
         page = page ?? 1;
         page = page <= 0 ? 1 : page;
         cant = cant ?? 25;

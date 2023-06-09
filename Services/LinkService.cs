@@ -109,7 +109,7 @@ public class LinkService : ILinkService
                     UserModelId = userB.Id,
                     Title = "Campaign shared",
                     Message = $"A link has been created to your campaign called '{campaign.Title}' by the user {userA.Fullname}",
-                };                
+                };
                 await _db.Notifications.AddAsync(noti);
                 await _db.SaveChangesAsync();
 
@@ -125,76 +125,86 @@ public class LinkService : ILinkService
         }
     }
 
-    // public async Task<object> CreateAffiliateLink(CreateAffiliateLink affLink, HttpContext ctx)
-    // {
-    //     var sponsoredLink = await _db.Campaigns.Where(e=>e.ExternalId == affLink.SponsoredLinkId).SingleOrDefaultAsync(); 
-    //     if(sponsoredLink == null) throw new Exception("Sponsored link not found");
-
-    //     var email = await _db.Emails.Where(e=>e.Email.ToLower() == affLink.Email!.ToLower()).SingleOrDefaultAsync();
-    //     if(email == null)
-    //     {
-    //         email = new EmailModel
-    //         {
-    //             CreatedAt = DateTime.UtcNow,
-    //             Email = affLink.Email!
-    //         };
-    //         _db.Emails.Add(email);
-    //         await _db.SaveChangesAsync();
-    //     }
-
-    //     var externalId = await Nanoid.Nanoid.GenerateAsync(size:16);
-    //     AffiliateLinkModel affiliateLinkModel = new AffiliateLinkModel
-    //     {
-    //         Available = 0m,
-    //         BTCAddress = affLink.BTCAddress,
-    //         CreatedAt = DateTime.UtcNow,
-    //         EmailModelId = email.Id,
-    //         ExternalId = externalId,
-    //         Group = affLink.Options?.Group,
-    //         CampaignModelId = sponsoredLink.Id,
-    //         Threshold = affLink.Options?.Threshold??0m
-    //     };
-    //     _db.AffiliateLinks.Add(affiliateLinkModel);
-    //     await _db.SaveChangesAsync();
-    //     return new {id=externalId, link=$"{ctx.Request.Scheme}://{ctx.Request.Host}/{externalId}"};
-    // }
-
-    public async Task<string> HitAffiliateLink(HitAffiliate hit)
+    public async Task<string> HitLink(Hit hit)
     {
-        //    var affiliateLink = await _db.AffiliateLinks.Where(e=>e.ExternalId == hit.AffLinkId)
-        //    .Include(e=>e.Campaign)
-        //    .SingleOrDefaultAsync();
+           var Link = await _db.Links.Where(e=>e.ExternalId == hit.LinkId)
+           .Include(e=>e.Campaign)
+           .SingleOrDefaultAsync();
 
-        //    if(affiliateLink == null) throw new Exception($"Affiliate link not found: {hit.AffLinkId}");
-        //    _queue.Item = hit; // Add for forward processing 
-        //    return affiliateLink.Campaign.Url;
-        return "";
+           if(Link == null) return string.Empty;
+           _queue.Item = hit; // Add for forward processing 
+           return Link.Campaign.Url;
     }
 
-    public async Task<AffLinkList> ListAffiliateLinks(int? page)
+    public async Task<PaginationList<MyLink>> GetAll(int? page, int? cant, string? filter)
     {
-        return null;
-        // AffLinkList list = new AffLinkList();
-        // int cant = 50;
-        // page = page ?? 1;
-        // page = page <= 0 ? 1 : page;
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
 
-        // list.AffLinks = await _db.AffiliateLinks
-        // .Include(e=>e.Campaign)
-        // .OrderByDescending(e => e.CreatedAt)
-        // .Skip((page.Value! - 1) * cant)
-        // .Take(cant)
-        // .Select(e => new AffLink
-        // {
-        //     Available = e.Available,
-        //     Id = e.ExternalId,
-        //     ImageUrl = e.Campaign.ImageUrl,
-        //     Title = $"affiliate: {e.Campaign.Title}",
-        //     Url = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}/{e.ExternalId}"
-        // })
-        // .ToListAsync();
-        // list.Page = page.Value!;
-        // list.TotalPages = ((await _db.Campaigns.CountAsync()) / cant) + 1;
-        // return list;
+        PaginationList<MyLink> list = new PaginationList<MyLink>();
+        page = page ?? 1;
+        page = page <= 0 ? 1 : page;
+        cant = cant ?? 11;
+
+        var counter = await _db.Links
+        .Include(e => e.Campaign)
+        .Where(e => e.UserModelId == userId)
+        .CountAsync();
+
+        var query = _db.Links
+        .Include(e => e.Campaign)
+        .Where(e => e.UserModelId == userId);
+
+        if (!string.IsNullOrEmpty(filter))
+        {
+            query = query.Where(e => e.Campaign.Title.ToLower().Contains(filter.ToLower()));
+        }
+
+        list.Items = await query
+        .OrderByDescending(e => e.CreatedAt)
+        .Skip((page.Value! - 1) * cant!.Value)
+        .Take(cant!.Value)
+        .Select(e => new MyLink
+        {
+            Id = e.ExternalId,
+            ImageUrl = e.Campaign.ImageUrl,
+            Title = e.Campaign.Title,
+            Url = e.Url,
+            Status = e.Campaign.Status,
+            LastClick = e.LastClick,
+            Profit = _db.PaymentTransactions.Where(k => k.LinkModelId == e.Id).Select(e => e.Amount).Sum()
+        })
+        .ToListAsync();
+        list.Pagination.Page = page.Value!;
+        list.Pagination.TotalPages = (counter / cant!.Value) + 1;
+        list.Pagination.Cant = list.Items.Count;
+        return list;
+    }
+
+    public async Task<LinkDetail> GetDetails(string id)
+    {
+        if (string.IsNullOrEmpty(id)) throw new Exception("Invalid Link ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var link = await _db.Links
+        .Include(e=>e.Campaign)
+        .Where(e => e.ExternalId == id).Select(e => new LinkDetail
+        {
+            Id = e.ExternalId,
+            ImageUrl = e.Campaign.ImageUrl!,
+            Status = e.Campaign.Status,
+            Title = e.Campaign.Title,
+            Url = e.Url,
+            LastClick = e.LastClick,
+            Description = e.Campaign.Description!,
+            Epm = e.Campaign.EPM,
+            Profit = _db.PaymentTransactions.Where(k => k.LinkModelId == e.Id).Select(e => e.Amount).Sum()  
+        }).SingleOrDefaultAsync();
+
+        if (link == null) throw new Exception("Link does not exits");
+        return link;
     }
 }

@@ -38,4 +38,14 @@ public interface IDataService
     Task<IActionResult> GetHistorySharedOnCampaign(string campaignId);
     Task<IActionResult> GetSharedLastWeekOnCampaign(string campaignId);
     Task<IActionResult> GetSharedTodayOnCampaignModel(string campaignId);
+
+    // Link Statistics
+    Task<IActionResult> GetClicksLastWeekOnLink(string linkId);
+    Task<IActionResult> GetClicksTodayOnLink(string linkId);
+    Task<IActionResult> GetEarnLastWeekOnLink(string linkId);
+    Task<IActionResult> GetEarnTodayOnLink(string linkId);
+    Task<IActionResult> GetHistoryClicksByCountriesOnLink(string linkId);
+    Task<IActionResult> GetHistoryEarnByCountriesOnLink(string linkId);
+    Task<IActionResult> GetHistoryEarnOnLink(string linkId);
+    Task<IActionResult> GetHistoryClicksOnLink(string linkId);
 }

@@ -13,26 +13,28 @@ public class PricingController : ControllerBase
 {
 
     private readonly IPricingService _service;
+    private readonly ILogger<PricingController> _logger;
 
-    public PricingController(IPricingService service)
+    public PricingController(IPricingService service, ILogger<PricingController> logger)
     {
         _service = service;
+        _logger = logger;
     }
 
     [HttpGet]
     [Route("all")]
     [ResponseCache(Duration = 1800)] // duración en segundos (30 minutos)
-    public async Task<IResult> GetAll()
+    public async Task<IActionResult> GetAll()
     {
         try
         {
             var results = await _service.GetAll();
-            return Results.Ok(results);
+            return new OkObjectResult(results);
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
-            return Results.Problem();
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
         }
     }
     

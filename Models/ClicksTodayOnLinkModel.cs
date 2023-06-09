@@ -1,6 +1,8 @@
+using WePromoLink.Interfaces;
+
 namespace WePromoLink.Models;
 
-public class ClicksTodayOnLinkModel: StatsBaseModel
+public class ClicksTodayOnLinkModel: StatsBaseModel, IHasValue<int>
 {
     public Guid Id { get; set; }
     public virtual LinkModel Link { get; set; }

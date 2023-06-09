@@ -2,9 +2,9 @@ using System.Net;
 
 namespace WePromoLink;
 
-public class HitAffiliate
+public class Hit
 {
-    public string? AffLinkId { get; set; }
+    public string? LinkId { get; set; }
     public IPAddress? Origin { get; set; }
     public DateTime? HitAt { get; set; }
 }

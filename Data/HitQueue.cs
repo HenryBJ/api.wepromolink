@@ -2,9 +2,9 @@ namespace WePromoLink.Data;
 
 public class HitQueue
 {
-    private readonly Queue<HitAffiliate> _queue = new Queue<HitAffiliate>();
+    private readonly Queue<Hit> _queue = new Queue<Hit>();
 
-    public HitAffiliate? Item
+    public Hit? Item
     {
         get
         {

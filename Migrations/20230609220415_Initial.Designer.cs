@@ -12,7 +12,7 @@ using WePromoLink.Data;
 namespace WePromoLink.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230528213514_Initial")]
+    [Migration("20230609220415_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,11 +42,11 @@ namespace WePromoLink.Migrations
                     b.Property<DateTime?>("FirstHitAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("GeoDataId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("GeolocatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Geolocation")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsGeolocated")
                         .HasColumnType("bit");
@@ -57,13 +57,12 @@ namespace WePromoLink.Migrations
                     b.Property<Guid>("LinkModelId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("MapImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Origin")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GeoDataId");
 
                     b.HasIndex("LinkModelId");
 
@@ -696,6 +695,56 @@ namespace WePromoLink.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("GenericEvent");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.GeoDataModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Continent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CountryCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CountryFlagUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ISP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Region")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RegionCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Zip")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GeoDatas");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnCampaignModel", b =>
@@ -2936,14 +2985,14 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("3f052450-17e3-48b8-b048-8bfbc8780280"),
+                            Id = new Guid("70db5a80-8fdf-423d-bd45-03f5cdb712ad"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             ContainAds = false,
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "-riPtgCg-9R4",
+                            ExternalId = "L4aaxEB_lPKU",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
@@ -2956,14 +3005,14 @@ namespace WePromoLink.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fc59e949-dbdd-4e87-802b-cfdd691e61b3"),
+                            Id = new Guid("71e6b3be-36b1-4bb3-ad73-8a1fc02fa470"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             ContainAds = true,
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "Ka6iP6dyoL17",
+                            ExternalId = "bHzzuS8Tf7S6",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",
@@ -3030,11 +3079,17 @@ namespace WePromoLink.Migrations
 
             modelBuilder.Entity("WePromoLink.HitModel", b =>
                 {
+                    b.HasOne("WePromoLink.Models.GeoDataModel", "GeoData")
+                        .WithMany()
+                        .HasForeignKey("GeoDataId");
+
                     b.HasOne("WePromoLink.Models.LinkModel", "Link")
                         .WithMany("Hits")
                         .HasForeignKey("LinkModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("GeoData");
 
                     b.Navigation("Link");
                 });

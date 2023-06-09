@@ -8,7 +8,8 @@ public static class  TransactionTypeEnum
     public const string Deposit = "DEPOSIT";
     public const string Payout = "PAYOUT";
     public const string Fee = "FEE";
-    public const string Profit = "PROFIT";  
+    public const string Profit = "PROFIT";
+    public const string ClickCost = "CLICK COST";  
 
 }
 

@@ -6,8 +6,9 @@ public interface ILinkService
 {
 
     Task<string> Create(string ExternalCampaignId);
+    Task<PaginationList<MyLink>> GetAll(int? page, int? cant, string? filter);
+    Task<LinkDetail> GetDetails(string id);
 
     // Task<object> CreateAffiliateLink(CreateAffiliateLink affLink, HttpContext ctx);
-    Task<string> HitAffiliateLink(HitAffiliate hit);
-    Task<AffLinkList> ListAffiliateLinks(int? page);
+    Task<string> HitLink(Hit hit);
 }

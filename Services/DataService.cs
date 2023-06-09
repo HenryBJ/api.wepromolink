@@ -373,4 +373,118 @@ public class DataService : IDataService
         if (campaign == null) return new NotFoundResult();
         return AddCache<SharedTodayOnCampaignModel, int>(campaign.SharedTodayOnCampaignModel);
     }
+
+    // Links
+
+    public async Task<IActionResult> GetClicksLastWeekOnLink(string linkId)
+    {
+        if (string.IsNullOrEmpty(linkId)) throw new Exception("Invalid Link ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var link = await _db.Links.Where(e => e.UserModelId == userId && e.ExternalId == linkId)
+        .Include(e => e.ClicksLastWeekOnLink).SingleOrDefaultAsync();
+
+        if (link == null) return new NotFoundResult();
+        return AddCache<ClicksLastWeekOnLinkModel, int>(link.ClicksLastWeekOnLink);
+    }
+
+    public async Task<IActionResult> GetClicksTodayOnLink(string linkId)
+    {
+        if (string.IsNullOrEmpty(linkId)) throw new Exception("Invalid Link ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var link = await _db.Links.Where(e => e.UserModelId == userId && e.ExternalId == linkId)
+        .Include(e => e.ClicksTodayOnLink).SingleOrDefaultAsync();
+
+        if (link == null) return new NotFoundResult();
+        return AddCache<ClicksTodayOnLinkModel, int>(link.ClicksTodayOnLink);
+    }
+
+    public async Task<IActionResult> GetEarnLastWeekOnLink(string linkId)
+    {
+        if (string.IsNullOrEmpty(linkId)) throw new Exception("Invalid Link ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var link = await _db.Links.Where(e => e.UserModelId == userId && e.ExternalId == linkId)
+        .Include(e => e.EarnLastWeekOnLink).SingleOrDefaultAsync();
+
+        if (link == null) return new NotFoundResult();
+        return AddCache<EarnLastWeekOnLinkModel, decimal>(link.EarnLastWeekOnLink);
+    }
+
+    public async Task<IActionResult> GetEarnTodayOnLink(string linkId)
+    {
+        if (string.IsNullOrEmpty(linkId)) throw new Exception("Invalid Link ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var link = await _db.Links.Where(e => e.UserModelId == userId && e.ExternalId == linkId)
+        .Include(e => e.EarnTodayOnLink).SingleOrDefaultAsync();
+
+        if (link == null) return new NotFoundResult();
+        return AddCache<EarnTodayOnLinkModel, decimal>(link.EarnTodayOnLink);
+    }
+
+    public async Task<IActionResult> GetHistoryClicksByCountriesOnLink(string linkId)
+    {
+        if (string.IsNullOrEmpty(linkId)) throw new Exception("Invalid Link ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var link = await _db.Links.Where(e => e.UserModelId == userId && e.ExternalId == linkId)
+        .Include(e => e.HistoryClicksByCountriesOnLink).SingleOrDefaultAsync();
+
+        if (link == null) return new NotFoundResult();
+        return AddCacheHistoricalData<HistoryClicksByCountriesOnLinkModel, int, string>(link.HistoryClicksByCountriesOnLink);
+    }
+
+    public async Task<IActionResult> GetHistoryEarnByCountriesOnLink(string linkId)
+    {
+        if (string.IsNullOrEmpty(linkId)) throw new Exception("Invalid Link ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var link = await _db.Links.Where(e => e.UserModelId == userId && e.ExternalId == linkId)
+        .Include(e => e.HistoryEarnByCountriesOnLink).SingleOrDefaultAsync();
+
+        if (link == null) return new NotFoundResult();
+        return AddCacheHistoricalData<HistoryEarnByCountriesOnLinkModel, decimal, string>(link.HistoryEarnByCountriesOnLink);
+    }
+
+    public async Task<IActionResult> GetHistoryEarnOnLink(string linkId)
+    {
+        if (string.IsNullOrEmpty(linkId)) throw new Exception("Invalid Link ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var link = await _db.Links.Where(e => e.UserModelId == userId && e.ExternalId == linkId)
+        .Include(e => e.HistoryEarnOnLink).SingleOrDefaultAsync();
+
+        if (link == null) return new NotFoundResult();
+        return AddCacheHistoricalData<HistoryEarnOnLinkModel, decimal, DateTime>(link.HistoryEarnOnLink);
+    }
+
+    public async Task<IActionResult> GetHistoryClicksOnLink(string linkId)
+    {
+        if (string.IsNullOrEmpty(linkId)) throw new Exception("Invalid Link ID");
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var link = await _db.Links.Where(e => e.UserModelId == userId && e.ExternalId == linkId)
+        .Include(e => e.HistoryClicksOnLink).SingleOrDefaultAsync();
+
+        if (link == null) return new NotFoundResult();
+        return AddCacheHistoricalData<HistoryClicksOnLinkModel, int, DateTime>(link.HistoryClicksOnLink);
+    }
 }
