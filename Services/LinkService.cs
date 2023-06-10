@@ -37,6 +37,7 @@ public class LinkService : ILinkService
         .Include(e => e.HistorySharedOnCampaign)
         .Include(e => e.SharedLastWeekOnCampaign)
         .Include(e => e.SharedTodayOnCampaignModel)
+        .Where(e=>e.ExternalId == ExternalCampaignId)
         .SingleOrDefaultAsync();
         if (campaign == null) throw new Exception("Campaign no found");
 

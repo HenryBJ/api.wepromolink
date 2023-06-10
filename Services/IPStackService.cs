@@ -6,7 +6,7 @@ namespace WePromoLink.Services;
 
 public class IPStackService
 {
-    private readonly string URL = "https://api.ipstack.com/{0}?access_key={1}";
+    private readonly string URL = "http://api.ipstack.com/{0}?access_key={1}";
     private readonly string _apiKey = "";
 
     public IPStackService(string apiKey)
@@ -30,8 +30,8 @@ public class IPStackService
               var requestUrl = string.Format(URL, ip, _apiKey);
               var response = await httpClient.GetAsync(requestUrl);
               response.EnsureSuccessStatusCode();
+            //   var dataString = await response.Content.ReadAsStringAsync();
               var data = await response.Content.ReadFromJsonAsync<IPStackGeoData>();
-
               if (data == null) throw new Exception("Invalid GeoData");
 
               result = new GeoDataModel
@@ -45,8 +45,8 @@ public class IPStackService
                   Currency = data?.currency?.code,
                   IP = data?.ip ?? ip,
                   ISP = data?.connection?.isp,
-                  Latitude = (decimal)data?.latitude,
-                  Longitude = (decimal)data?.longitude,
+                  Latitude = Convert.ToDecimal(data?.latitude),
+                  Longitude = Convert.ToDecimal(data?.longitude),
                   Region = data?.region_name,
                   RegionCode = data?.region_code,
               };

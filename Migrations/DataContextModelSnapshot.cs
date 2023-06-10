@@ -726,10 +726,12 @@ namespace WePromoLink.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Latitude")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(20, 14)
+                        .HasColumnType("decimal(20,14)");
 
                     b.Property<decimal?>("Longitude")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(20, 14)
+                        .HasColumnType("decimal(20,14)");
 
                     b.Property<string>("Region")
                         .HasColumnType("nvarchar(max)");
@@ -2983,14 +2985,14 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("70db5a80-8fdf-423d-bd45-03f5cdb712ad"),
+                            Id = new Guid("02df28e3-76b4-4f73-b9fe-729c0dae4945"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             ContainAds = false,
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "L4aaxEB_lPKU",
+                            ExternalId = "FEVhyQ4GNnBn",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
@@ -3003,14 +3005,14 @@ namespace WePromoLink.Migrations
                         },
                         new
                         {
-                            Id = new Guid("71e6b3be-36b1-4bb3-ad73-8a1fc02fa470"),
+                            Id = new Guid("c99e8bd4-a37c-482f-8279-0bfe7f16e8eb"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             ContainAds = true,
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "bHzzuS8Tf7S6",
+                            ExternalId = "7GxguEEJjH7e",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",

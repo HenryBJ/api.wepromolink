@@ -78,6 +78,8 @@ public class DataContext : DbContext
         builder.Entity<GeoDataModel>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Latitude).HasPrecision(20, 14);
+            entity.Property(e => e.Longitude).HasPrecision(20, 14);
         });
 
         builder.Entity<UserModel>(entity =>

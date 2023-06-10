@@ -37,8 +37,8 @@ namespace WePromoLink.Migrations
                     RegionCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Zip = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Latitude = table.Column<decimal>(type: "decimal(20,14)", precision: 20, scale: 14, nullable: true),
+                    Longitude = table.Column<decimal>(type: "decimal(20,14)", precision: 20, scale: 14, nullable: true),
                     CountryFlagUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ISP = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -1604,12 +1604,12 @@ namespace WePromoLink.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("70db5a80-8fdf-423d-bd45-03f5cdb712ad"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "L4aaxEB_lPKU", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
+                values: new object[] { new Guid("02df28e3-76b4-4f73-b9fe-729c0dae4945"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "FEVhyQ4GNnBn", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("71e6b3be-36b1-4bb3-ad73-8a1fc02fa470"), 0m, "", "", true, 9m, 0m, "bHzzuS8Tf7S6", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                values: new object[] { new Guid("c99e8bd4-a37c-482f-8279-0bfe7f16e8eb"), 0m, "", "", true, 9m, 0m, "7GxguEEJjH7e", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Availables_UserModelId",
