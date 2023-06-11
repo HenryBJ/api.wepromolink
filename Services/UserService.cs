@@ -1,3 +1,4 @@
+using System.Dynamic;
 using FirebaseAdmin.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -7,6 +8,7 @@ using Stripe;
 using WePromoLink.Data;
 using WePromoLink.DTO;
 using WePromoLink.Models;
+using WePromoLink.Services.Email;
 using WePromoLink.Settings;
 
 namespace WePromoLink.Services;
@@ -16,11 +18,13 @@ public class UserService : IUserService
     private readonly DataContext _db;
     private readonly ILogger<UserService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    public UserService(DataContext db, IHttpContextAccessor httpContextAccessor, ILogger<UserService> logger)
+    private readonly IEmailSender _emailSender;
+    public UserService(DataContext db, IHttpContextAccessor httpContextAccessor, ILogger<UserService> logger, IEmailSender emailSender)
     {
         _db = db;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
+        _emailSender = emailSender;
     }
 
     public async Task Create(User user, bool isSubscribed = false, string firebaseId = "")
@@ -163,6 +167,10 @@ public class UserService : IUserService
                     Status = "active"
                 }
             }, true, data.FirebaseId);
+
+            // Notificar por email (Welcome)
+            await _emailSender.Send(data.Fullname, data.Email, "Welcome to WePromoLink", Templates.Welcome(new { user = data.Fullname }));
+
 
             return true; //Ok
         }

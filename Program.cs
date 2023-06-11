@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Stripe;
 using Google.Apis.Auth.OAuth2;
+using WePromoLink.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
@@ -34,7 +35,7 @@ builder.Services.AddMemoryCache(options =>
 {
     options.SizeLimit = 2000;
 }); //Remplazar por Redis cuando se use microservicios
-builder.Services.AddScoped<IPStackService>(_=>
+builder.Services.AddScoped<IPStackService>(_ =>
 {
     return new IPStackService(builder.Configuration["IpStack:ApiKey"]);
 });
@@ -61,6 +62,14 @@ builder.Services.AddHostedService<WebHookWorker>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<ICampaignService, CampaignService>();
+builder.Services.AddTransient<IEmailSender, EmailSender>(_ =>
+{
+    return new EmailSender(
+        builder.Configuration["Email:Server"],
+        Convert.ToInt32(builder.Configuration["Email:Port"]),
+        builder.Configuration["Email:Sender"],
+        builder.Configuration["Email:Password"]);
+});
 builder.Services.AddTransient<IDataService, DataService>();
 builder.Services.AddTransient<IPricingService, PricingService>();
 builder.Services.AddTransient<IUserService, UserService>();
