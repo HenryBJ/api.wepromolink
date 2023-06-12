@@ -4,6 +4,6 @@ namespace WePromoLink.Services;
 
 public interface IPaymentService
 {
-    Task<string> CreateInvoice(PaymentTransaction payment, string redirectUrl = "");
+    Task<string> CreateInvoice(decimal amount, string firebaseId);
     Task HandleWebHook(HttpContext ctx);
 }

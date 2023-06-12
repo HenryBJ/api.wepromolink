@@ -8,6 +8,7 @@ using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json.Linq;
 using WePromoLink.Data;
 using WePromoLink.DTO.BTCPay;
+using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Settings;
 using static BTCPayServer.Client.Models.InvoiceDataBase;
@@ -41,7 +42,7 @@ public class BTCPaymentService : IPaymentService
 
             JsonElement data = JsonSerializer.Deserialize<JsonElement>(json);
             string event_type = getEventType(data);
-            //  _logger.LogInformation($"Received BTCPay event: {event_type}"); 
+             _logger.LogInformation($"Received BTCPay event: {event_type}"); 
             try
             {
                 Type? type = Type.GetType($"WePromoLink.DTO.BTCPay.{event_type}");
@@ -62,12 +63,12 @@ public class BTCPaymentService : IPaymentService
         if (btcpayEvent == null) return;
         switch (btcpayEvent!)
         {
-            case InvoiceSettled ev:
-                var invoiceData = await _client.GetInvoice(_settings.Value.StoreId, ev.InvoiceId);
-                var pay = invoiceData.Metadata.ToObject<PaymentTransaction>();
-                _logger.LogInformation($"Amount:{invoiceData.Amount} PaymentId:{pay!.Id} ");
-                await ProcessPayment(invoiceData, pay);
-                break;
+            // case InvoiceSettled ev:
+            //     var invoiceData = await _client.GetInvoice(_settings.Value.StoreId, ev.InvoiceId);
+            //     var pay = invoiceData.Metadata.ToObject<PaymentTransaction>();
+            //     _logger.LogInformation($"Amount:{invoiceData.Amount} PaymentId:{pay!.Id} ");
+            //     await ProcessPayment(invoiceData, pay);
+            //     break;
             default:
                 _logger.LogInformation(btcpayEvent?.ToString());
                 break;
@@ -149,21 +150,57 @@ public class BTCPaymentService : IPaymentService
         return null;
     }
 
-    public async Task<string> CreateInvoice(PaymentTransaction payment, string RedirectUrl = "")
+    public async Task<string> CreateInvoice(decimal amount, string firebaseId)
     {
-        var result = await _client.CreateInvoice(_settings.Value.StoreId, new CreateInvoiceRequest
+        BTCPayServer.Client.Models.InvoiceData? result = null;
+        using (var transaction = _bd.Database.BeginTransaction())
         {
-            Amount = payment.Amount,
-            Currency = "BTC",
-            Checkout = new CheckoutOptions
+            try
             {
-                SpeedPolicy = SpeedPolicy.MediumSpeed,
-                Expiration = TimeSpan.FromHours(5),
-                RedirectURL = RedirectUrl
-            },
-            Metadata = JObject.FromObject(payment)
-        });
+                var userId = _bd.Users
+                .Where(e => e.FirebaseId == firebaseId)
+                .Where(e => e.IsSubscribed)
+                .Where(e => !e.IsBlocked)
+                .Select(e => e.Id)
+                .Single();
 
-        return result.CheckoutLink;
+                PaymentTransaction payment = new PaymentTransaction
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = amount,
+                    UserModelId = userId,
+                    CreatedAt = DateTime.UtcNow,
+                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                    Status = TransactionStatusEnum.Pending,
+                    TransactionType = TransactionTypeEnum.Deposit,
+                    Title = $"Deposit ${amount}",
+                    ExpiredAt = DateTime.UtcNow.AddHours(5)
+                };
+                _bd.PaymentTransactions.Add(payment);
+                await _bd.SaveChangesAsync();
+
+                result = await _client.CreateInvoice(_settings.Value.StoreId, new CreateInvoiceRequest
+                {
+                    Amount = amount,
+                    Currency = "USD",
+                    Checkout = new CheckoutOptions
+                    {
+                        SpeedPolicy = SpeedPolicy.MediumSpeed,
+                        Expiration = TimeSpan.FromHours(5),
+                        RedirectURL = "https://wepromolink.com/balance"
+                    },
+                    Metadata = JObject.FromObject(payment)
+                });
+                transaction.Commit();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                transaction.Rollback();
+                throw new Exception("Creating invoice fail");
+            }
+        }
+        return result?.CheckoutLink ?? "";
     }
+
 }
