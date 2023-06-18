@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Stripe;
 using WePromoLink.Data;
 using WePromoLink.DTO;
+using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Services.Email;
 using WePromoLink.Settings;
@@ -81,6 +82,57 @@ public class UserService : IUserService
 
         await _db.Users.AddAsync(newUser);
         await _db.SaveChangesAsync();
+    }
+
+    public async Task Deposit(PaymentTransaction payment)
+    {
+        using (var transaction = _db.Database.BeginTransaction())
+        {
+            try
+            {
+                // Completamos la transaccion
+                payment.CompletedAt = DateTime.UtcNow;
+                payment.Status = TransactionStatusEnum.Completed;
+                _db.PaymentTransactions.Update(payment);
+                await _db.SaveChangesAsync();
+
+                // Asignamos la cantidad al Available
+                var available = await _db.Availables
+                .Where(e => e.UserModelId == payment.UserModelId)
+                .SingleOrDefaultAsync();
+                if (available == null) throw new Exception("No Availabe account found");
+
+                available.Etag = await Nanoid.Nanoid.GenerateAsync(size:12);
+                available.Value +=payment.Amount;
+                _db.Availables.Update(available);
+                await _db.SaveChangesAsync();
+
+                // Notificamos del Deposito
+                var noti = new NotificationModel
+                {
+                    Id = Guid.NewGuid(),
+                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                    Status = NotificationStatusEnum.Unread,
+                    UserModelId = payment.UserModelId!.Value,
+                    Title = "Deposit completed",
+                    Message = $"We are pleased to inform you that your Bitcoin deposit has been successfully processed. An amount of $${payment.Amount} USD has been credited to your account.",
+                };
+                await _db.Notifications.AddAsync(noti);
+                await _db.SaveChangesAsync();
+
+                // Enviamos un correo
+                var user = await _db.Users.Where(e=>e.Id == payment.UserModelId).SingleOrDefaultAsync();
+                if(user == null) throw new Exception("User no found");
+                await _emailSender.Send(user.Fullname!, user.Email, "Deposit completed", Templates.DepositBTC(new { user = user.Fullname, amount = payment.Amount.ToString("C") }));
+
+                transaction.Commit();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                transaction.Rollback();
+            }
+        }
     }
 
     public async Task<bool> Exits(string email)

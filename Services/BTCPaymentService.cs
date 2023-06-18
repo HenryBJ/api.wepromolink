@@ -21,13 +21,15 @@ public class BTCPaymentService : IPaymentService
     private readonly IOptions<BTCPaySettings> _settings;
     private readonly ILogger<BTCPaymentService> _logger;
     private readonly DataContext _bd;
+    private readonly IUserService _userService;
 
-    public BTCPaymentService(ILogger<BTCPaymentService> logger, IOptions<BTCPaySettings> settings, BTCPayServerClient client, DataContext bd)
+    public BTCPaymentService(ILogger<BTCPaymentService> logger, IOptions<BTCPaySettings> settings, BTCPayServerClient client, DataContext bd, IUserService userService)
     {
         _logger = logger;
         _settings = settings;
         _client = client;
         _bd = bd;
+        _userService = userService;
     }
 
     public async Task HandleWebHook(HttpContext ctx)
@@ -49,11 +51,11 @@ public class BTCPaymentService : IPaymentService
                 if (type == null) throw new Exception("BTCPay event invalid");
                 var btcpayEvent = data.Deserialize(type);
                 await ProcessEvent(btcpayEvent);
-                // await _mediator.Publish(new WebHookNotification{Event = btcpayEvent as BTCPayEventBase});
             }
             catch (System.Exception ex)
             {
                 _logger.LogWarning($"Parsing {event_type} error: {ex.Message}");
+                throw;
             }
         }
     }
@@ -63,12 +65,15 @@ public class BTCPaymentService : IPaymentService
         if (btcpayEvent == null) return;
         switch (btcpayEvent!)
         {
-            // case InvoiceSettled ev:
-            //     var invoiceData = await _client.GetInvoice(_settings.Value.StoreId, ev.InvoiceId);
-            //     var pay = invoiceData.Metadata.ToObject<PaymentTransaction>();
-            //     _logger.LogInformation($"Amount:{invoiceData.Amount} PaymentId:{pay!.Id} ");
-            //     await ProcessPayment(invoiceData, pay);
-            //     break;
+            case InvoiceSettled ev:
+                var invoiceData = await _client.GetInvoice(_settings.Value.StoreId, ev.InvoiceId);
+                var pay = invoiceData.Metadata.ToObject<PaymentTransaction>();
+                _logger.LogInformation($"Amount:{invoiceData.Amount} PaymentId:{pay!.Id} ");
+                
+                var payment = _bd.PaymentTransactions.Where(e=>e.Id == pay.Id).Single();
+                
+                await ProcessPayment(invoiceData, payment);
+                break;
             default:
                 _logger.LogInformation(btcpayEvent?.ToString());
                 break;
@@ -77,42 +82,7 @@ public class BTCPaymentService : IPaymentService
 
     private async Task ProcessPayment(InvoiceData invoiceData, PaymentTransaction pay)
     {
-        // try
-        // {
-        //     var fee = _settings.Value.Fee;
-        //     var commition = invoiceData.Amount * fee;
-        //     var remaining = invoiceData.Amount - commition;
-        //     using var transaction = await _bd.Database.BeginTransactionAsync();
-
-        //     pay.Amount = remaining;
-        //     pay.CompletedAt = DateTime.UtcNow;
-        //     pay.Status = "COMPLETED";
-
-        //     PaymentTransaction feepay = new PaymentTransaction
-        //     {
-        //         Title = "FEE",
-        //         Amount = commition,
-        //         Status = "PENDING",
-        //         CreatedAt = DateTime.UtcNow,
-        //         IsDeposit = false,
-        //         EmailModelId = pay.EmailModelId,
-        //         SponsoredLinkId = pay.SponsoredLinkId,
-        //         AffiliateLinkId = pay.AffiliateLinkId
-        //     };
-
-        //     _bd.PaymentTransactions.Update(pay);
-        //     await _bd.PaymentTransactions.AddAsync(feepay);
-        //     await _bd.SaveChangesAsync();
-        //     await transaction.CommitAsync();
-        //     // TODO: here add notification
-
-        // }
-        // catch (System.Exception ex)
-        // {
-
-        //     throw;
-        // }
-
+        await _userService.Deposit(pay);
     }
 
     private async Task<bool> VerifyEvent(StringValues btcpay_sig, Stream stream)

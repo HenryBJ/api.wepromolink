@@ -1,4 +1,6 @@
 using WePromoLink.DTO;
+using WePromoLink.Models;
+
 namespace WePromoLink.Services;
 
 public interface IUserService
@@ -10,4 +12,5 @@ public interface IUserService
     Task<bool> SignUp(SignUpData data);
     Task SetFirebaseUid(String email, String Uid);
     Task UpdateSubscription(SubscriptionInfo subscriptionInfo, string CustomerId);
+    Task Deposit(PaymentTransaction payment);
 }
