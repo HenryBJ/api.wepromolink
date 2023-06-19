@@ -44,10 +44,12 @@ public class BTCPaymentService : IPaymentService
 
             JsonElement data = JsonSerializer.Deserialize<JsonElement>(json);
             string event_type = getEventType(data);
-             _logger.LogInformation($"Received BTCPay event: {event_type}"); 
+            _logger.LogInformation($"Received BTCPay event: {event_type}");
             try
             {
-                Type? type = Type.GetType($"WePromoLink.DTO.BTCPay.{event_type}");
+                string path = $"WePromoLink.DTO.BTCPay.{event_type}";
+                _logger.LogInformation(path);
+                Type? type = Type.GetType(path);
                 if (type == null) throw new Exception("BTCPay event invalid");
                 var btcpayEvent = data.Deserialize(type);
                 await ProcessEvent(btcpayEvent);
@@ -69,9 +71,9 @@ public class BTCPaymentService : IPaymentService
                 var invoiceData = await _client.GetInvoice(_settings.Value.StoreId, ev.InvoiceId);
                 var pay = invoiceData.Metadata.ToObject<PaymentTransaction>();
                 _logger.LogInformation($"Amount:{invoiceData.Amount} PaymentId:{pay!.Id} ");
-                
-                var payment = _bd.PaymentTransactions.Where(e=>e.Id == pay.Id).Single();
-                
+
+                var payment = _bd.PaymentTransactions.Where(e => e.Id == pay.Id).Single();
+
                 await ProcessPayment(invoiceData, payment);
                 break;
             default:
