@@ -19,7 +19,12 @@ public class PaymentTransaction
     public string Status { get; set; } // See TransactionStatusEnum
     public string? Metadata { get; set; }
 
+    [JsonConverter(typeof(IsoDateTimeConverter))]
     public DateTime CreatedAt { get; set; }
+
+    [JsonConverter(typeof(IsoDateTimeConverter))]
     public DateTime? ExpiredAt { get; set; }
+
+    [JsonConverter(typeof(IsoDateTimeConverter))]
     public DateTime? CompletedAt { get; set; }
 }
