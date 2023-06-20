@@ -71,8 +71,8 @@ public class DataRepository
     public async Task Update(HistorySharedByUsersOnCampaignModel model)
     {
         var campaign = await _db.Campaigns
-        .Include(e => e.User)
         .Include(e => e.Links)
+        .ThenInclude(e=>e.User)
         .Where(e => e.Id == model.CampaignModelId)
         .SingleOrDefaultAsync();
 
