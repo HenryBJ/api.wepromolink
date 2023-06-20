@@ -62,6 +62,7 @@ builder.Services.AddHostedService<WebHookWorker>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<ICampaignService, CampaignService>();
+builder.Services.AddTransient<ITransactionService, TransactionService>();
 builder.Services.AddTransient<IEmailSender, EmailSender>(_ =>
 {
     return new EmailSender(
