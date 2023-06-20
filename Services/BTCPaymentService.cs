@@ -69,12 +69,9 @@ public class BTCPaymentService : IPaymentService
         {
             case InvoiceSettled ev:
                 var invoiceData = await _client.GetInvoice(_settings.Value.StoreId, ev.InvoiceId);
-                var pay = invoiceData.Metadata.ToObject<PaymentTransaction>();
-                _logger.LogInformation($"Amount:{invoiceData.Amount} PaymentId:{pay!.Id} ");
-
-                var payment = _bd.PaymentTransactions.Where(e => e.Id == pay.Id).Single();
-
-                await ProcessPayment(invoiceData, payment);
+                var paymentId = invoiceData?.Metadata["paymentId"]?.ToObject<Guid>();
+                var payment = _bd.PaymentTransactions.Where(e => e.Id == paymentId).Single();
+                await ProcessPayment(invoiceData!, payment);
                 break;
             default:
                 _logger.LogInformation(btcpayEvent?.ToString());
@@ -161,7 +158,7 @@ public class BTCPaymentService : IPaymentService
                         Expiration = TimeSpan.FromHours(5),
                         RedirectURL = "https://wepromolink.com/balance"
                     },
-                    Metadata = JObject.FromObject(payment)
+                    Metadata = JObject.FromObject(new { paymentId = payment.Id })
                 });
                 transaction.Commit();
             }
