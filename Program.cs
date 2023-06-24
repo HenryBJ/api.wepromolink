@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Stripe;
 using Google.Apis.Auth.OAuth2;
 using WePromoLink.Services.Email;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
@@ -64,6 +65,10 @@ builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<ICampaignService, CampaignService>();
 builder.Services.AddTransient<ITransactionService, TransactionService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddTransient<BlobServiceClient>(_ =>
+{
+    return new BlobServiceClient(builder.Configuration["Azure:blob:connectionstring"]);
+});
 builder.Services.AddTransient<IEmailSender, EmailSender>(_ =>
 {
     return new EmailSender(
