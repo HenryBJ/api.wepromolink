@@ -352,7 +352,7 @@ public class CampaignService : ICampaignService
         if (timestamp == 0)
         {
             campaigns = await _db.Campaigns
-            .Where(e=>e.Status)
+            .Where(e => e.Status)
             .OrderByDescending(c => c.LastUpdated)
             .Skip(offset)
             .Take(limit)
@@ -374,7 +374,7 @@ public class CampaignService : ICampaignService
             var last_timestamp = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).UtcDateTime;
             campaigns = await _db.Campaigns
             .Include(e => e.User)
-            .Where(e=>e.Status)
+            .Where(e => e.Status)
             .Where(e => e.LastUpdated <= last_timestamp)
             .Where(e => !e.IsArchived)
             .OrderByDescending(c => c.LastUpdated)
@@ -420,11 +420,6 @@ public class CampaignService : ICampaignService
         page = page <= 0 ? 1 : page;
         cant = cant ?? 25;
 
-        var counter = await _db.Campaigns
-        .Where(e => e.UserModelId == userId)
-        .Where(e => e.IsArchived == false)
-        .CountAsync();
-
         var query = _db.Campaigns
         .Where(e => e.UserModelId == userId)
         .Where(e => e.IsArchived == false);
@@ -433,6 +428,8 @@ public class CampaignService : ICampaignService
         {
             query = query.Where(e => e.Title.ToLower().Contains(filter.ToLower()));
         }
+
+        var counter = await query.CountAsync();
 
         list.Items = await query
         .OrderByDescending(e => e.CreatedAt)
@@ -452,7 +449,7 @@ public class CampaignService : ICampaignService
         })
         .ToListAsync();
         list.Pagination.Page = page.Value!;
-        list.Pagination.TotalPages = (counter / cant!.Value) + 1;
+        list.Pagination.TotalPages = (int)Math.Ceiling((double)counter / (double)cant!.Value);
         list.Pagination.Cant = list.Items.Count;
         return list;
     }

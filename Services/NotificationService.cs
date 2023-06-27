@@ -72,7 +72,7 @@ public class NotificationService : INotificationService
         .ToListAsync();
 
         list.Pagination.Page = page.Value!;
-        list.Pagination.TotalPages = (counter / cant!.Value) + 1;
+        list.Pagination.TotalPages = (int)Math.Ceiling((double)counter / (double)cant!.Value);
         list.Pagination.Cant = list.Items.Count;
         return list;
     }

@@ -37,7 +37,7 @@ public class LinkService : ILinkService
         .Include(e => e.HistorySharedOnCampaign)
         .Include(e => e.SharedLastWeekOnCampaign)
         .Include(e => e.SharedTodayOnCampaignModel)
-        .Where(e=>e.ExternalId == ExternalCampaignId)
+        .Where(e => e.ExternalId == ExternalCampaignId)
         .SingleOrDefaultAsync();
         if (campaign == null) throw new Exception("Campaign no found");
 
@@ -128,13 +128,13 @@ public class LinkService : ILinkService
 
     public async Task<string> HitLink(Hit hit)
     {
-           var Link = await _db.Links.Where(e=>e.ExternalId == hit.LinkId)
-           .Include(e=>e.Campaign)
-           .SingleOrDefaultAsync();
+        var Link = await _db.Links.Where(e => e.ExternalId == hit.LinkId)
+        .Include(e => e.Campaign)
+        .SingleOrDefaultAsync();
 
-           if(Link == null) return string.Empty;
-           _queue.Item = hit; // Add for forward processing 
-           return Link.Campaign.Url;
+        if (Link == null) return string.Empty;
+        _queue.Item = hit; // Add for forward processing 
+        return Link.Campaign.Url;
     }
 
     public async Task<PaginationList<MyLink>> GetAll(int? page, int? cant, string? filter)
@@ -148,11 +148,6 @@ public class LinkService : ILinkService
         page = page <= 0 ? 1 : page;
         cant = cant ?? 11;
 
-        var counter = await _db.Links
-        .Include(e => e.Campaign)
-        .Where(e => e.UserModelId == userId)
-        .CountAsync();
-
         var query = _db.Links
         .Include(e => e.Campaign)
         .Where(e => e.UserModelId == userId);
@@ -161,6 +156,8 @@ public class LinkService : ILinkService
         {
             query = query.Where(e => e.Campaign.Title.ToLower().Contains(filter.ToLower()));
         }
+
+        var counter = await query.CountAsync();
 
         list.Items = await query
         .OrderByDescending(e => e.CreatedAt)
@@ -177,8 +174,9 @@ public class LinkService : ILinkService
             Profit = _db.PaymentTransactions.Where(k => k.LinkModelId == e.Id).Select(e => e.Amount).Sum()
         })
         .ToListAsync();
+
         list.Pagination.Page = page.Value!;
-        list.Pagination.TotalPages = (counter / cant!.Value) + 1;
+        list.Pagination.TotalPages = (int)Math.Ceiling((double)counter / (double)cant!.Value);
         list.Pagination.Cant = list.Items.Count;
         return list;
     }
@@ -191,7 +189,7 @@ public class LinkService : ILinkService
         if (userId == Guid.Empty) throw new Exception("User no found");
 
         var link = await _db.Links
-        .Include(e=>e.Campaign)
+        .Include(e => e.Campaign)
         .Where(e => e.ExternalId == id).Select(e => new LinkDetail
         {
             Id = e.ExternalId,
@@ -202,7 +200,7 @@ public class LinkService : ILinkService
             LastClick = e.LastClick,
             Description = e.Campaign.Description!,
             Epm = e.Campaign.EPM,
-            Profit = _db.PaymentTransactions.Where(k => k.LinkModelId == e.Id).Select(e => e.Amount).Sum()  
+            Profit = _db.PaymentTransactions.Where(k => k.LinkModelId == e.Id).Select(e => e.Amount).Sum()
         }).SingleOrDefaultAsync();
 
         if (link == null) throw new Exception("Link does not exits");
