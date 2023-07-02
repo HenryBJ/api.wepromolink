@@ -39,7 +39,7 @@ public class UserService : IUserService
             IsSubscribed = isSubscribed,
             ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
             CreatedAt = DateTime.UtcNow,
-            ThumbnailImageUrl = user.PhotoUrl,
+            ThumbnailImageUrl = user.PhotoUrl ?? "",
             CustomerId = user.CustomerId,
             Available = new AvailableModel(),
             Budget = new BudgetModel(),
@@ -59,6 +59,8 @@ public class UserService : IUserService
             HistoryEarnByCountriesUser = new HistoryEarnByCountriesUserModel(),
             HistoryEarnOnLinksUser = new HistoryEarnOnLinksUserModel(), //done
             HistorySharedByUsersUser = new HistorySharedByUsersUserModel(),
+            BitcoinBillingMethod = new BitcoinBillingMethod(),
+            StripeBillingMethod = new StripeBillingMethod(),
             Locked = new LockedModel(),
             PayoutStat = new PayoutStatModel(),
             Profit = new ProfitModel(),
@@ -102,8 +104,8 @@ public class UserService : IUserService
                 .SingleOrDefaultAsync();
                 if (available == null) throw new Exception("No Availabe account found");
 
-                available.Etag = await Nanoid.Nanoid.GenerateAsync(size:12);
-                available.Value +=payment.Amount;
+                available.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
+                available.Value += payment.Amount;
                 _db.Availables.Update(available);
                 await _db.SaveChangesAsync();
 
@@ -121,8 +123,8 @@ public class UserService : IUserService
                 await _db.SaveChangesAsync();
 
                 // Enviamos un correo
-                var user = await _db.Users.Where(e=>e.Id == payment.UserModelId).SingleOrDefaultAsync();
-                if(user == null) throw new Exception("User no found");
+                var user = await _db.Users.Where(e => e.Id == payment.UserModelId).SingleOrDefaultAsync();
+                if (user == null) throw new Exception("User no found");
                 await _emailSender.Send(user.Fullname!, user.Email, "Deposit completed", Templates.DepositBTC(new { user = user.Fullname, amount = payment.Amount.ToString("C") }));
 
                 transaction.Commit();
@@ -138,6 +140,45 @@ public class UserService : IUserService
     public async Task<bool> Exits(string email)
     {
         return await _db.Users.AnyAsync(e => e.Email.ToLower() == email.ToLower());
+    }
+
+    public async Task<PaymentMethodData[]> GetPaymentMethods()
+    {
+        List<PaymentMethodData> result = new List<PaymentMethodData>();
+        // Get UserId
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = _db.Users
+        .Include(e => e.StripeBillingMethod)
+        .Include(e => e.BitcoinBillingMethod)
+        .Include(e => e.Subscription)
+        .ThenInclude(e => e.SubscriptionPlan)
+        .Where(e => e.FirebaseId == firebaseId).Single();
+
+        var methods = user.Subscription.SubscriptionPlan.PaymentMethod.Split(',');
+
+        foreach (var item in methods)
+        {
+            if (item.Trim().ToLower() == "bitcoin")
+            {
+                result.Add(new PaymentMethodData
+                {
+                    Name = "Bitcoin",
+                    Value = user.BitcoinBillingMethod.Address,
+                    IsVerified = user.BitcoinBillingMethod.IsVerified
+                });
+            }
+            else
+            if (item.Trim().ToLower() == "stripe")
+            {
+                result.Add(new PaymentMethodData
+                {
+                    Name = "Stripe",
+                    Value = user.StripeBillingMethod.AccountId,
+                    IsVerified = user.StripeBillingMethod.IsVerified
+                });
+            }
+        }
+        return result.ToArray();
     }
 
     public async Task<bool> IsBlocked()

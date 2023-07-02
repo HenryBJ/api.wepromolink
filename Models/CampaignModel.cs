@@ -12,7 +12,8 @@ public class CampaignModel
     public string? Description { get; set; }
     public bool Status { get; set; }
     public string Url { get; set; }
-    public string? ImageUrl { get; set; }
+    public ImageDataModel? ImageData { get; set; }
+    public Guid? ImageDataModelId { get; set; }
     public decimal Budget { get; set; }
     public decimal EPM { get; set; }
     public bool IsArchived { get; set; }

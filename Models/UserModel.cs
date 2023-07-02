@@ -40,5 +40,7 @@ public class UserModel
     public HistoryEarnOnLinksUserModel HistoryEarnOnLinksUser { get; set; }
     public HistorySharedByUsersUserModel HistorySharedByUsersUser { get; set; }
     public HistoryClicksOnLinksUserModel HistoryClicksOnLinksUser { get; set; }
+    public BitcoinBillingMethod BitcoinBillingMethod { get; set; }
+    public StripeBillingMethod StripeBillingMethod { get; set; }
 
 }

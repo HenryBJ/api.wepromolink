@@ -7,10 +7,13 @@ namespace WePromoLink.Data;
 public class DataContext : DbContext
 {
 
+    public virtual DbSet<SubscriptionFeatureModel> SubscriptionFeatures { get; set; }
+    public virtual DbSet<ImageDataModel> ImageDatas { get; set; }
     public virtual DbSet<GeoDataModel> GeoDatas { get; set; }
     public virtual DbSet<GenericEventModel> GenericEvent { get; set; }
     public virtual DbSet<BadgetModel> Badgets { get; set; }
-    public virtual DbSet<PayoutInfoModel> PayoutInfos { get; set; }
+    public virtual DbSet<StripeBillingMethod> StripeBillings { get; set; }
+    public virtual DbSet<BitcoinBillingMethod> BitcoinBillings { get; set; }
     public virtual DbSet<SubscriptionModel> Subscriptions { get; set; }
     public virtual DbSet<SubscriptionPlanModel> SubscriptionPlans { get; set; }
     public virtual DbSet<NotificationModel> Notifications { get; set; }
@@ -73,7 +76,24 @@ public class DataContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        Guid subPlanCommunity = Guid.NewGuid();
+        Guid subPlanProfesional = Guid.NewGuid();
         base.OnModelCreating(builder);
+
+        builder.Entity<SubscriptionFeatureModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasData(new[]
+            {
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = true,SubscriptionPlanModelId = subPlanCommunity},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional}
+        });
+        });
+
+        builder.Entity<ImageDataModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
 
         builder.Entity<GeoDataModel>(entity =>
         {
@@ -86,9 +106,6 @@ public class DataContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.ExternalId);
-            //     entity.HasOne(s => s.Subscription)
-            // .WithOne(u => u.User)
-            // .HasForeignKey<SubscriptionModel>(u => u.UserModelId);
         });
 
         builder.Entity<SubscriptionModel>(entity =>
@@ -100,7 +117,12 @@ public class DataContext : DbContext
         .HasForeignKey<UserModel>(u => u.SubscriptionModelId);
         });
 
-        builder.Entity<PayoutInfoModel>(entity =>
+        builder.Entity<StripeBillingMethod>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<BitcoinBillingMethod>(entity =>
         {
             entity.HasKey(e => e.Id);
         });
@@ -145,7 +167,7 @@ public class DataContext : DbContext
 
             entity.HasData(new[]{
                 new SubscriptionPlanModel {
-                    Id = Guid.NewGuid(),
+                    Id = subPlanProfesional,
                     AnnualyProductId = "prod_NpuAflpfqloJa9",
                     MonthlyProductId = "prod_NpnKrvEvvWJtqG",
                     Annually = 244,
@@ -153,8 +175,7 @@ public class DataContext : DbContext
                     Discount = 15,
                     DepositFee = 0,
                     PayoutFee = 0,
-                    PaymentMethod = "mastercard, visa, stripe",
-                    ContainAds = false,
+                    PaymentMethod = "stripe",
                     PayoutMinimun = 50,
                     Tag = "Popular",
                     Title = "Professional",
@@ -164,7 +185,7 @@ public class DataContext : DbContext
                     Order = 2
                 },
                 new SubscriptionPlanModel {
-                    Id = Guid.NewGuid(),
+                    Id = subPlanCommunity,
                     AnnualyProductId = "",
                     MonthlyProductId = "",
                     Annually = 0,
@@ -173,7 +194,6 @@ public class DataContext : DbContext
                     DepositFee = 9,
                     PayoutFee = 9,
                     PaymentMethod = "bitcoin",
-                    ContainAds = true,
                     PayoutMinimun = 100,
                     Tag = "",
                     Title = "Community",

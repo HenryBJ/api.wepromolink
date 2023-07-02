@@ -65,6 +65,37 @@ public class StripeService
 
     }
 
+    public async Task<string> CreateOrUpdateAccountLink(bool updating)
+    {
+        string accType = updating ? "account_update" : "account_onboarding";
+
+        // Get UserId
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = _db.Users.Include(e => e.StripeBillingMethod).Where(e => e.FirebaseId == firebaseId).Single();
+        
+        if (!updating) // Creating
+        {
+            // Update StripeBilligMethod
+            user.StripeBillingMethod.AccountId = $"acct_{await Nanoid.Nanoid.GenerateAsync("0123456789abcdefghijklmnopqrstuvwxyz", 12)}";
+            user.StripeBillingMethod.LastModified = DateTime.UtcNow;
+            _db.StripeBillings.Update(user.StripeBillingMethod);
+            await _db.SaveChangesAsync();
+        }
+
+        var accLinkService = new Stripe.AccountLinkService();
+        AccountLinkCreateOptions options = new AccountLinkCreateOptions
+        {
+            Account = user.StripeBillingMethod.AccountId,
+            Type = accType,
+            ReturnUrl = "https://wepromolink.com/billing",
+            RefreshUrl = "https://wepromolink.com/billing"
+        };
+
+        AccountLink response = await accLinkService.CreateAsync(options);
+        return response.Url;
+
+    }
+
     public async Task UpdateUserSubscription(Subscription subscription, string status)
     {
         var subService = new Stripe.SubscriptionService();

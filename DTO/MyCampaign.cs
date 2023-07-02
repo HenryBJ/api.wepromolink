@@ -6,7 +6,7 @@ public class MyCampaign
     public string? Title { get; set; }
     public string? Url { get; set; }
     public bool Status { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBundleId { get; set; }
     public decimal Budget { get; set; }
     public decimal EPM { get; set; }
     public DateTime? LastClick { get; set; }

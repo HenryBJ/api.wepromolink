@@ -13,6 +13,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Net;
+using WePromoLink.Extension;
 
 namespace WePromoLink.Services;
 
@@ -70,29 +71,38 @@ public class TransactionService : ITransactionService
         var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).SingleOrDefaultAsync();
         if (user == null) throw new Exception("User does not exits");
 
-        var result = await _db.PaymentTransactions
+        var transaction = _db.PaymentTransactions
         .Include(e => e.Campaign)
         .Include(e => e.Link)
+        .ThenInclude(e => e.Campaign)
         .Where(e => e.ExternalId == id)
-        .Select(e => new TransactionDetail
+        .Single();
+
+        var result = new TransactionDetail
         {
-            Id = e.ExternalId,
-            Amount = e.Amount,
-            CampaignImageUrl = e.Campaign != null ? e.Campaign.ImageUrl : null,
-            CampaignName = e.Campaign != null ? e.Campaign.Title : null,
-            CompletedAt = e.CompletedAt,
-            CreatedAt = e.CreatedAt,
-            ExpiredAt = e.ExpiredAt,
-            LinkImageUrl = e.Link != null ? e.Link.Url : null,
-            Status = e.Status,
-            Title = e.Title,
-            TransactionType = e.TransactionType
-        })
-        .SingleOrDefaultAsync();
-        if (result == null) throw new Exception("Payment Transaction no found");
+            Id = transaction.ExternalId,
+            Amount = transaction.Amount,
+            ImageBundle = GetImageData(transaction.Campaign != null ? transaction.Campaign?.Id : transaction.Link?.Campaign?.Id),
+            CampaignName = transaction.Campaign?.Title,
+            CompletedAt = transaction.CompletedAt,
+            CreatedAt = transaction.CreatedAt,
+            ExpiredAt = transaction.ExpiredAt,
+            Status = transaction.Status,
+            Title = transaction.Title,
+            TransactionType = transaction.TransactionType
+        };
 
         return result;
     }
 
+    private ImageData? GetImageData(Guid? campaignId)
+    {
+        if (!campaignId.HasValue) return null;
+        return _db.Campaigns
+        .Include(e => e.ImageData)
+        .Where(e => e.Id == campaignId)
+        .Select(e => e.ImageData)
+        .SingleOrDefault()?.ConvertToImageData();
+    }
 
 }

@@ -14,12 +14,12 @@ public class SubscriptionPlanModel
     public decimal Monthly { get; set; }
     public decimal Annually { get; set; }
     public decimal Discount { get; set; }
-    public bool ContainAds { get; set; }
     public decimal DepositFee { get; set; }
     public decimal PayoutFee { get; set; }
     public decimal PayoutMinimun { get; set; }
     public string PaymentMethod { get; set; }
     public string Tag { get; set; }
+    public List<SubscriptionFeatureModel> Features { get; set; }
     public string? Metadata { get; set; }
 
 }

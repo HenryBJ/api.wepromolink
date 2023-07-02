@@ -65,6 +65,7 @@ builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<ICampaignService, CampaignService>();
 builder.Services.AddTransient<ITransactionService, TransactionService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddTransient<BlobServiceClient>(_ =>
 {
     return new BlobServiceClient(builder.Configuration["Azure:blob:connectionstring"]);

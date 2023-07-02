@@ -150,6 +150,7 @@ public class LinkService : ILinkService
 
         var query = _db.Links
         .Include(e => e.Campaign)
+        .ThenInclude(e => e.ImageData)
         .Where(e => e.UserModelId == userId);
 
         if (!string.IsNullOrEmpty(filter))
@@ -166,7 +167,26 @@ public class LinkService : ILinkService
         .Select(e => new MyLink
         {
             Id = e.ExternalId,
-            ImageUrl = e.Campaign.ImageUrl,
+            ImageData = e.Campaign.ImageData != null ? new ImageData
+            {
+                ExternalId = e.Campaign.ImageData.ExternalId,
+                Compressed = e.Campaign.ImageData.Compressed,
+                CompressedAspectRatio = e.Campaign.ImageData.CompressedAspectRatio,
+                CompressedHeight = e.Campaign.ImageData.CompressedHeight,
+                CompressedWidth = e.Campaign.ImageData.CompressedWidth,
+                Medium = e.Campaign.ImageData.Medium,
+                MediumAspectRatio = e.Campaign.ImageData.MediumAspectRatio,
+                MediumHeight = e.Campaign.ImageData.MediumHeight,
+                MediumWidth = e.Campaign.ImageData.MediumWidth,
+                Original = e.Campaign.ImageData.Original,
+                OriginalAspectRatio = e.Campaign.ImageData.OriginalAspectRatio,
+                OriginalHeight = e.Campaign.ImageData.OriginalHeight,
+                OriginalWidth = e.Campaign.ImageData.OriginalWidth,
+                Thumbnail = e.Campaign.ImageData.Thumbnail,
+                ThumbnailAspectRatio = e.Campaign.ImageData.ThumbnailAspectRatio,
+                ThumbnailHeight = e.Campaign.ImageData.ThumbnailHeight,
+                ThumbnailWidth = e.Campaign.ImageData.ThumbnailWidth
+            } : null,
             Title = e.Campaign.Title,
             Url = e.Url,
             Status = e.Campaign.Status,
@@ -190,10 +210,30 @@ public class LinkService : ILinkService
 
         var link = await _db.Links
         .Include(e => e.Campaign)
+        .ThenInclude(e => e.ImageData)
         .Where(e => e.ExternalId == id).Select(e => new LinkDetail
         {
             Id = e.ExternalId,
-            ImageUrl = e.Campaign.ImageUrl!,
+            ImageData = e.Campaign.ImageData != null ? new ImageData
+            {
+                Compressed = e.Campaign.ImageData.Compressed,
+                CompressedAspectRatio = e.Campaign.ImageData.CompressedAspectRatio,
+                CompressedHeight = e.Campaign.ImageData.CompressedHeight,
+                CompressedWidth = e.Campaign.ImageData.CompressedWidth,
+                ExternalId = e.Campaign.ImageData.ExternalId,
+                Medium = e.Campaign.ImageData.Medium,
+                MediumAspectRatio = e.Campaign.ImageData.MediumAspectRatio,
+                MediumHeight = e.Campaign.ImageData.MediumHeight,
+                MediumWidth = e.Campaign.ImageData.MediumWidth,
+                Original = e.Campaign.ImageData.Original,
+                OriginalAspectRatio = e.Campaign.ImageData.OriginalAspectRatio,
+                OriginalHeight = e.Campaign.ImageData.OriginalHeight,
+                OriginalWidth = e.Campaign.ImageData.OriginalWidth,
+                Thumbnail = e.Campaign.ImageData.Thumbnail,
+                ThumbnailAspectRatio = e.Campaign.ImageData.ThumbnailAspectRatio,
+                ThumbnailHeight = e.Campaign.ImageData.ThumbnailHeight,
+                ThumbnailWidth = e.Campaign.ImageData.ThumbnailWidth
+            } : null,
             Status = e.Campaign.Status,
             Title = e.Campaign.Title,
             Url = e.Url,

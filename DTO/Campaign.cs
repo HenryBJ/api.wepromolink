@@ -16,8 +16,8 @@ public class Campaign
     [StringLength(500)]
     public string? Description { get; set; }
 
-    [StringLength(500)]
-    public string? ImageUrl { get; set; }
+    [StringLength(20)]
+    public string? ImageBundleId { get; set; }
 
     [StringLength(500)]
     [EmailAddress]

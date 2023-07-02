@@ -1,3 +1,5 @@
+using WePromoLink.DTO;
+
 namespace WePromoLink;
 
 public class TransactionDetail
@@ -8,8 +10,7 @@ public class TransactionDetail
     public string TransactionType { get; set; }
     public string Status { get; set; }
     public string? CampaignName { get; set; }
-    public string? CampaignImageUrl { get; set; }
-    public string? LinkImageUrl { get; set; }
+    public ImageData? ImageBundle { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? ExpiredAt { get; set; }
     public DateTime? CompletedAt { get; set; }

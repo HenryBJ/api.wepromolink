@@ -13,6 +13,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Net;
+using WePromoLink.Extension;
 
 namespace WePromoLink.Services;
 
@@ -53,6 +54,14 @@ public class CampaignService : ICampaignService
         {
             try
             {
+                //Fetchear la image y vincularla
+                var imageData = _db.ImageDatas.Where(e => e.ExternalId == campaign.ImageBundleId).SingleOrDefault();
+                if (imageData != null)
+                {
+                    imageData.Bound = true;
+                    _db.ImageDatas.Update(imageData);
+                }
+
                 var item = new CampaignModel
                 {
                     Id = Guid.NewGuid(),
@@ -62,7 +71,7 @@ public class CampaignService : ICampaignService
                     Description = campaign.Description,
                     EPM = campaign.EPM,
                     ExternalId = externalId,
-                    ImageUrl = campaign.ImageUrl,
+                    ImageDataModelId = imageData?.Id,
                     Title = campaign.Title,
                     Url = campaign.Url,
                     IsArchived = false,
@@ -239,7 +248,9 @@ public class CampaignService : ICampaignService
         if (user.IsBlocked) throw new Exception("User is blocked");
         if (!user.IsSubscribed) throw new Exception("User is not subscribed");
 
-        var campaignModel = await _db.Campaigns.Where(e => e.ExternalId == id).SingleOrDefaultAsync();
+        var campaignModel = await _db.Campaigns
+        .Include(e => e.ImageData)
+        .Where(e => e.ExternalId == id).SingleOrDefaultAsync();
         if (campaignModel == null) throw new Exception("Campaign does not exits");
         if (campaignModel.IsArchived) throw new Exception("Campaing deleted");
         var oldbudget = campaignModel.Budget;
@@ -256,12 +267,32 @@ public class CampaignService : ICampaignService
                 await _db.SaveChangesAsync();
                 if (available.Value < 0) throw new Exception("Negative balance");
 
+                // Verificar si hay que cambiar la imagen
+                if (campaignModel.ImageData?.ExternalId != campaign.ImageBundleId)
+                {
+                    // Desvincular la nueva imagen
+                    if (campaignModel.ImageDataModelId != null)
+                    {
+                        var oldImageData = _db.ImageDatas.Where(e => e.Id == campaignModel.ImageDataModelId).Single();
+                        oldImageData.Bound = false;
+                        _db.ImageDatas.Update(oldImageData);
+                    }
+
+                    // Fetchear la nueva imagen o asignar null
+                    var imageData = await _db.ImageDatas.Where(e => e.ExternalId == campaign.ImageBundleId).SingleOrDefaultAsync();
+                    campaignModel.ImageDataModelId = imageData?.Id;
+                    if (imageData != null)
+                    {
+                        imageData.Bound = true;
+                        _db.ImageDatas.Update(imageData);
+                    }
+                }
+
                 // Edit Campaign
                 campaignModel.Budget = campaign.Budget;
                 campaignModel.LastUpdated = DateTime.UtcNow;
                 campaignModel.Description = campaign.Description;
                 campaignModel.EPM = campaign.EPM;
-                campaignModel.ImageUrl = campaign.ImageUrl;
                 campaignModel.Title = campaign.Title;
                 campaignModel.Url = campaign.Url;
                 _db.Campaigns.Update(campaignModel);
@@ -351,11 +382,17 @@ public class CampaignService : ICampaignService
         // Los datos no están en caché, realiza la consulta en la base de datos
         if (timestamp == 0)
         {
-            campaigns = await _db.Campaigns
+
+            var items = await _db.Campaigns
+            .Include(e => e.ImageData)
+            .Include(e => e.User)
             .Where(e => e.Status)
             .OrderByDescending(c => c.LastUpdated)
             .Skip(offset)
             .Take(limit)
+            .ToListAsync();
+
+            campaigns = items
             .Select(e => new CampaignCard
             {
                 AutorName = e.User.Fullname,
@@ -364,15 +401,17 @@ public class CampaignService : ICampaignService
                 EPM = e.EPM,
                 Id = e.ExternalId,
                 Title = e.Title,
-                ImageUrl = e.ImageUrl,
+                ImageBundle = e.ImageData?.ConvertToImageData(),
                 LastModified = new DateTimeOffset(e.LastUpdated!.Value).ToUnixTimeMilliseconds()
             })
-            .ToListAsync();
+            .ToList();
         }
         else
         {
             var last_timestamp = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).UtcDateTime;
-            campaigns = await _db.Campaigns
+
+            var items = await _db.Campaigns
+            .Include(e => e.ImageData)
             .Include(e => e.User)
             .Where(e => e.Status)
             .Where(e => e.LastUpdated <= last_timestamp)
@@ -380,6 +419,9 @@ public class CampaignService : ICampaignService
             .OrderByDescending(c => c.LastUpdated)
             .Skip(offset)
             .Take(limit)
+            .ToListAsync();
+
+            campaigns = items
             .Select(e => new CampaignCard
             {
                 AutorName = e.User.Fullname,
@@ -388,10 +430,10 @@ public class CampaignService : ICampaignService
                 EPM = e.EPM,
                 Id = e.ExternalId,
                 Title = e.Title,
-                ImageUrl = e.ImageUrl,
+                ImageBundle = e.ImageData?.ConvertToImageData(),
                 LastModified = new DateTimeOffset(e.LastUpdated!.Value).ToUnixTimeMilliseconds()
             })
-            .ToListAsync();
+            .ToList();
         }
 
         if (timestamp != 0)
@@ -421,6 +463,7 @@ public class CampaignService : ICampaignService
         cant = cant ?? 25;
 
         var query = _db.Campaigns
+        .Include(e => e.ImageData)
         .Where(e => e.UserModelId == userId)
         .Where(e => e.IsArchived == false);
 
@@ -440,7 +483,7 @@ public class CampaignService : ICampaignService
             Budget = e.Budget,
             EPM = e.EPM,
             Id = e.ExternalId,
-            ImageUrl = e.ImageUrl,
+            ImageBundleId = e.ImageData != null ? e.ImageData.ExternalId : "",
             Title = e.Title,
             Url = e.Url,
             Status = e.Status,
@@ -461,13 +504,13 @@ public class CampaignService : ICampaignService
         var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
         if (userId == Guid.Empty) throw new Exception("User no found");
 
-        var campaign = await _db.Campaigns.Where(e => e.ExternalId == id).Select(e => new CampaignDetail
+        var campaign = await _db.Campaigns
+        .Where(e => e.ExternalId == id).Select(e => new CampaignDetail
         {
             Budget = e.Budget,
             Description = e.Description,
             EPM = e.EPM,
             Id = e.ExternalId,
-            ImageUrl = e.ImageUrl,
             Status = e.Status,
             Title = e.Title,
             Url = e.Url,
@@ -476,6 +519,14 @@ public class CampaignService : ICampaignService
         }).SingleOrDefaultAsync();
 
         if (campaign == null) throw new Exception("Campaign does not exits");
+
+        var imageD = _db.Campaigns
+        .Include(e => e.ImageData)
+        .Where(e => e.ExternalId == id)
+        .Select(e => e.ImageData).SingleOrDefault();
+
+        campaign.ImageBundle = imageD?.ConvertToImageData();
+
         return campaign;
     }
 

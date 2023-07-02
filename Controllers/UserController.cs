@@ -55,6 +55,24 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
+    [Route("payment/methods")]
+    [Authorize]
+    [ResponseCache(Duration = 600)]
+    public async Task<IActionResult> GetPaymentMethods()
+    {
+        try
+        {
+            var results = await _service.GetPaymentMethods();
+            return new OkObjectResult(results);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
     [Route("issubscribed")]
     [Authorize]
     [ResponseCache(Duration = 60)]

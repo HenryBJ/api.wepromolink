@@ -13,4 +13,5 @@ public interface IUserService
     Task SetFirebaseUid(String email, String Uid);
     Task UpdateSubscription(SubscriptionInfo subscriptionInfo, string CustomerId);
     Task Deposit(PaymentTransaction payment);
+    Task <PaymentMethodData[]> GetPaymentMethods();
 }

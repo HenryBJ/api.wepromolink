@@ -49,6 +49,35 @@ namespace WePromoLink.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ImageDatas",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Original = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OriginalWidth = table.Column<int>(type: "int", nullable: false),
+                    OriginalHeight = table.Column<int>(type: "int", nullable: false),
+                    OriginalAspectRatio = table.Column<double>(type: "float", nullable: false),
+                    Compressed = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompressedWidth = table.Column<int>(type: "int", nullable: false),
+                    CompressedHeight = table.Column<int>(type: "int", nullable: false),
+                    CompressedAspectRatio = table.Column<double>(type: "float", nullable: false),
+                    Medium = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MediumWidth = table.Column<int>(type: "int", nullable: false),
+                    MediumHeight = table.Column<int>(type: "int", nullable: false),
+                    MediumAspectRatio = table.Column<double>(type: "float", nullable: false),
+                    Thumbnail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ThumbnailWidth = table.Column<int>(type: "int", nullable: false),
+                    ThumbnailHeight = table.Column<int>(type: "int", nullable: false),
+                    ThumbnailAspectRatio = table.Column<double>(type: "float", nullable: false),
+                    Bound = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ImageDatas", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SubscriptionPlans",
                 columns: table => new
                 {
@@ -63,7 +92,6 @@ namespace WePromoLink.Migrations
                     Monthly = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     Annually = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     Discount = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
-                    ContainAds = table.Column<bool>(type: "bit", nullable: false),
                     DepositFee = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     PayoutFee = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     PayoutMinimun = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
@@ -74,6 +102,27 @@ namespace WePromoLink.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SubscriptionPlans", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubscriptionFeatures",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BoolValue = table.Column<bool>(type: "bit", nullable: true),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SubscriptionPlanModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubscriptionFeatures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubscriptionFeatures_SubscriptionPlans_SubscriptionPlanModelId",
+                        column: x => x.SubscriptionPlanModelId,
+                        principalTable: "SubscriptionPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -182,6 +231,29 @@ namespace WePromoLink.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BitcoinBillings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
+                    VerifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BitcoinBillings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BitcoinBillings_Users_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Budgets",
                 columns: table => new
                 {
@@ -216,7 +288,7 @@ namespace WePromoLink.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImageDataModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Budget = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     EPM = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     IsArchived = table.Column<bool>(type: "bit", nullable: false),
@@ -229,6 +301,11 @@ namespace WePromoLink.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Campaigns", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Campaigns_ImageDatas_ImageDataModelId",
+                        column: x => x.ImageDataModelId,
+                        principalTable: "ImageDatas",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Campaigns_Users_UserModelId",
                         column: x => x.UserModelId,
@@ -785,39 +862,6 @@ namespace WePromoLink.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PayoutInfos",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PayoutType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BCTAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DebitCard = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Paypal = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Stripe = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WireName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WireBankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WireSwiftorBic = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WireIban = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WireBankAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WireBranch = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    wireRouting = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PayoutInfos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PayoutInfos_Users_UserModelId",
-                        column: x => x.UserModelId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PayoutStats",
                 columns: table => new
                 {
@@ -907,6 +951,29 @@ namespace WePromoLink.Migrations
                     table.PrimaryKey("PK_SharedTodayUsers", x => x.Id);
                     table.ForeignKey(
                         name: "FK_SharedTodayUsers_Users_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StripeBillings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AccountId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
+                    VerifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StripeBillings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StripeBillings_Users_UserModelId",
                         column: x => x.UserModelId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -1603,13 +1670,23 @@ namespace WePromoLink.Migrations
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
-                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("02df28e3-76b4-4f73-b9fe-729c0dae4945"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", false, 0m, 15m, "FEVhyQ4GNnBn", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "mastercard, visa, stripe", 0m, 50m, "Popular", "Professional" });
+                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
+                values: new object[] { new Guid("6cdccbe3-6300-4c26-8573-1863a4c5dcef"), 0m, "", "", 9m, 0m, "48uDDV36qLfo", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
-                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "ContainAds", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("c99e8bd4-a37c-482f-8279-0bfe7f16e8eb"), 0m, "", "", true, 9m, 0m, "7GxguEEJjH7e", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
+                values: new object[] { new Guid("9f9e6b58-5722-4583-b5ea-c12e42549cca"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 0m, 15m, "VVLjMBrh41Bt", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", 0m, 50m, "Popular", "Professional" });
+
+            migrationBuilder.InsertData(
+                table: "SubscriptionFeatures",
+                columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
+                values: new object[] { new Guid("23154fd1-dc90-47e1-a55e-74fc5637504a"), true, "Contain ads", new Guid("6cdccbe3-6300-4c26-8573-1863a4c5dcef"), null });
+
+            migrationBuilder.InsertData(
+                table: "SubscriptionFeatures",
+                columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
+                values: new object[] { new Guid("c6660327-2d10-45fd-926f-dbb7b60f73b3"), true, "Contain ads", new Guid("9f9e6b58-5722-4583-b5ea-c12e42549cca"), null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Availables_UserModelId",
@@ -1623,6 +1700,12 @@ namespace WePromoLink.Migrations
                 column: "UserModelId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BitcoinBillings_UserModelId",
+                table: "BitcoinBillings",
+                column: "UserModelId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Budgets_UserModelId",
                 table: "Budgets",
                 column: "UserModelId",
@@ -1632,6 +1715,11 @@ namespace WePromoLink.Migrations
                 name: "IX_Campaigns_ExternalId",
                 table: "Campaigns",
                 column: "ExternalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Campaigns_ImageDataModelId",
+                table: "Campaigns",
+                column: "ImageDataModelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Campaigns_UserModelId",
@@ -1873,11 +1961,6 @@ namespace WePromoLink.Migrations
                 column: "UserModelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PayoutInfos_UserModelId",
-                table: "PayoutInfos",
-                column: "UserModelId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_PayoutStats_UserModelId",
                 table: "PayoutStats",
                 column: "UserModelId",
@@ -1914,6 +1997,17 @@ namespace WePromoLink.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_StripeBillings_UserModelId",
+                table: "StripeBillings",
+                column: "UserModelId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubscriptionFeatures_SubscriptionPlanModelId",
+                table: "SubscriptionFeatures",
+                column: "SubscriptionPlanModelId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubscriptionPlans_ExternalId",
                 table: "SubscriptionPlans",
                 column: "ExternalId");
@@ -1947,6 +2041,9 @@ namespace WePromoLink.Migrations
 
             migrationBuilder.DropTable(
                 name: "Badgets");
+
+            migrationBuilder.DropTable(
+                name: "BitcoinBillings");
 
             migrationBuilder.DropTable(
                 name: "Budgets");
@@ -2054,9 +2151,6 @@ namespace WePromoLink.Migrations
                 name: "PaymentTransactions");
 
             migrationBuilder.DropTable(
-                name: "PayoutInfos");
-
-            migrationBuilder.DropTable(
                 name: "PayoutStats");
 
             migrationBuilder.DropTable(
@@ -2075,6 +2169,12 @@ namespace WePromoLink.Migrations
                 name: "SharedTodayUsers");
 
             migrationBuilder.DropTable(
+                name: "StripeBillings");
+
+            migrationBuilder.DropTable(
+                name: "SubscriptionFeatures");
+
+            migrationBuilder.DropTable(
                 name: "GeoDatas");
 
             migrationBuilder.DropTable(
@@ -2082,6 +2182,9 @@ namespace WePromoLink.Migrations
 
             migrationBuilder.DropTable(
                 name: "Campaigns");
+
+            migrationBuilder.DropTable(
+                name: "ImageDatas");
 
             migrationBuilder.DropTable(
                 name: "Users");

@@ -20,10 +20,9 @@ public class PricingService : IPricingService
 
     public async Task<PricingCard[]> GetAll()
     {
-        return await _db.SubscriptionPlans.Select(e => new PricingCard
+        return await _db.SubscriptionPlans.Include(e => e.Features).Select(e => new PricingCard
         {
             Id = e.ExternalId,
-            Ads = e.ContainAds,
             Annually = e.Annually,
             Monthly = e.Monthly,
             DepositFee = e.DepositFee,
@@ -35,7 +34,9 @@ public class PricingService : IPricingService
             Tag = e.Tag,
             MonthlyPaymantLink = e.MonthlyPaymantLink,
             AnnualyPaymantLink = e.AnnualyPaymantLink,
-            Order = e.Order
+            Order = e.Order,
+            Features = e.Features.Select(k => new PricingFeature { BoolValue = k.BoolValue, Name = k.Name, Value = k.Value }).ToList()
+
         }).ToArrayAsync();
     }
 }

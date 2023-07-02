@@ -12,7 +12,7 @@ using WePromoLink.Data;
 namespace WePromoLink.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230610201400_Initial")]
+    [Migration("20230702045432_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,6 +146,38 @@ namespace WePromoLink.Migrations
                     b.ToTable("Badgets");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.BitcoinBillingMethod", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("BitcoinBillings");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.BudgetModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -206,8 +238,8 @@ namespace WePromoLink.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("ImageDataModelId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsArchived")
                         .HasColumnType("bit");
@@ -241,6 +273,8 @@ namespace WePromoLink.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ExternalId");
+
+                    b.HasIndex("ImageDataModelId");
 
                     b.HasIndex("UserModelId");
 
@@ -2403,6 +2437,76 @@ namespace WePromoLink.Migrations
                     b.ToTable("HistorySharedOnCampaigns");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.ImageDataModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Bound")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Compressed")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("CompressedAspectRatio")
+                        .HasColumnType("float");
+
+                    b.Property<int>("CompressedHeight")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CompressedWidth")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Medium")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("MediumAspectRatio")
+                        .HasColumnType("float");
+
+                    b.Property<int>("MediumHeight")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MediumWidth")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Original")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("OriginalAspectRatio")
+                        .HasColumnType("float");
+
+                    b.Property<int>("OriginalHeight")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OriginalWidth")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("ThumbnailAspectRatio")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ThumbnailHeight")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ThumbnailWidth")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ImageDatas");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.LinkModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2586,68 +2690,6 @@ namespace WePromoLink.Migrations
                     b.HasIndex("UserModelId");
 
                     b.ToTable("PaymentTransactions");
-                });
-
-            modelBuilder.Entity("WePromoLink.Models.PayoutInfoModel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BCTAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DebitCard")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PayoutType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Paypal")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Stripe")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("UserModelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("WireBankAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WireBankName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WireBranch")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WireIban")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WireName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("WireSwiftorBic")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("wireRouting")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserModelId");
-
-                    b.ToTable("PayoutInfos");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.PayoutStatModel", b =>
@@ -2862,6 +2904,80 @@ namespace WePromoLink.Migrations
                     b.ToTable("SharedTodayUsers");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.StripeBillingMethod", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AccountId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("StripeBillings");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SubscriptionFeatureModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool?>("BoolValue")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SubscriptionPlanModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubscriptionPlanModelId");
+
+                    b.ToTable("SubscriptionFeatures");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("23154fd1-dc90-47e1-a55e-74fc5637504a"),
+                            BoolValue = true,
+                            Name = "Contain ads",
+                            SubscriptionPlanModelId = new Guid("6cdccbe3-6300-4c26-8573-1863a4c5dcef")
+                        },
+                        new
+                        {
+                            Id = new Guid("c6660327-2d10-45fd-926f-dbb7b60f73b3"),
+                            BoolValue = true,
+                            Name = "Contain ads",
+                            SubscriptionPlanModelId = new Guid("9f9e6b58-5722-4583-b5ea-c12e42549cca")
+                        });
+                });
+
             modelBuilder.Entity("WePromoLink.Models.SubscriptionModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2926,9 +3042,6 @@ namespace WePromoLink.Migrations
                     b.Property<string>("AnnualyProductId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("ContainAds")
-                        .HasColumnType("bit");
-
                     b.Property<decimal>("DepositFee")
                         .HasPrecision(10, 4)
                         .HasColumnType("decimal(10,4)");
@@ -2987,19 +3100,18 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("02df28e3-76b4-4f73-b9fe-729c0dae4945"),
+                            Id = new Guid("9f9e6b58-5722-4583-b5ea-c12e42549cca"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
-                            ContainAds = false,
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "FEVhyQ4GNnBn",
+                            ExternalId = "VVLjMBrh41Bt",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
                             Order = 2,
-                            PaymentMethod = "mastercard, visa, stripe",
+                            PaymentMethod = "stripe",
                             PayoutFee = 0m,
                             PayoutMinimun = 50m,
                             Tag = "Popular",
@@ -3007,14 +3119,13 @@ namespace WePromoLink.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c99e8bd4-a37c-482f-8279-0bfe7f16e8eb"),
+                            Id = new Guid("6cdccbe3-6300-4c26-8573-1863a4c5dcef"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
-                            ContainAds = true,
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "7GxguEEJjH7e",
+                            ExternalId = "48uDDV36qLfo",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",
@@ -3118,6 +3229,17 @@ namespace WePromoLink.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.BitcoinBillingMethod", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("BitcoinBillingMethod")
+                        .HasForeignKey("WePromoLink.Models.BitcoinBillingMethod", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.BudgetModel", b =>
                 {
                     b.HasOne("WePromoLink.Models.UserModel", "User")
@@ -3131,11 +3253,17 @@ namespace WePromoLink.Migrations
 
             modelBuilder.Entity("WePromoLink.Models.CampaignModel", b =>
                 {
+                    b.HasOne("WePromoLink.Models.ImageDataModel", "ImageData")
+                        .WithMany()
+                        .HasForeignKey("ImageDataModelId");
+
                     b.HasOne("WePromoLink.Models.UserModel", "User")
                         .WithMany("Campaigns")
                         .HasForeignKey("UserModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ImageData");
 
                     b.Navigation("User");
                 });
@@ -3519,17 +3647,6 @@ namespace WePromoLink.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WePromoLink.Models.PayoutInfoModel", b =>
-                {
-                    b.HasOne("WePromoLink.Models.UserModel", "User")
-                        .WithMany()
-                        .HasForeignKey("UserModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WePromoLink.Models.PayoutStatModel", b =>
                 {
                     b.HasOne("WePromoLink.Models.UserModel", "User")
@@ -3594,6 +3711,26 @@ namespace WePromoLink.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.StripeBillingMethod", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("StripeBillingMethod")
+                        .HasForeignKey("WePromoLink.Models.StripeBillingMethod", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SubscriptionFeatureModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.SubscriptionPlanModel", null)
+                        .WithMany("Features")
+                        .HasForeignKey("SubscriptionPlanModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WePromoLink.Models.SubscriptionModel", b =>
@@ -3688,12 +3825,17 @@ namespace WePromoLink.Migrations
 
             modelBuilder.Entity("WePromoLink.Models.SubscriptionPlanModel", b =>
                 {
+                    b.Navigation("Features");
+
                     b.Navigation("Subscriptions");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.UserModel", b =>
                 {
                     b.Navigation("Available")
+                        .IsRequired();
+
+                    b.Navigation("BitcoinBillingMethod")
                         .IsRequired();
 
                     b.Navigation("Budget")
@@ -3760,6 +3902,9 @@ namespace WePromoLink.Migrations
                         .IsRequired();
 
                     b.Navigation("SharedToday")
+                        .IsRequired();
+
+                    b.Navigation("StripeBillingMethod")
                         .IsRequired();
 
                     b.Navigation("Transactions");
