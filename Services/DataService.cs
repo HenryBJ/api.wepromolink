@@ -11,32 +11,42 @@ namespace WePromoLink.Services;
 public class DataService : IDataService
 {
     private readonly DataContext _db;
+    private readonly ILogger<DataService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    public DataService(DataContext db, IHttpContextAccessor httpContextAccessor)
+    public DataService(DataContext db, IHttpContextAccessor httpContextAccessor, ILogger<DataService> logger)
     {
         _db = db;
         _httpContextAccessor = httpContextAccessor;
+        _logger = logger;
     }
 
     private IActionResult AddCacheHistoricalData<T, R, L>(T result) where T : HistoryStatsBaseModel<R, L>
     {
-        if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("If-None-Match", out StringValues requestETagValues))
+        try
         {
-            if (requestETagValues[0] == result.Etag)
+            if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("If-None-Match", out StringValues requestETagValues))
             {
-                _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-                //_httpContextAccessor.HttpContext.Response.StatusCode = 304;
-                return new StatusCodeResult(304);
+                if (requestETagValues[0] == result.Etag)
+                {
+                    _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
+                    //_httpContextAccessor.HttpContext.Response.StatusCode = 304;
+                    return new StatusCodeResult(304);
+                }
             }
-        }
 
-        _httpContextAccessor.HttpContext!.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+            _httpContextAccessor.HttpContext!.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+            {
+                Public = true,
+                MaxAge = result.MaxAge!.Value
+            };
+            _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
+            return new OkObjectResult(ConvertToHistoricalData<T, R, L>(result));
+        }
+        catch (System.Exception ex)
         {
-            Public = true,
-            MaxAge = result.MaxAge!.Value
-        };
-        _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-        return new OkObjectResult(ConvertToHistoricalData<T, R, L>(result));
+            _logger.LogWarning(ex.Message);
+            return new OkObjectResult(ConvertToHistoricalData<T, R, L>(result));
+        }
     }
 
     private HistoricalData<R> ConvertToHistoricalData<T, R, L>(T result) where T : HistoryStatsBaseModel<R, L>
@@ -73,23 +83,32 @@ public class DataService : IDataService
 
     private IActionResult AddCache<T, R>(T result) where T : StatsBaseModel, IHasValue<R>
     {
-        if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("If-None-Match", out StringValues requestETagValues))
+        try
         {
-            if (requestETagValues[0] == result.Etag)
+            if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue("If-None-Match", out StringValues requestETagValues))
             {
-                _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-                // _httpContextAccessor.HttpContext.Response.StatusCode = 304;
-                return new StatusCodeResult(304);
+                if (requestETagValues[0] == result.Etag)
+                {
+                    _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
+                    // _httpContextAccessor.HttpContext.Response.StatusCode = 304;
+                    return new StatusCodeResult(304);
+                }
             }
+
+            _httpContextAccessor.HttpContext!.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+            {
+                Public = true,
+                MaxAge = result.MaxAge!.Value
+            };
+            _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
+            return new OkObjectResult(result.Value);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogWarning(ex.Message);
+            return new OkObjectResult(result.Value);
         }
 
-        _httpContextAccessor.HttpContext!.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-        {
-            Public = true,
-            MaxAge = result.MaxAge!.Value
-        };
-        _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-        return new OkObjectResult(result.Value);
     }
 
     public async Task<IActionResult> GetAvailable()

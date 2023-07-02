@@ -78,7 +78,7 @@ builder.Services.AddTransient<IEmailSender, EmailSender>(_ =>
         builder.Configuration["Email:Sender"],
         builder.Configuration["Email:Password"]);
 });
-builder.Services.AddTransient<IDataService, DataService>();
+builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddTransient<IPricingService, PricingService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<StripeService>();
