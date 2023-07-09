@@ -19,13 +19,13 @@ namespace WePromoLink.Services;
 
 public class CampaignService : ICampaignService
 {
-    private readonly IPaymentService _client;
+    private readonly BTCPaymentService _client;
     private readonly IOptions<BTCPaySettings> _options;
     private readonly DataContext _db;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<CampaignService> _logger;
     private readonly IMemoryCache _cache;
-    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, IPaymentService client, IHttpContextAccessor httpContextAccessor, ILogger<CampaignService> logger, IMemoryCache cache)
+    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, BTCPaymentService client, IHttpContextAccessor httpContextAccessor, ILogger<CampaignService> logger, IMemoryCache cache)
     {
         _db = db;
         _options = options;

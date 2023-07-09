@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using BTCPayServer.Client;
 using BTCPayServer.Client.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json.Linq;
@@ -15,21 +16,25 @@ using static BTCPayServer.Client.Models.InvoiceDataBase;
 
 namespace WePromoLink.Services;
 
-public class BTCPaymentService : IPaymentService
+public class BTCPaymentService
 {
     private readonly BTCPayServerClient _client;
     private readonly IOptions<BTCPaySettings> _settings;
     private readonly ILogger<BTCPaymentService> _logger;
     private readonly DataContext _bd;
     private readonly IUserService _userService;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public BTCPaymentService(ILogger<BTCPaymentService> logger, IOptions<BTCPaySettings> settings, BTCPayServerClient client, DataContext bd, IUserService userService)
+    public BTCPaymentService(ILogger<BTCPaymentService> logger, IOptions<BTCPaySettings> settings, BTCPayServerClient client, DataContext bd, IUserService userService, IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
     {
         _logger = logger;
         _settings = settings;
         _client = client;
         _bd = bd;
         _userService = userService;
+        _httpClientFactory = httpClientFactory;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task HandleWebHook(HttpContext ctx)
@@ -170,6 +175,39 @@ public class BTCPaymentService : IPaymentService
             }
         }
         return result?.CheckoutLink ?? "";
+    }
+
+    public async Task<bool> VerifyAddress(string address)
+    {
+        const string URL = "https://blockchain.info/rawaddr/{0}";
+        HttpClient httpClient = _httpClientFactory.CreateClient();
+
+        // Get UserId
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var user = _bd.Users
+        .Include(e => e.BitcoinBillingMethod)
+        .Where(e => e.FirebaseId == firebaseId).Single();
+
+        try
+        {
+            var requestUrl = string.Format(URL, address);
+            var response = await httpClient.GetFromJsonAsync<BitcoinAddressData>(requestUrl);
+            var isValid = response.total_received > 0 || response.total_sent > 0;
+            if (!isValid) return false;
+            var billingInfo = user.BitcoinBillingMethod;
+            billingInfo.IsVerified = true;
+            billingInfo.LastModified = DateTime.UtcNow;
+            billingInfo.VerifiedAt = DateTime.UtcNow;
+            billingInfo.Address = address;
+            _bd.BitcoinBillings.Update(billingInfo);
+            await _bd.SaveChangesAsync();
+            return true;
+
+        }
+        catch (System.Exception)
+        {
+            return false;
+        }
     }
 
 }

@@ -12,11 +12,11 @@ namespace WePromoLink.Controllers;
 public class BtcController : ControllerBase
 {
 
-    private readonly IPaymentService _service;
+    private readonly BTCPaymentService _service;
     private readonly ILogger<BtcController> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public BtcController(IPaymentService service, ILogger<BtcController> logger, IHttpContextAccessor httpContextAccessor)
+    public BtcController(BTCPaymentService service, ILogger<BtcController> logger, IHttpContextAccessor httpContextAccessor)
     {
         _service = service;
         _logger = logger;
@@ -40,5 +40,22 @@ public class BtcController : ControllerBase
             return new StatusCodeResult(500);
         }
     }
-    
+
+    [HttpPost]
+    [Authorize]
+    [Route("verify/{address}")]
+    public async Task<IActionResult> VerifyAddress(string address)
+    {
+        try
+        {
+            var results = await _service.VerifyAddress(address);
+            return new OkObjectResult(results);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
 }

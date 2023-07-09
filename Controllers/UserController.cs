@@ -57,7 +57,6 @@ public class UserController : ControllerBase
     [HttpGet]
     [Route("payment/methods")]
     [Authorize]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetPaymentMethods()
     {
         try

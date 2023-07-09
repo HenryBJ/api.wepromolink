@@ -21,9 +21,9 @@ public static class Templates
         return Bind(WelcomeTemplate, model);
     }
 
-    public static string DepositBTC(dynamic model)
+    public static string Deposit(dynamic model)
     {
-        return Bind(DepositBTCTemplate, model);
+        return Bind(DepositTemplate, model);
     }
 
     // Templates
@@ -131,7 +131,7 @@ static string WelcomeTemplate = @"
 ";
 
 
-static string DepositBTCTemplate = @"
+static string DepositTemplate = @"
 <!DOCTYPE html>
 <html>
 <head>
@@ -202,7 +202,7 @@ static string DepositBTCTemplate = @"
         </div>
         <h1>Deposit completed</h1>
         <p class=""message"">Dear {{user}},</p>
-        <p class=""message"">We are writing to inform you that your Bitcoin deposit has been successfully processed. We are pleased to confirm that an amount of ${{amount}} USD has been credited to your account.</p>
+        <p class=""message"">We are writing to inform you that your deposit has been successfully processed. We are pleased to confirm that an amount of {{amount}} USD has been credited to your account.</p>
         <p class=""message"">This notification serves as confirmation that the transfer has been completed and the funds are now available for your use. We understand the importance of timely and accurate transactions, and we are committed to providing you with exceptional service.</p>
         <p class=""message"">If you have any questions or require further assistance, please do not hesitate to contact our customer support team. We are here to assist you.</p>
       

@@ -46,7 +46,8 @@ builder.Services.AddSingleton<HitQueue>();
 builder.Services.AddSingleton<WebHookEventQueue>();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddTransient<IPaymentService, BTCPaymentService>();
+builder.Services.AddHttpClient();
+builder.Services.AddTransient<BTCPaymentService>();
 builder.Services.AddScoped<BTCPayServerClient>(x =>
 {
     var s = x.GetRequiredService<IOptions<BTCPaySettings>>();

@@ -84,6 +84,9 @@ public class UserService : IUserService
 
         await _db.Users.AddAsync(newUser);
         await _db.SaveChangesAsync();
+
+        // Notificar por email (Welcome)
+        await _emailSender.Send(user.Fullname, user.Email, "Welcome to WePromoLink", Templates.Welcome(new { user = user.Fullname }));
     }
 
     public async Task Deposit(PaymentTransaction payment)
@@ -117,7 +120,7 @@ public class UserService : IUserService
                     Status = NotificationStatusEnum.Unread,
                     UserModelId = payment.UserModelId!.Value,
                     Title = "Deposit completed",
-                    Message = $"We are pleased to inform you that your Bitcoin deposit has been successfully processed. An amount of $${payment.Amount} USD has been credited to your account.",
+                    Message = $"We are pleased to inform you that your deposit has been successfully processed. An amount of ${payment.Amount} USD has been credited to your account.",
                 };
                 await _db.Notifications.AddAsync(noti);
                 await _db.SaveChangesAsync();
@@ -125,7 +128,7 @@ public class UserService : IUserService
                 // Enviamos un correo
                 var user = await _db.Users.Where(e => e.Id == payment.UserModelId).SingleOrDefaultAsync();
                 if (user == null) throw new Exception("User no found");
-                await _emailSender.Send(user.Fullname!, user.Email, "Deposit completed", Templates.DepositBTC(new { user = user.Fullname, amount = payment.Amount.ToString("C") }));
+                await _emailSender.Send(user.Fullname!, user.Email, "Deposit completed", Templates.Deposit(new { user = user.Fullname, amount = payment.Amount.ToString("C") }));
 
                 transaction.Commit();
             }
@@ -261,8 +264,6 @@ public class UserService : IUserService
                 }
             }, true, data.FirebaseId);
 
-            // Notificar por email (Welcome)
-            await _emailSender.Send(data.Fullname, data.Email, "Welcome to WePromoLink", Templates.Welcome(new { user = data.Fullname }));
 
 
             return true; //Ok

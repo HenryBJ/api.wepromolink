@@ -12,13 +12,13 @@ public class WebhookController : ControllerBase
 {
 
     private readonly WebHookEventQueue _queue;
-    private readonly IPaymentService _service;
+    private readonly BTCPaymentService _service;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     // This is your Stripe CLI webhook secret for testing your endpoint locally.
     const string endpointSecret = "whsec_910a6037215b9b45b6e222ab692bae8058e9d04132471d858f40889e87da8921";
 
-    public WebhookController(WebHookEventQueue queue, IPaymentService service, IHttpContextAccessor httpContextAccessor)
+    public WebhookController(WebHookEventQueue queue, BTCPaymentService service, IHttpContextAccessor httpContextAccessor)
     {
         _queue = queue;
         _service = service;

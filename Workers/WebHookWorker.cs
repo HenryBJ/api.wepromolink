@@ -1,7 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using Stripe;
 using WePromoLink.Data;
-using WePromoLink.Models;
 using WePromoLink.Services;
 
 namespace WePromoLink.Workers;
@@ -53,6 +51,15 @@ public class WebHookWorker : BackgroundService
                 case Events.CustomerSubscriptionUpdated:
                     var sub = item.Data.Object as Subscription;
                     await _stripeService.UpdateUserSubscription(sub!, sub!.Status);
+                    break;
+
+                case Events.AccountExternalAccountCreated:
+                    await _stripeService.VerifyAccount(item.Account);
+                    break;
+
+                case Events.InvoicePaid:
+                    var invoice = item.Data.Object as Invoice;
+                    await _stripeService.HandleInvoiceWebHook(invoice!);
                     break;
 
                 default:

@@ -6,7 +6,9 @@ using Newtonsoft.Json.Linq;
 using Stripe;
 using WePromoLink.Data;
 using WePromoLink.DTO;
+using WePromoLink.Enums;
 using WePromoLink.Models;
+using WePromoLink.Services.Email;
 using WePromoLink.Settings;
 
 namespace WePromoLink.Services;
@@ -16,11 +18,13 @@ public class StripeService
     private readonly DataContext _db;
     private readonly IUserService _userService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    public StripeService(DataContext db, IHttpContextAccessor httpContextAccessor, IUserService userService)
+    private ILogger<StripeService> _logger { get; set; }
+    public StripeService(DataContext db, IHttpContextAccessor httpContextAccessor, IUserService userService, ILogger<StripeService> logger)
     {
         _db = db;
         _httpContextAccessor = httpContextAccessor;
         _userService = userService;
+        _logger = logger;
     }
 
 
@@ -60,40 +64,184 @@ public class StripeService
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex.Message);
         }
 
     }
 
-    public async Task<string> CreateOrUpdateAccountLink(bool updating)
+    public async Task VerifyAccount(string accountId)
     {
-        string accType = updating ? "account_update" : "account_onboarding";
+        if (string.IsNullOrEmpty(accountId)) return;
+        var billing = await _db.StripeBillings.Where(e => e.AccountId == accountId).SingleOrDefaultAsync();
+        if (billing == null)
+        {
+            _logger.LogWarning($"Account ${accountId} not found in DB trying to verify it");
+            return;
+        }
+        billing.LastModified = DateTime.UtcNow;
+        billing.VerifiedAt = DateTime.UtcNow;
+        billing.IsVerified = true;
+        _db.StripeBillings.Update(billing);
+        await _db.SaveChangesAsync();
+    }
 
+    public async Task<string> CreateAccountLink()
+    {
         // Get UserId
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var user = _db.Users.Include(e => e.StripeBillingMethod).Where(e => e.FirebaseId == firebaseId).Single();
-        
-        if (!updating) // Creating
+
+        if (string.IsNullOrEmpty(user.StripeBillingMethod.AccountId))
         {
-            // Update StripeBilligMethod
-            user.StripeBillingMethod.AccountId = $"acct_{await Nanoid.Nanoid.GenerateAsync("0123456789abcdefghijklmnopqrstuvwxyz", 12)}";
-            user.StripeBillingMethod.LastModified = DateTime.UtcNow;
-            _db.StripeBillings.Update(user.StripeBillingMethod);
-            await _db.SaveChangesAsync();
+            // Creating
+            user.StripeBillingMethod.AccountId = await CreateStripeAccount(user.Email);
         }
+
+        user.StripeBillingMethod.LastModified = DateTime.UtcNow;
+        _db.StripeBillings.Update(user.StripeBillingMethod);
+        await _db.SaveChangesAsync();
 
         var accLinkService = new Stripe.AccountLinkService();
         AccountLinkCreateOptions options = new AccountLinkCreateOptions
         {
             Account = user.StripeBillingMethod.AccountId,
-            Type = accType,
+            Type = "account_onboarding",
             ReturnUrl = "https://wepromolink.com/billing",
             RefreshUrl = "https://wepromolink.com/billing"
         };
 
         AccountLink response = await accLinkService.CreateAsync(options);
         return response.Url;
+    }
 
+    public async Task<bool> HasVerifiedAccount()
+    {
+        // Get User
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var hasVerified = await _db.Users
+        .Where(e => e.FirebaseId == firebaseId)
+        .Select(e => e.StripeBillingMethod.IsVerified)
+        .SingleAsync();
+        return hasVerified;
+    }
+
+    public async Task<string> GetStripeDashboardLink()
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var accountId = await _db.Users
+        .Where(e => e.FirebaseId == firebaseId)
+        .Select(e => e.StripeBillingMethod.AccountId)
+        .SingleAsync();
+
+        var loginAccService = new Stripe.LoginLinkService();
+        LoginLink loginLink = await loginAccService.CreateAsync(accountId);
+        return loginLink.Url;
+    }
+
+    public async Task<string> CreateInvoice(int amount)
+    {
+        using (var transaction = _db.Database.BeginTransaction())
+        {
+            try
+            {
+                int amountCents = amount * 100;
+                // Get User
+                var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+                var user = await _db.Users
+                .Where(e => e.FirebaseId == firebaseId)
+                .SingleAsync();
+
+                var invoiceService = new Stripe.InvoiceService();
+                var invoiceItemService = new Stripe.InvoiceItemService();
+                var priceService = new Stripe.PriceService();
+
+                // Create Payment Transaction
+                var paymentTrans = new PaymentTransaction
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = amount,
+                    CreatedAt = DateTime.UtcNow,
+                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                    Status = TransactionStatusEnum.Pending,
+                    Title = $"Deposit ${amount}",
+                    TransactionType = TransactionTypeEnum.Deposit,
+                    UserModelId = user.Id,
+                    ExpiredAt = DateTime.UtcNow.AddDays(10)
+                };
+                await _db.PaymentTransactions.AddAsync(paymentTrans);
+                await _db.SaveChangesAsync();
+
+                // Create invoice
+                var options = new InvoiceCreateOptions
+                {
+                    Currency = "usd",
+                    CollectionMethod = "send_invoice",
+                    Customer = user.CustomerId,
+                    DaysUntilDue = 10,
+                    Metadata = new Dictionary<string, string>
+                    {
+                        {"type", "deposit"},
+                        {"firebaseId",user.FirebaseId??""},
+                        {"paymentId",paymentTrans.ExternalId}
+                    }
+                };
+
+                Invoice invoice = await invoiceService.CreateAsync(options);
+                // Get price object
+                var prices = await priceService.ListAsync();
+                var selected_price = prices.Where(e => e.UnitAmount == amountCents).FirstOrDefault();
+                if (selected_price == null) throw new Exception("Price info not found");
+
+                // Create invoice item
+                var invoiceItemOptions = new InvoiceItemCreateOptions
+                {
+                    Customer = user.CustomerId,
+                    Quantity = 1,
+                    Description = $"${amount} usd of credit",
+                    Invoice = invoice.Id,
+                    Price = selected_price.Id
+                };
+                var invoiceItem = await invoiceItemService.CreateAsync(invoiceItemOptions);
+
+                // Finalize it
+                invoice = await invoiceService.FinalizeInvoiceAsync(invoice.Id);
+
+                //Send invoice
+                await invoiceService.SendInvoiceAsync(invoice.Id);
+
+                await transaction.CommitAsync();
+                return invoice.HostedInvoiceUrl;
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                transaction.Rollback();
+                throw new Exception("Creating invoice fail");
+            }
+        }
+    }
+
+    public async Task HandleInvoiceWebHook(Invoice invoice)
+    {
+        var paymentId = invoice.Metadata["paymentId"];
+        var pay = await _db.PaymentTransactions
+        .Where(e => e.ExternalId == paymentId)
+        .SingleOrDefaultAsync();
+        if (pay == null) throw new Exception("Payment transaction not found");
+        await _userService.Deposit(pay);
+    }
+
+    private async Task<string> CreateStripeAccount(string email)
+    {
+        var accService = new Stripe.AccountService();
+        AccountCreateOptions options = new AccountCreateOptions
+        {
+            Type = AccountType.Express,
+            Email = email,
+            BusinessType = "individual"
+        };
+        Account account = await accService.CreateAsync(options);
+        return account.Id;
     }
 
     public async Task UpdateUserSubscription(Subscription subscription, string status)

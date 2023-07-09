@@ -30,7 +30,7 @@ public class StripeController : ControllerBase
     {
         try
         {
-            var url = await _service.CreateOrUpdateAccountLink(false);
+            var url = await _service.CreateAccountLink();
             return new OkObjectResult(url);
         }
         catch (System.Exception ex)
@@ -40,15 +40,15 @@ public class StripeController : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPost]
     [Authorize]
-    [Route("account/update")]
-    public async Task<IActionResult> UpdateAccountLink()
+    [Route("invoice/{amount}")]
+    public async Task<IActionResult> CreateInvoice(decimal amount)
     {
         try
         {
-            var url = await _service.CreateOrUpdateAccountLink(true);
-            return new OkObjectResult(url);
+            var results = await _service.CreateInvoice((int)amount);
+            return new OkObjectResult(results);
         }
         catch (System.Exception ex)
         {
@@ -56,5 +56,39 @@ public class StripeController : ControllerBase
             return new StatusCodeResult(500);
         }
     }
-    
+
+    [HttpGet]
+    [Authorize]
+    [Route("account/isverified")]
+    public async Task<IActionResult> HasVerifiedAccount()
+    {
+        try
+        {
+            var response = await _service.HasVerifiedAccount();
+            return new OkObjectResult(response);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("account/login")]
+    public async Task<IActionResult> GetStripeDashboardLink()
+    {
+        try
+        {
+            var response = await _service.GetStripeDashboardLink();
+            return new OkObjectResult(response);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
 }
