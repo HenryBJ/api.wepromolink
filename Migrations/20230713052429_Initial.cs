@@ -981,6 +981,32 @@ namespace WePromoLink.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AbuseReports",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CampaignId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AbuseReports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AbuseReports_Campaigns_CampaignId",
+                        column: x => x.CampaignId,
+                        principalTable: "Campaigns",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AbuseReports_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClicksLastWeekOnCampaigns",
                 columns: table => new
                 {
@@ -1671,22 +1697,32 @@ namespace WePromoLink.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("6cdccbe3-6300-4c26-8573-1863a4c5dcef"), 0m, "", "", 9m, 0m, "48uDDV36qLfo", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                values: new object[] { new Guid("265c447d-26bd-43c4-be16-5bb6b91d663b"), 0m, "", "", 9m, 0m, "uoSbzcX9KgaT", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("9f9e6b58-5722-4583-b5ea-c12e42549cca"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 0m, 15m, "VVLjMBrh41Bt", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", 0m, 50m, "Popular", "Professional" });
+                values: new object[] { new Guid("6b8f5194-120f-4828-9324-00cd7c2a5d55"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 0m, 15m, "7fF5u0U0m4Qm", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", 0m, 50m, "Popular", "Professional" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("23154fd1-dc90-47e1-a55e-74fc5637504a"), true, "Contain ads", new Guid("6cdccbe3-6300-4c26-8573-1863a4c5dcef"), null });
+                values: new object[] { new Guid("51ababad-84ff-4d09-9bdb-ca91aca9f5ee"), true, "Contain ads", new Guid("265c447d-26bd-43c4-be16-5bb6b91d663b"), null });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("c6660327-2d10-45fd-926f-dbb7b60f73b3"), true, "Contain ads", new Guid("9f9e6b58-5722-4583-b5ea-c12e42549cca"), null });
+                values: new object[] { new Guid("70c94428-1e62-4fd9-82fb-2795599d372c"), false, "Contain ads", new Guid("6b8f5194-120f-4828-9324-00cd7c2a5d55"), null });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AbuseReports_CampaignId",
+                table: "AbuseReports",
+                column: "CampaignId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AbuseReports_UserId",
+                table: "AbuseReports",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Availables_UserModelId",
@@ -2036,6 +2072,9 @@ namespace WePromoLink.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AbuseReports");
+
             migrationBuilder.DropTable(
                 name: "Availables");
 

@@ -154,5 +154,23 @@ public class CampaignController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+    
+    [HttpPost]
+    [Authorize]
+    [Route("report-abuse")]
+    public async Task<IActionResult> ReportAbuse([FromBody] AbuseReport abuseReport)
+    {
+        try
+        {
+            await _campaignService.ReportAbuse(abuseReport);
+            return Ok();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return BadRequest(ex.Message);
+        }
+    }
+
 
 }
