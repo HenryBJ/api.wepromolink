@@ -450,6 +450,28 @@ public class CampaignService : ICampaignService
         return new OkObjectResult(campaigns);
     }
 
+    public async Task ReportAbuse(AbuseReport report)
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        var campaign = await _db.Campaigns.Where(e => e.ExternalId == report.CampaignExternalId).SingleAsync();
+        
+        var abuseReportModel = new AbuseReportModel 
+        { 
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            CampaignId = campaign.Id,
+            Reason = report.Reason
+        };
+
+        
+        _db.AbuseReports.Add(abuseReportModel);
+
+        await _db.SaveChangesAsync();
+    }
+
 
     public async Task<PaginationList<MyCampaign>> GetAll(int? page, int? cant, string? filter)
     {

@@ -67,6 +67,34 @@ namespace WePromoLink.Migrations
                     b.ToTable("Hits");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.AbuseReportModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CampaignId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AbuseReports");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.AvailableModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2962,17 +2990,17 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("23154fd1-dc90-47e1-a55e-74fc5637504a"),
+                            Id = new Guid("51ababad-84ff-4d09-9bdb-ca91aca9f5ee"),
                             BoolValue = true,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("6cdccbe3-6300-4c26-8573-1863a4c5dcef")
+                            SubscriptionPlanModelId = new Guid("265c447d-26bd-43c4-be16-5bb6b91d663b")
                         },
                         new
                         {
-                            Id = new Guid("c6660327-2d10-45fd-926f-dbb7b60f73b3"),
-                            BoolValue = true,
+                            Id = new Guid("70c94428-1e62-4fd9-82fb-2795599d372c"),
+                            BoolValue = false,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("9f9e6b58-5722-4583-b5ea-c12e42549cca")
+                            SubscriptionPlanModelId = new Guid("6b8f5194-120f-4828-9324-00cd7c2a5d55")
                         });
                 });
 
@@ -3098,13 +3126,13 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9f9e6b58-5722-4583-b5ea-c12e42549cca"),
+                            Id = new Guid("6b8f5194-120f-4828-9324-00cd7c2a5d55"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "VVLjMBrh41Bt",
+                            ExternalId = "7fF5u0U0m4Qm",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
@@ -3117,13 +3145,13 @@ namespace WePromoLink.Migrations
                         },
                         new
                         {
-                            Id = new Guid("6cdccbe3-6300-4c26-8573-1863a4c5dcef"),
+                            Id = new Guid("265c447d-26bd-43c4-be16-5bb6b91d663b"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "48uDDV36qLfo",
+                            ExternalId = "uoSbzcX9KgaT",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",
@@ -3203,6 +3231,23 @@ namespace WePromoLink.Migrations
                     b.Navigation("GeoData");
 
                     b.Navigation("Link");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.AbuseReportModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
+                        .WithMany()
+                        .HasForeignKey("CampaignId");
+
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.AvailableModel", b =>

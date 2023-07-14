@@ -22,6 +22,7 @@ public class DataContext : DbContext
     public virtual DbSet<HitModel> Hits { get; set; }
     public virtual DbSet<PaymentTransaction> PaymentTransactions { get; set; }
     public virtual DbSet<CampaignModel> Campaigns { get; set; }
+    public virtual DbSet<AbuseReportModel> AbuseReports { get; set; }
     public virtual DbSet<AvailableModel> Availables { get; set; }
     public virtual DbSet<BudgetModel> Budgets { get; set; }
     public virtual DbSet<LockedModel> Lockeds { get; set; }
@@ -234,6 +235,11 @@ public class DataContext : DbContext
             entity.HasIndex(e => e.ExternalId);
             entity.Property(e => e.Budget).HasPrecision(10, 4);
             entity.Property(e => e.EPM).HasPrecision(10, 4);
+        });
+
+        builder.Entity<AbuseReportModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
         });
 
         builder.Entity<GenericEventModel>(entity => entity.HasKey(e => e.Id));
