@@ -221,14 +221,72 @@ public class StripeService
         }
     }
 
+
+    public async Task CreateWithdrawRequest(int amount)
+    {
+        using (var transaction = _db.Database.BeginTransaction())
+        {
+            try
+            {
+                int amountCents = amount * 100;
+                // Get User
+                var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+                var user = await _db.Users
+                .Include(e => e.Profit)
+                .Where(e => e.FirebaseId == firebaseId)
+                .SingleAsync();
+
+                // Discount from Profit
+                user.Profit.Value -= amount;
+                user.Profit.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
+                _db.Profits.Update(user.Profit);
+
+                if (user.Profit.Value < 0) throw new Exception("Profit negative");
+
+                // Create Payment Transaction
+                var paymentTrans = new PaymentTransaction
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = amount,
+                    CreatedAt = DateTime.UtcNow,
+                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                    Status = TransactionStatusEnum.Requesting,
+                    Title = $"Withdraw ${amount}",
+                    TransactionType = TransactionTypeEnum.Withdraw,
+                    UserModelId = user.Id,
+                    ExpiredAt = DateTime.UtcNow.AddDays(10),
+                    Metadata = "stripe"
+                };
+                await _db.PaymentTransactions.AddAsync(paymentTrans);
+                await _db.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                transaction.Rollback();
+                throw new Exception("Creating payment transaction fail");
+            }
+        }
+    }
+
     public async Task HandleInvoiceWebHook(Invoice invoice)
     {
-        var paymentId = invoice.Metadata["paymentId"];
-        var pay = await _db.PaymentTransactions
-        .Where(e => e.ExternalId == paymentId)
-        .SingleOrDefaultAsync();
-        if (pay == null) throw new Exception("Payment transaction not found");
-        await _userService.Deposit(pay);
+        if (invoice.Metadata.ContainsKey("paymentId"))
+        {
+            var paymentId = invoice.Metadata["paymentId"];
+            var pay = await _db.PaymentTransactions
+            .Where(e => e.ExternalId == paymentId)
+            .SingleOrDefaultAsync();
+            if (pay == null) throw new Exception("Payment transaction not found");
+            await _userService.Deposit(pay);
+        }
+        else
+        {
+            _logger.LogInformation("Receive invoice paid event without payment info, must be from subscription");
+        }
+
     }
 
     private async Task<string> CreateStripeAccount(string email)

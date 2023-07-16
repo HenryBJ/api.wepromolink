@@ -13,11 +13,13 @@ public class UserController : ControllerBase
 {
     private readonly IUserService _service;
     private readonly ILogger<UserController> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserController(IUserService service, ILogger<UserController> logger)
+    public UserController(IUserService service, ILogger<UserController> logger, IHttpContextAccessor httpContextAccessor)
     {
         _service = service;
         _logger = logger;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     [HttpGet]
@@ -74,12 +76,19 @@ public class UserController : ControllerBase
     [HttpGet]
     [Route("issubscribed")]
     [Authorize]
-    [ResponseCache(Duration = 60)]
     public async Task<IActionResult> IsSubscribed()
     {
         try
         {
             var results = await _service.IsSubscribed();
+            if (results)
+            {
+                _httpContextAccessor.HttpContext!.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+                {
+                    Public = true,
+                    MaxAge = TimeSpan.FromHours(3)
+                };
+            }
             return new OkObjectResult(results);
         }
         catch (System.Exception ex)

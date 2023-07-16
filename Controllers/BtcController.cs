@@ -43,6 +43,23 @@ public class BtcController : ControllerBase
 
     [HttpPost]
     [Authorize]
+    [Route("withdraw/{amount}")]
+    public async Task<IActionResult> CreateWithdrawRequest(decimal amount)
+    {
+        try
+        {
+            await _service.CreateWithdrawRequest((int)amount);
+            return new OkResult();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
     [Route("verify/{address}")]
     public async Task<IActionResult> VerifyAddress(string address)
     {

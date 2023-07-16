@@ -21,7 +21,7 @@ public class BTCPaymentService
     private readonly BTCPayServerClient _client;
     private readonly IOptions<BTCPaySettings> _settings;
     private readonly ILogger<BTCPaymentService> _logger;
-    private readonly DataContext _bd;
+    private readonly DataContext _db;
     private readonly IUserService _userService;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -31,7 +31,7 @@ public class BTCPaymentService
         _logger = logger;
         _settings = settings;
         _client = client;
-        _bd = bd;
+        _db = bd;
         _userService = userService;
         _httpClientFactory = httpClientFactory;
         _httpContextAccessor = httpContextAccessor;
@@ -75,7 +75,7 @@ public class BTCPaymentService
             case InvoiceSettled ev:
                 var invoiceData = await _client.GetInvoice(_settings.Value.StoreId, ev.InvoiceId);
                 var paymentId = invoiceData?.Metadata["paymentId"]?.ToObject<Guid>();
-                var payment = _bd.PaymentTransactions.Where(e => e.Id == paymentId).Single();
+                var payment = _db.PaymentTransactions.Where(e => e.Id == paymentId).Single();
                 await ProcessPayment(invoiceData!, payment);
                 break;
             default:
@@ -87,6 +87,55 @@ public class BTCPaymentService
     private async Task ProcessPayment(InvoiceData invoiceData, PaymentTransaction pay)
     {
         await _userService.Deposit(pay);
+    }
+
+    public async Task CreateWithdrawRequest(int amount)
+    {
+        using (var transaction = _db.Database.BeginTransaction())
+        {
+            try
+            {
+                int amountCents = amount * 100;
+                // Get User
+                var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+                var user = await _db.Users
+                .Include(e => e.Profit)
+                .Where(e => e.FirebaseId == firebaseId)
+                .SingleAsync();
+
+                // Discount from Profit
+                user.Profit.Value -= amount;
+                user.Profit.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
+                _db.Profits.Update(user.Profit);
+
+                if (user.Profit.Value < 0) throw new Exception("Profit negative");
+
+                // Create Payment Transaction
+                var paymentTrans = new PaymentTransaction
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = amount,
+                    CreatedAt = DateTime.UtcNow,
+                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
+                    Status = TransactionStatusEnum.Requesting,
+                    Title = $"Withdraw ${amount}",
+                    TransactionType = TransactionTypeEnum.Withdraw,
+                    UserModelId = user.Id,
+                    ExpiredAt = DateTime.UtcNow.AddDays(10),
+                    Metadata = "bitcoin"
+                };
+                await _db.PaymentTransactions.AddAsync(paymentTrans);
+                await _db.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                transaction.Rollback();
+                throw new Exception("Creating payment transaction fail");
+            }
+        }
     }
 
     private async Task<bool> VerifyEvent(StringValues btcpay_sig, Stream stream)
@@ -127,11 +176,11 @@ public class BTCPaymentService
     public async Task<string> CreateInvoice(decimal amount, string firebaseId)
     {
         BTCPayServer.Client.Models.InvoiceData? result = null;
-        using (var transaction = _bd.Database.BeginTransaction())
+        using (var transaction = _db.Database.BeginTransaction())
         {
             try
             {
-                var userId = _bd.Users
+                var userId = _db.Users
                 .Where(e => e.FirebaseId == firebaseId)
                 .Where(e => e.IsSubscribed)
                 .Where(e => !e.IsBlocked)
@@ -150,8 +199,8 @@ public class BTCPaymentService
                     Title = $"Deposit ${amount}",
                     ExpiredAt = DateTime.UtcNow.AddHours(5)
                 };
-                _bd.PaymentTransactions.Add(payment);
-                await _bd.SaveChangesAsync();
+                _db.PaymentTransactions.Add(payment);
+                await _db.SaveChangesAsync();
 
                 result = await _client.CreateInvoice(_settings.Value.StoreId, new CreateInvoiceRequest
                 {
@@ -184,7 +233,7 @@ public class BTCPaymentService
 
         // Get UserId
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        var user = _bd.Users
+        var user = _db.Users
         .Include(e => e.BitcoinBillingMethod)
         .Where(e => e.FirebaseId == firebaseId).Single();
 
@@ -199,8 +248,8 @@ public class BTCPaymentService
             billingInfo.LastModified = DateTime.UtcNow;
             billingInfo.VerifiedAt = DateTime.UtcNow;
             billingInfo.Address = address;
-            _bd.BitcoinBillings.Update(billingInfo);
-            await _bd.SaveChangesAsync();
+            _db.BitcoinBillings.Update(billingInfo);
+            await _db.SaveChangesAsync();
             return true;
 
         }
