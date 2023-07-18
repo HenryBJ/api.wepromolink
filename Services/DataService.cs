@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using WePromoLink.Data;
 using WePromoLink.DTO;
@@ -29,7 +31,6 @@ public class DataService : IDataService
                 if (requestETagValues[0] == result.Etag)
                 {
                     _httpContextAccessor.HttpContext.Response.Headers.ETag = result.Etag;
-                    //_httpContextAccessor.HttpContext.Response.StatusCode = 304;
                     return new StatusCodeResult(304);
                 }
             }

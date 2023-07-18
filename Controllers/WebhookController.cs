@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using WePromoLink.Data;
 using WePromoLink.Services;
+using WePromoLink.Shared.RabbitMQ;
 using WePromoLink.Validators;
 
 namespace WePromoLink.Controllers;
@@ -11,18 +12,21 @@ namespace WePromoLink.Controllers;
 public class WebhookController : ControllerBase
 {
 
-    private readonly WebHookEventQueue _queue;
     private readonly BTCPaymentService _service;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly MessageBroker<Event> _messageBroker;
+    private readonly ILogger<WebhookController> _logger;
 
     // This is your Stripe CLI webhook secret for testing your endpoint locally.
     const string endpointSecret = "whsec_910a6037215b9b45b6e222ab692bae8058e9d04132471d858f40889e87da8921";
 
-    public WebhookController(WebHookEventQueue queue, BTCPaymentService service, IHttpContextAccessor httpContextAccessor)
+    public WebhookController(BTCPaymentService service, IHttpContextAccessor httpContextAccessor, IServiceScopeFactory fac, ILogger<WebhookController> logger)
     {
-        _queue = queue;
+        var scope = fac.CreateScope();
+        _messageBroker = scope.ServiceProvider.GetRequiredService<MessageBroker<Event>>();
         _service = service;
         _httpContextAccessor = httpContextAccessor;
+        _logger = logger;
     }
 
 
@@ -43,12 +47,13 @@ public class WebhookController : ControllerBase
             var stripeEvent = EventUtility.ConstructEvent(json,
                 Request.Headers["Stripe-Signature"], endpointSecret);
 
-            _queue.Item = stripeEvent;
+            _messageBroker.Send(stripeEvent);
 
             return Results.Ok();
         }
-        catch (StripeException e)
+        catch (StripeException ex)
         {
+            _logger.LogError(ex.Message);
             return Results.BadRequest();
         }
     }

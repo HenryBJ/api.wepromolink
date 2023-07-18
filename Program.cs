@@ -3,7 +3,6 @@ using System.Text;
 using BTCPayServer.Client;
 using FirebaseAdmin;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Polly;
 using WePromoLink;
@@ -11,13 +10,13 @@ using WePromoLink.Data;
 using WePromoLink.Services;
 using WePromoLink.Settings;
 using WePromoLink.Validators;
-using WePromoLink.Workers;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Stripe;
 using Google.Apis.Auth.OAuth2;
 using WePromoLink.Services.Email;
 using Azure.Storage.Blobs;
+using WePromoLink.Shared.RabbitMQ;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
@@ -42,8 +41,6 @@ builder.Services.AddScoped<IPStackService>(_ =>
 });
 builder.Services.AddScoped<CampaignValidator>();
 builder.Services.AddScoped<FundSponsoredLinkValidator>();
-builder.Services.AddSingleton<HitQueue>();
-builder.Services.AddSingleton<WebHookEventQueue>();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
@@ -58,11 +55,28 @@ builder.Services.AddScoped<BTCPayServerClient>(x =>
     var cc = new BTCPayServerClient(new Uri(s.Value.Url), c);
     return cc;
 });
-builder.Services.AddHostedService<HitWorker>();
-builder.Services.AddHostedService<WebHookWorker>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<ILinkService, LinkService>();
+builder.Services.AddSingleton<MessageBroker<Hit>>(sp =>
+{
+    return new MessageBroker<Hit>(new MessageBrokerOptions
+    {
+        HostName = "db.wepromolink.com",
+        UserName = "ra",
+        Password = "HackthePlanet23234"
+    });
+});
+
+builder.Services.AddSingleton<MessageBroker<Event>>(sp =>
+{
+    return new MessageBroker<Event>(new MessageBrokerOptions
+    {
+        HostName = "db.wepromolink.com",
+        UserName = "ra",
+        Password = "HackthePlanet23234"
+    });
+});
 builder.Services.AddTransient<ICampaignService, CampaignService>();
 builder.Services.AddTransient<ITransactionService, TransactionService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
@@ -111,7 +125,7 @@ app.UseAuthorization();
 
 InitializeDataBase(app);
 
-app.MapGet("/", () => "WePromoLink API v1.0.3 - 29/04/2023");
+app.MapGet("/", () => $"WePromoLink API v1.0.3 - {DateTime.Now.ToShortDateString()}");
 
 
 // Access to link (HIT)
@@ -121,7 +135,7 @@ app.MapGet("/{link}", async (string link, HttpContext ctx, ILinkService service)
     var url = await service.HitLink(new Hit
     {
         LinkId = link,
-        Origin = ctx.Request.HttpContext.Connection.RemoteIpAddress,
+        Origin = ctx.Request.HttpContext.Connection.RemoteIpAddress.ToString(),
         HitAt = DateTime.UtcNow
     });
     return String.IsNullOrEmpty(url) ? Results.NotFound() : Results.Redirect(url);
