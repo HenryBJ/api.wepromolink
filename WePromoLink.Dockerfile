@@ -2,9 +2,9 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
 WORKDIR /app
 
 # Copy necessary files and restore as distinct layer
-COPY ["WePromoLink.csproj","."]
-COPY ["../WePromoLink.Shared/WePromoLink.Shared.csproj", "WePromoLink.Shared/"]
-RUN dotnet restore "WePromoLink.csproj" -s https://api.nuget.org/v3/index.json 
+COPY ["/WePromoLink/WePromoLink.csproj","./WePromoLink/"]
+COPY ["/WePromoLink.Shared/WePromoLink.Shared.csproj", "WePromoLink.Shared/"]
+RUN dotnet restore "./WePromoLink/WePromoLink.csproj"  
 
 # Copy everything else and build
 COPY . ./
