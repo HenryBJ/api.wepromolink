@@ -3,7 +3,7 @@ WORKDIR /app
 
 # Copy necessary files and restore as distinct layer
 COPY ["WePromoLink.csproj","."]
-COPY ["../WePromoLink.Shared/WePromoLink.Shared.csproj", "../WePromoLink.Shared/"]
+COPY ["../WePromoLink.Shared/WePromoLink.Shared.csproj", "WePromoLink.Shared/"]
 RUN dotnet restore "WePromoLink.csproj" -s https://api.nuget.org/v3/index.json 
 
 # Copy everything else and build
