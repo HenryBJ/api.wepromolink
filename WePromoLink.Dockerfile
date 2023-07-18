@@ -8,7 +8,7 @@ RUN dotnet restore "./WePromoLink/WePromoLink.csproj"
 
 # Copy everything else and build
 COPY . ./
-RUN dotnet publish "WePromoLink.csproj" -c Release -o out
+RUN dotnet publish "./WePromoLink/WePromoLink.csproj" -c Release -o out
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
