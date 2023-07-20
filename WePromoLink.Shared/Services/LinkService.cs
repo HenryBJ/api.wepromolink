@@ -65,7 +65,7 @@ public class LinkService : ILinkService
                 LinkModel link = new LinkModel
                 {
                     Id = Guid.NewGuid(),
-                    Url = $"{_httpContextAccessor.HttpContext!.Request.Scheme}://{_httpContextAccessor.HttpContext!.Request.Host}/{externalLinkId}",
+                    Url = $"https://wepromolink.io/{externalLinkId}",
                     CampaignModelId = campaign.Id,
                     ExternalId = externalLinkId,
                     ClicksLastWeekOnLink = new ClicksLastWeekOnLinkModel(),
