@@ -21,22 +21,15 @@ public class Worker : BackgroundService
     public Worker(IServiceScopeFactory fac, ILogger<Worker> logger)
     {
         var scope = fac.CreateScope();
-        var s = scope.ServiceProvider.GetRequiredService<DataContext>();
-        _db = s;
+        _db = scope.ServiceProvider.GetRequiredService<DataContext>();
+        _messageBroker = scope.ServiceProvider.GetRequiredService<MessageBroker<Hit>>();
         _logger = logger;
         _service = scope.ServiceProvider.GetRequiredService<IPStackService>();
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-
-        _messageBroker = new MessageBroker<Hit>(new MessageBrokerOptions
-        {
-            HostName = "db.wepromolink.com",
-            UserName = "ra",
-            Password = "HackthePlanet23234"
-        });
-
+ 
         await _messageBroker.Receive((hit) => ProcessHit(hit).Result);
 
         while (true)
@@ -53,13 +46,13 @@ public class Worker : BackgroundService
             try
             {
                 if (item.Origin == null) throw new Exception("Invalid Origen IP Address");
-                var originIP = IPAddress.Parse(item.Origin);    
+                var originIP = IPAddress.Parse(item.Origin);
 
                 if (IPAddress.IsLoopback(originIP))
-                {                    
+                {
                     originIP = IPAddress.Parse("170.75.168.146");
                 }
-                else 
+                else
                 {
                     originIP = originIP.MapToIPv4();
                 }

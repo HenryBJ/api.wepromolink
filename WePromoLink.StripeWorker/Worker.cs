@@ -15,18 +15,13 @@ public class Worker : BackgroundService
     {
         var scope = fac.CreateScope();
         _stripeService = scope.ServiceProvider.GetRequiredService<StripeService>();
+        _messageBroker = scope.ServiceProvider.GetRequiredService<MessageBroker<Event>>();
         _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _messageBroker = new MessageBroker<Event>(new MessageBrokerOptions
-        {
-            HostName = "db.wepromolink.com",
-            UserName = "ra",
-            Password = "HackthePlanet23234"
-        });
-
+       
         await _messageBroker.Receive((ev) => ProcessEvent(ev).Result);
 
         while (true)
