@@ -1,5 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Stripe;
+using WePromoLink.Data;
 using WePromoLink.Services;
+using WePromoLink.Services.Email;
 using WePromoLink.Shared.RabbitMQ;
 using WePromoLink.StripeWorker;
 
@@ -13,7 +16,20 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         IConfiguration configuration = hostContext.Configuration;
         services.AddHostedService<Worker>();
+        services.AddHttpContextAccessor();
         services.AddTransient<StripeService>();
+        services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IEmailSender, EmailSender>(_ =>
+        {
+            return new EmailSender(
+                configuration["Email:Server"],
+                Convert.ToInt32(configuration["Email:Port"]),
+                configuration["Email:Sender"],
+                configuration["Email:Password"]);
+        });
+
+        var connectionString = configuration.GetConnectionString("Default");
+        services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
 
         services.AddSingleton<MessageBroker<Event>>(_ =>
         {

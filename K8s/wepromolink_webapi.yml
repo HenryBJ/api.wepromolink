@@ -1,6 +1,52 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: hitworker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hitworker-app
+  template:
+    metadata:
+      labels:
+        app: hitworker-app
+    spec:
+      containers:
+        - name: hitworker-container
+          image: cod4it/wepromolink.hitworker:1.0.2
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: my-configmap
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stripeworker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stripeworker-app
+  template:
+    metadata:
+      labels:
+        app: stripeworker-app
+    spec:
+      containers:
+        - name: stripeworker-container
+          image: cod4it/wepromolink.stripeworker:1.0.2
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: my-configmap
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: webclient-deployment
 spec:
   replicas: 1

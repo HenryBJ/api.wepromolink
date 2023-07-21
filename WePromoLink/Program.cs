@@ -62,9 +62,9 @@ builder.Services.AddSingleton<MessageBroker<Hit>>(sp =>
 {
     return new MessageBroker<Hit>(new MessageBrokerOptions
     {
-        HostName = "db.wepromolink.com",
-        UserName = "ra",
-        Password = "HackthePlanet23234"
+        HostName = builder.Configuration["RabbitMQ:hostname"],
+        UserName = builder.Configuration["RabbitMQ:username"],
+        Password = builder.Configuration["RabbitMQ:password"]
     });
 });
 
@@ -72,9 +72,9 @@ builder.Services.AddSingleton<MessageBroker<Event>>(sp =>
 {
     return new MessageBroker<Event>(new MessageBrokerOptions
     {
-        HostName = "db.wepromolink.com",
-        UserName = "ra",
-        Password = "HackthePlanet23234"
+        HostName = builder.Configuration["RabbitMQ:hostname"],
+        UserName = builder.Configuration["RabbitMQ:username"],
+        Password = builder.Configuration["RabbitMQ:password"]
     });
 });
 builder.Services.AddTransient<ICampaignService, CampaignService>();
