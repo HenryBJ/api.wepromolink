@@ -16,17 +16,24 @@ public class WebhookController : ControllerBase
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly MessageBroker<Event> _messageBroker;
     private readonly ILogger<WebhookController> _logger;
+    private readonly IConfiguration _configuration;
 
     // This is your Stripe CLI webhook secret for testing your endpoint locally.
-    const string endpointSecret = "whsec_910a6037215b9b45b6e222ab692bae8058e9d04132471d858f40889e87da8921";
+    //const string endpointSecret = "whsec_910a6037215b9b45b6e222ab692bae8058e9d04132471d858f40889e87da8921";
 
-    public WebhookController(BTCPaymentService service, IHttpContextAccessor httpContextAccessor, IServiceScopeFactory fac, ILogger<WebhookController> logger)
+    public WebhookController(
+        BTCPaymentService service, 
+        IHttpContextAccessor httpContextAccessor, 
+        IServiceScopeFactory fac, 
+        ILogger<WebhookController> logger, 
+        IConfiguration configuration)
     {
         var scope = fac.CreateScope();
         _messageBroker = scope.ServiceProvider.GetRequiredService<MessageBroker<Event>>();
         _service = service;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
+        _configuration = configuration;
     }
 
 
@@ -45,7 +52,28 @@ public class WebhookController : ControllerBase
         try
         {
             var stripeEvent = EventUtility.ConstructEvent(json,
-                Request.Headers["Stripe-Signature"], endpointSecret);
+                Request.Headers["Stripe-Signature"], _configuration["Stripe:WebHookAccount"]);
+
+            _messageBroker.Send(stripeEvent);
+
+            return Results.Ok();
+        }
+        catch (StripeException ex)
+        {
+            _logger.LogError(ex.Message);
+            return Results.BadRequest();
+        }
+    }
+
+    [HttpPost]
+    [Route("stripe/connect")]
+    public async Task<IResult> StripeConnect()
+    {
+        var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+        try
+        {
+            var stripeEvent = EventUtility.ConstructEvent(json,
+                Request.Headers["Stripe-Signature"], _configuration["Stripe:WebHookConnect"]);
 
             _messageBroker.Send(stripeEvent);
 
