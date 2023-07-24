@@ -1,14 +1,14 @@
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using WePromoLink.Data;
 using WePromoLink.DTO;
 using WePromoLink.Models;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Drawing.Processing;
 
 namespace WePromoLink.Services
 {
@@ -79,7 +79,7 @@ namespace WePromoLink.Services
             string originalUrl = await UploadImageToBlobStorage(image, uniqueFileName, "original");
 
             // Obtener las dimensiones de la imagen original
-            using (var originalImage = Image.FromStream(image.OpenReadStream()))
+            using (var originalImage = Image.Load(image.OpenReadStream()))
             {
                 int originalWidth = originalImage.Width;
                 int originalHeight = originalImage.Height;
@@ -137,14 +137,10 @@ namespace WePromoLink.Services
             BlobClient blobClient = containerClient.GetBlobClient(fileName);
             using (var outputStream = new MemoryStream())
             {
-                EncoderParameters encoderParams = new EncoderParameters(1);
-                encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 50L);
-
-                ImageCodecInfo eEncoder = GetEncoder(isPNG ? ImageFormat.Png : ImageFormat.Jpeg);
-
-                image.Save(outputStream, eEncoder, encoderParams);
+                ApplyWaterMark(image); // Apply watermark
+                AddWaterMarkURL(image); 
+                image.SaveAsJpeg(outputStream, new JpegEncoder { Quality = 50 });
                 outputStream.Position = 0;
-
                 await blobClient.UploadAsync(outputStream, true);
             }
             return blobClient.Uri.ToString();
@@ -158,38 +154,17 @@ namespace WePromoLink.Services
             BlobClient blobClient = containerClient.GetBlobClient(resizedFileName);
             using (var outputStream = new MemoryStream())
             {
-                using (var resizedImage = new Bitmap(width, height))
+
+                image.Mutate(ctx => ctx.Resize(new ResizeOptions
                 {
-                    resizedImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-
-                    using (var graphics = Graphics.FromImage(resizedImage))
-                    {
-                        graphics.DrawImage(image, 0, 0, width, height);
-                    }
-
-                    resizedImage.Save(outputStream, ImageFormat.Jpeg);
-                }
-
+                    Mode = ResizeMode.BoxPad,
+                    Size = new SixLabors.ImageSharp.Size(width, height)
+                }));
+                image.SaveAsJpeg(outputStream);
                 outputStream.Position = 0;
                 await blobClient.UploadAsync(outputStream, true);
             }
-
             return blobClient.Uri.ToString();
-        }
-
-        private ImageCodecInfo GetEncoder(ImageFormat format)
-        {
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
-
-            foreach (var codec in codecs)
-            {
-                if (codec.FormatID == format.Guid)
-                {
-                    return codec;
-                }
-            }
-
-            return null;
         }
 
         public async Task<ImageData> GetImage(string id)
@@ -214,7 +189,45 @@ namespace WePromoLink.Services
                 ThumbnailHeight = e.ThumbnailHeight,
                 ThumbnailWidth = e.ThumbnailWidth
             }).Single();
+        }
 
+        private void ApplyWaterMark(Image image)
+        {
+            string logoFileName = "logo.png";
+            string logoFilePath = Path.Combine(AppContext.BaseDirectory, "Assets", logoFileName);
+
+            using (var logoStream = File.OpenRead(logoFilePath))
+            {
+                using (var logoImage = Image.Load(logoStream))
+                {
+                    // Calculate the position where the watermark will be placed (bottom-right corner in this example)
+                    int posX = image.Width - logoImage.Width - 150; // 10-pixel padding from the right edge
+                    int posY = image.Height - logoImage.Height - 35; // 10-pixel padding from the bottom edge
+
+                    // Apply watermark (logo) on the image
+                    image.Mutate(ctx => ctx.DrawImage(new Image<Rgba32>(logoImage.Width, logoImage.Height, Color.Transparent), new Point(posX, posY), 1f)); // Transparent background for the watermark
+                    image.Mutate(ctx => ctx.DrawImage(logoImage, new Point(posX, posY), 0.5f)); // 0.5f is the opacity (0.0f to 1.0f)
+                }
+            }
+        }
+
+        private void AddWaterMarkURL(Image image)
+        {
+            string fontName = "audiowide.ttf";
+            string fontFilePath = Path.Combine(AppContext.BaseDirectory, "Assets", fontName);
+
+            FontCollection collection = new();
+            collection.Add(fontFilePath);
+            if (collection.TryGet("Audiowide", out FontFamily family))
+            {
+                Font font = family.CreateFont(40, FontStyle.Regular);
+                var text = "wepromolink.com";
+
+                int posX = image.Width - 400;
+                int posY = image.Height - 60;
+                var textColor = Color.FromRgba(255, 255, 255, 10);
+                image.Mutate(ctx => ctx.DrawText(text, font, textColor, new Point(posX, posY))); // Place the text at the bottom center with 30-pixel padding
+            }
         }
     }
 }
