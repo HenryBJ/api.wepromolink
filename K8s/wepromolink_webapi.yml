@@ -80,7 +80,7 @@ spec:
     spec:
       containers:
         - name: webapi-container
-          image: cod4it/wepromolink:1.0.3
+          image: cod4it/wepromolink:1.0.4
           ports:
             - containerPort: 80
           envFrom:
@@ -180,6 +180,7 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     # nginx.ingress.kubernetes.io/rewrite-target: /
     # nginx.ingress.kubernetes.io/whitelist-source-range: "170.75.168.146/32"
+    nginx.ingress.kubernetes.io/proxy-body-size: "8m"
 spec:
   ingressClassName: nginx  # Especifica el nombre del controlador de Ingress que debe manejar las reglas definidas en este Ingress
   tls:

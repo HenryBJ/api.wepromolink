@@ -22,7 +22,7 @@ public class IPStackService
         var retryPolicy = Policy
                 .Handle<HttpRequestException>()
                 .Or<TaskCanceledException>()
-                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+                .WaitAndRetryAsync(2, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         GeoDataModel result = null;
 
@@ -31,7 +31,6 @@ public class IPStackService
               var requestUrl = string.Format(URL, ip, _apiKey);
               var response = await httpClient.GetAsync(requestUrl);
               response.EnsureSuccessStatusCode();
-            //   var dataString = await response.Content.ReadAsStringAsync();
               var data = await response.Content.ReadFromJsonAsync<IPStackGeoData>();
               if (data == null) throw new Exception("Invalid GeoData");
 

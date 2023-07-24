@@ -29,7 +29,7 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
- 
+
         await _messageBroker.Receive((hit) => ProcessHit(hit).Result);
 
         while (true)
@@ -58,23 +58,7 @@ public class Worker : BackgroundService
                 }
 
                 var origin = originIP.ToString();
-
-                var newGeoData = await _db.GeoDatas.Where(e => e.IP == origin).Select(e => new GeoDataModel
-                {
-                    Id = Guid.NewGuid(),
-                    City = e.City,
-                    Continent = e.Continent,
-                    Country = e.Country,
-                    CountryCode = e.CountryCode,
-                    CountryFlagUrl = e.CountryFlagUrl,
-                    Currency = e.Currency,
-                    IP = e.IP,
-                    ISP = e.ISP,
-                    Latitude = e.Latitude,
-                    Longitude = e.Longitude,
-                    Region = e.Region,
-                    RegionCode = e.RegionCode
-                }).SingleOrDefaultAsync();
+                var geoData = await _db.GeoDatas.Where(e => e.IP == origin).SingleOrDefaultAsync();
 
                 var link = await _db.Links
                 .Include(e => e.User)
@@ -100,15 +84,18 @@ public class Worker : BackgroundService
 
                     if (!hit.IsGeolocated)
                     {
-                        hit.GeoData = newGeoData != null ? newGeoData : await _service.Locate(hit.Origin!);
+                        hit.GeoData = geoData ?? await _service.Locate(hit.Origin!);
                         if (hit.GeoData != null)
                         {
                             hit.Country = hit.GeoData?.Country;
-                            await _db.GeoDatas.AddAsync(hit.GeoData!);
+                            if (geoData == null)
+                            {
+                                await _db.GeoDatas.AddAsync(hit.GeoData!);
+                            }
                             await _db.SaveChangesAsync();
 
-                            hit.IsGeolocated = !string.IsNullOrEmpty(hit.Country);
-                            hit.GeolocatedAt = string.IsNullOrEmpty(hit.Country) ? null : DateTime.UtcNow;
+                            hit.IsGeolocated = true;
+                            hit.GeolocatedAt = DateTime.UtcNow;
                         }
                     }
 
@@ -164,15 +151,19 @@ public class Worker : BackgroundService
                     Origin = origin
                 };
 
-                model.GeoData = newGeoData != null ? newGeoData : await _service.Locate(model.Origin!);
+                model.GeoData = geoData ?? await _service.Locate(model.Origin!);
                 if (model.GeoData != null)
                 {
                     model.Country = model.GeoData?.Country;
-                    await _db.GeoDatas.AddAsync(model.GeoData!);
+
+                    if (geoData == null)
+                    {
+                        await _db.GeoDatas.AddAsync(model.GeoData!);
+                    }
                     await _db.SaveChangesAsync();
 
-                    model.IsGeolocated = !string.IsNullOrEmpty(model.Country);
-                    model.GeolocatedAt = string.IsNullOrEmpty(model.Country) ? null : DateTime.UtcNow;
+                    model.IsGeolocated = true;
+                    model.GeolocatedAt = DateTime.UtcNow;
                 }
                 _db.Hits.Add(model);
                 await _db.SaveChangesAsync();

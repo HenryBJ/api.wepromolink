@@ -132,10 +132,21 @@ app.MapGet("/", () => $"WePromoLink API v1.0.3 - {DateTime.Now.ToShortDateString
 app.MapGet("/{link}", async (string link, HttpContext ctx, ILinkService service) =>
 {
     if (String.IsNullOrEmpty(link)) return Results.BadRequest();
+
+    string ipAddress;
+    if (ctx.Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor))
+    {
+        ipAddress = forwardedFor.FirstOrDefault();
+    }
+    else
+    {
+        ipAddress = ctx.Request.HttpContext.Connection.RemoteIpAddress.ToString();
+    }
+
     var url = await service.HitLink(new Hit
     {
         LinkId = link,
-        Origin = ctx.Request.HttpContext.Connection.RemoteIpAddress.ToString(),
+        Origin = ipAddress,
         HitAt = DateTime.UtcNow
     });
     return String.IsNullOrEmpty(url) ? Results.NotFound() : Results.Redirect(url);
