@@ -27,5 +27,5 @@ jobs:
           context: .
           push: true
           tags: cod4it/wepromolink:${{ env.IMAGE_TAG }}
-          dockerfile: WePromoLink.Dockerfile
+          file: WePromoLink.Dockerfile
   
