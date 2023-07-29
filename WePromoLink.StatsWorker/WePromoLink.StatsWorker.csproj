@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-WePromoLink.StatsWorker-054a1d89-1015-4bd4-a01b-bd87df318394</UserSecretsId>
+    <UserSecretsId>310d3c99-f000-4003-b50b-bc06ded5b546</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

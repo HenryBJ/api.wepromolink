@@ -12,8 +12,7 @@ public class Worker : BackgroundService
     private MessageBroker<UpdateCampaignMessage> _campaignMessageBroker;
     private MessageBroker<UpdateUserMessage> _userMessageBroker;
     private MessageBroker<UpdateLinkMessage> _linkMessageBroker;
-    private readonly DataContext _db;
-    private readonly DataRepository _repo;
+    private readonly IServiceScopeFactory _fac;
 
     public Worker(IServiceScopeFactory fac,
     ILogger<Worker> logger,
@@ -25,9 +24,7 @@ public class Worker : BackgroundService
         _campaignMessageBroker = campaignMessageBroker;
         _userMessageBroker = userMessageBroker;
         _linkMessageBroker = linkMessageBroker;
-        var scope = fac.CreateScope();
-        _db = scope.ServiceProvider.GetRequiredService<DataContext>();
-        _repo = new DataRepository(_db);
+        _fac = fac;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -46,78 +43,96 @@ public class Worker : BackgroundService
 
     private async Task<bool> UpdateLink(UpdateLinkMessage item)
     {
-        var exist = _db.Links.Any(e => e.Id == item.Id);
-        if (!exist)
-        {
-            _logger.LogWarning($"Updating link: {item.Id} not found");
-            return false;
-        }
 
-        using (var dbtrans = _db.Database.BeginTransaction())
+        using (var scope = _fac.CreateScope())
         {
-            try
+            DataContext _db = scope.ServiceProvider.GetRequiredService<DataContext>();
+            DataRepository _repo = new DataRepository(_db);
+            var exist = _db.Links.Any(e => e.Id == item.Id);
+            if (!exist)
             {
-                await _repo.UpdateLink(item.Id);
-                dbtrans.Commit();
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                dbtrans.Rollback();
+                _logger.LogWarning($"Updating link: {item.Id} not found");
                 return false;
+            }
+
+            using (var dbtrans = _db.Database.BeginTransaction())
+            {
+                try
+                {
+                    await _repo.UpdateLink(item.Id);
+                    dbtrans.Commit();
+                    return true;
+                }
+                catch (System.Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                    dbtrans.Rollback();
+                    return false;
+                }
             }
         }
     }
 
     private async Task<bool> UpdateUser(UpdateUserMessage item)
     {
-        var exist = _db.Users.Any(e => e.Id == item.Id);
-        if (!exist)
+        using (var scope = _fac.CreateScope())
         {
-            _logger.LogWarning($"Updating User: {item.Id} not found");
-            return false;
-        }
-
-        using (var dbtrans = _db.Database.BeginTransaction())
-        {
-            try
+            DataContext _db = scope.ServiceProvider.GetRequiredService<DataContext>();
+            DataRepository _repo = new DataRepository(_db);
+            var exist = _db.Users.Any(e => e.Id == item.Id);
+            if (!exist)
             {
-                await _repo.UpdateUser(item.Id);
-                dbtrans.Commit();
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                dbtrans.Rollback();
+                _logger.LogWarning($"Updating User: {item.Id} not found");
                 return false;
             }
+
+            using (var dbtrans = _db.Database.BeginTransaction())
+            {
+                try
+                {
+                    await _repo.UpdateUser(item.Id);
+                    dbtrans.Commit();
+                    return true;
+                }
+                catch (System.Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                    dbtrans.Rollback();
+                    return false;
+                }
+            }
         }
+
+
     }
 
     private async Task<bool> UpdateCampaign(UpdateCampaignMessage item)
     {
-        var exist = _db.Users.Any(e => e.Id == item.Id);
-        if (!exist)
+        using (var scope = _fac.CreateScope())
         {
-            _logger.LogWarning($"Updating User: {item.Id} not found");
-            return false;
-        }
-
-        using (var dbtrans = _db.Database.BeginTransaction())
-        {
-            try
+            DataContext _db = scope.ServiceProvider.GetRequiredService<DataContext>();
+            DataRepository _repo = new DataRepository(_db);
+            var exist = _db.Campaigns.Any(e => e.Id == item.Id);
+            if (!exist)
             {
-                await _repo.UpdateCampaign(item.Id);
-                dbtrans.Commit();
-                return true;
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                dbtrans.Rollback();
+                _logger.LogWarning($"Updating Campaign: {item.Id} not found");
                 return false;
+            }
+
+            using (var dbtrans = _db.Database.BeginTransaction())
+            {
+                try
+                {
+                    await _repo.UpdateCampaign(item.Id);
+                    dbtrans.Commit();
+                    return true;
+                }
+                catch (System.Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                    dbtrans.Rollback();
+                    return false;
+                }
             }
         }
     }
