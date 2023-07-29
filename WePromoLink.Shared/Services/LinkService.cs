@@ -7,6 +7,7 @@ using WePromoLink.DTO;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Repositories;
+using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.Services;
@@ -17,14 +18,18 @@ public class LinkService : ILinkService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<LinkService> _logger;
     private readonly MessageBroker<Hit> _messageBroker;
+    private readonly MessageBroker<UpdateUserMessage> _userMessageBroker;
+    private readonly MessageBroker<UpdateCampaignMessage> _campaignMessageBroker;
 
-    public LinkService(DataContext ctx, IHttpContextAccessor httpContextAccessor, ILogger<LinkService> logger, IServiceScopeFactory fac)
+    public LinkService(DataContext ctx, IHttpContextAccessor httpContextAccessor, ILogger<LinkService> logger, IServiceScopeFactory fac, MessageBroker<UpdateUserMessage> userMessageBroker, MessageBroker<UpdateCampaignMessage> campaignMessageBroker)
     {
         var scope = fac.CreateScope();
         _messageBroker = scope.ServiceProvider.GetRequiredService<MessageBroker<Hit>>();
         _db = ctx;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
+        _userMessageBroker = userMessageBroker;
+        _campaignMessageBroker = campaignMessageBroker;
     }
 
     public async Task<string> Create(string ExternalCampaignId)
@@ -58,7 +63,6 @@ public class LinkService : ILinkService
         {
             try
             {
-                var repo = new DataRepository(_db);
                 string externalLinkId = await Nanoid.Nanoid.GenerateAsync(size: 16);
 
                 // Create the link
@@ -84,27 +88,10 @@ public class LinkService : ILinkService
                 await _db.SaveChangesAsync();
 
                 // Update Campaign Statistics
-                var historySharedByUsersOnCampaign = campaign.HistorySharedByUsersOnCampaign;
-                await repo.Update(historySharedByUsersOnCampaign);
-
-                var historySharedOnCampaign = campaign.HistorySharedOnCampaign;
-                await repo.Update(historySharedOnCampaign);
-
-                var sharedLastWeekOnCampaign = campaign.SharedLastWeekOnCampaign;
-                await repo.Update(sharedLastWeekOnCampaign);
-
-                var sharedTodayOnCampaignModel = campaign.SharedTodayOnCampaignModel;
-                await repo.Update(sharedTodayOnCampaignModel);
+                _campaignMessageBroker.Send(new UpdateCampaignMessage { Id = campaign.Id });
 
                 // Update User (campaign owner) Statistics
-                var historySharedByUsersUser = userB.HistorySharedByUsersUser;
-                await repo.Update(historySharedByUsersUser);
-
-                var sharedLastWeek = userB.SharedLastWeek;
-                await repo.Update(sharedLastWeek);
-
-                var sharedToday = userB.SharedToday;
-                await repo.Update(sharedToday);
+                _userMessageBroker.Send(new UpdateUserMessage { Id = userB.Id });
 
                 //Create a Notification
                 var noti = new NotificationModel

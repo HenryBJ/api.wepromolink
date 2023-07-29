@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WePromoLink.Data;
 
 #nullable disable
 
-namespace WePromoLink.Migrations
+namespace WePromoLink.Shared.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230713052429_Initial")]
-    partial class Initial
+    partial class DataContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2992,17 +2990,17 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("51ababad-84ff-4d09-9bdb-ca91aca9f5ee"),
+                            Id = new Guid("e4aedea1-35e2-4f33-8694-e3e39e02fcb4"),
                             BoolValue = true,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("265c447d-26bd-43c4-be16-5bb6b91d663b")
+                            SubscriptionPlanModelId = new Guid("9cbeeb9b-b5ce-4aed-92ee-c2fd134cfa7d")
                         },
                         new
                         {
-                            Id = new Guid("70c94428-1e62-4fd9-82fb-2795599d372c"),
+                            Id = new Guid("407d2bd6-c17b-4986-8701-9ae40ac8bfb9"),
                             BoolValue = false,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("6b8f5194-120f-4828-9324-00cd7c2a5d55")
+                            SubscriptionPlanModelId = new Guid("e77ddb77-0694-494d-bfe2-2f36fcfd9c30")
                         });
                 });
 
@@ -3128,13 +3126,13 @@ namespace WePromoLink.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("6b8f5194-120f-4828-9324-00cd7c2a5d55"),
+                            Id = new Guid("e77ddb77-0694-494d-bfe2-2f36fcfd9c30"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "7fF5u0U0m4Qm",
+                            ExternalId = "wIPpdj60R5Gk",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
@@ -3147,13 +3145,13 @@ namespace WePromoLink.Migrations
                         },
                         new
                         {
-                            Id = new Guid("265c447d-26bd-43c4-be16-5bb6b91d663b"),
+                            Id = new Guid("9cbeeb9b-b5ce-4aed-92ee-c2fd134cfa7d"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "uoSbzcX9KgaT",
+                            ExternalId = "EcsLUL3FBeoo",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",

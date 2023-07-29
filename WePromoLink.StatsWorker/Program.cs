@@ -1,13 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using WePromoLink;
 using WePromoLink.Data;
-using WePromoLink.HitWorker;
-using WePromoLink.Services;
 using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
+using WePromoLink.StatsWorker;
 
 IHost host = Host.CreateDefaultBuilder(args)
-.ConfigureAppConfiguration((hostContext, config) =>
+    .ConfigureAppConfiguration((hostContext, config) =>
     {
         config.AddUserSecrets<Program>();
     })
@@ -17,17 +15,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         var connectionString = configuration.GetConnectionString("Default");
         services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
 
-        services.AddSingleton<MessageBroker<Hit>>(_ =>
-        {
-            return new MessageBroker<Hit>(new MessageBrokerOptions
-            {
-                HostName = configuration["RabbitMQ:hostname"],
-                UserName = configuration["RabbitMQ:username"],
-                Password = configuration["RabbitMQ:password"]
-            });
-        });
-
-        services.AddSingleton<MessageBroker<UpdateCampaignMessage>>(sp =>
+        services.AddSingleton<MessageBroker<UpdateCampaignMessage>>(_ =>
         {
             return new MessageBroker<UpdateCampaignMessage>(new MessageBrokerOptions
             {
@@ -37,7 +25,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             });
         });
 
-        services.AddSingleton<MessageBroker<UpdateUserMessage>>(sp =>
+        services.AddSingleton<MessageBroker<UpdateUserMessage>>(_ =>
         {
             return new MessageBroker<UpdateUserMessage>(new MessageBrokerOptions
             {
@@ -47,7 +35,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             });
         });
 
-        services.AddSingleton<MessageBroker<UpdateLinkMessage>>(sp =>
+        services.AddSingleton<MessageBroker<UpdateLinkMessage>>(_ =>
         {
             return new MessageBroker<UpdateLinkMessage>(new MessageBrokerOptions
             {
@@ -57,11 +45,6 @@ IHost host = Host.CreateDefaultBuilder(args)
             });
         });
 
-
-        services.AddScoped<IPStackService>(_ =>
-        {
-            return new IPStackService(configuration["IpStack:ApiKey"]);
-        });
         services.AddHostedService<Worker>();
     })
     .Build();

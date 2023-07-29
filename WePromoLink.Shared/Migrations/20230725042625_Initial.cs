@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace WePromoLink.Migrations
+namespace WePromoLink.Shared.Migrations
 {
     public partial class Initial : Migration
     {
@@ -1697,22 +1697,22 @@ namespace WePromoLink.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("265c447d-26bd-43c4-be16-5bb6b91d663b"), 0m, "", "", 9m, 0m, "uoSbzcX9KgaT", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                values: new object[] { new Guid("9cbeeb9b-b5ce-4aed-92ee-c2fd134cfa7d"), 0m, "", "", 9m, 0m, "EcsLUL3FBeoo", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("6b8f5194-120f-4828-9324-00cd7c2a5d55"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 0m, 15m, "7fF5u0U0m4Qm", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", 0m, 50m, "Popular", "Professional" });
+                values: new object[] { new Guid("e77ddb77-0694-494d-bfe2-2f36fcfd9c30"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 0m, 15m, "wIPpdj60R5Gk", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", 0m, 50m, "Popular", "Professional" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("51ababad-84ff-4d09-9bdb-ca91aca9f5ee"), true, "Contain ads", new Guid("265c447d-26bd-43c4-be16-5bb6b91d663b"), null });
+                values: new object[] { new Guid("407d2bd6-c17b-4986-8701-9ae40ac8bfb9"), false, "Contain ads", new Guid("e77ddb77-0694-494d-bfe2-2f36fcfd9c30"), null });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("70c94428-1e62-4fd9-82fb-2795599d372c"), false, "Contain ads", new Guid("6b8f5194-120f-4828-9324-00cd7c2a5d55"), null });
+                values: new object[] { new Guid("e4aedea1-35e2-4f33-8694-e3e39e02fcb4"), true, "Contain ads", new Guid("9cbeeb9b-b5ce-4aed-92ee-c2fd134cfa7d"), null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AbuseReports_CampaignId",

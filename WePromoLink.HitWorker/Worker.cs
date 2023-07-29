@@ -5,6 +5,7 @@ using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Repositories;
 using WePromoLink.Services;
+using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.HitWorker;
@@ -16,15 +17,21 @@ public class Worker : BackgroundService
     private readonly IPStackService _service;
     private readonly ILogger<Worker> _logger;
     private MessageBroker<Hit> _messageBroker;
+    private MessageBroker<UpdateCampaignMessage> _campaignMessageBroker;
+    private MessageBroker<UpdateUserMessage> _userMessageBroker;
+    private MessageBroker<UpdateLinkMessage> _linkMessageBroker;
 
 
-    public Worker(IServiceScopeFactory fac, ILogger<Worker> logger)
+    public Worker(IServiceScopeFactory fac, ILogger<Worker> logger, MessageBroker<UpdateCampaignMessage> campaignMessageBroker, MessageBroker<UpdateUserMessage> userMessageBroker, MessageBroker<UpdateLinkMessage> linkMessageBroker)
     {
         var scope = fac.CreateScope();
         _db = scope.ServiceProvider.GetRequiredService<DataContext>();
         _messageBroker = scope.ServiceProvider.GetRequiredService<MessageBroker<Hit>>();
         _logger = logger;
         _service = scope.ServiceProvider.GetRequiredService<IPStackService>();
+        _campaignMessageBroker = campaignMessageBroker;
+        _userMessageBroker = userMessageBroker;
+        _linkMessageBroker = linkMessageBroker;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -216,11 +223,10 @@ public class Worker : BackgroundService
                 await _db.SaveChangesAsync();
 
                 // Actualizamos las estadisticas
-                DataRepository _dataRepo = new DataRepository(_db);
-                await _dataRepo.UpdateCampaign(campaign.Id);
-                await _dataRepo.UpdateUser(userFromLink.Id);
-                await _dataRepo.UpdateUser(userFromCampaign.Id);
-                await _dataRepo.UpdateLink(link.Id);
+                _campaignMessageBroker.Send(new UpdateCampaignMessage { Id = campaign.Id });
+                _userMessageBroker.Send(new UpdateUserMessage { Id = userFromLink.Id });
+                _userMessageBroker.Send(new UpdateUserMessage { Id = userFromCampaign.Id });
+                _linkMessageBroker.Send(new UpdateLinkMessage { Id = link.Id });
 
                 dbtrans.Commit();
                 return true;
