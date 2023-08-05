@@ -32,18 +32,19 @@ public partial class DataRepository
 
     private async Task Update(ClicksLastWeekOnLinkModel model)
     {
-        DateTime weekAgo = DateTime.UtcNow.AddDays(-7);
-        var link = await _db.Links.Where(e => e.Id == model.Id).SingleOrDefaultAsync();
+        DateTime weekAgo = DateTime.UtcNow.AddDays(-8);
+        var link = await _db.Links.Where(e => e.Id == model.LinkModelId).SingleOrDefaultAsync();
         if (link == null) return;
 
         var count = _db.Hits
         .Where(e => e.LinkModelId == link.Id)
-        .Where(e => e.CreatedAt.Date >= weekAgo && e.CreatedAt.Date <= DateTime.UtcNow.Date)
+        .Where(e => e.CreatedAt.Date >= weekAgo && e.CreatedAt.Date <= DateTime.UtcNow.Date.AddDays(-1))
         .Count();
 
         model.Value = count;
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;
+        model.ExpiredAt = DateTime.UtcNow.AddDays(1);
 
         _db.ClicksLastWeekOnLinks.Update(model);
         await _db.SaveChangesAsync();
@@ -51,7 +52,7 @@ public partial class DataRepository
 
     private async Task Update(ClicksTodayOnLinkModel model)
     {
-        var link = await _db.Links.Where(e => e.Id == model.Id).SingleOrDefaultAsync();
+        var link = await _db.Links.Where(e => e.Id == model.LinkModelId).SingleOrDefaultAsync();
         if (link == null) return;
 
         var count = _db.Hits
@@ -62,29 +63,30 @@ public partial class DataRepository
         model.Value = count;
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;
+        model.ExpiredAt = DateTime.UtcNow.AddDays(1);
 
         _db.ClicksTodayOnLinks.Update(model);
         await _db.SaveChangesAsync();
-
     }
 
     private async Task Update(EarnLastWeekOnLinkModel model)
     {
-        DateTime weekAgo = DateTime.UtcNow.AddDays(-7);
-        var link = await _db.Links.Where(e => e.Id == model.Id).SingleOrDefaultAsync();
+        DateTime weekAgo = DateTime.UtcNow.AddDays(-8);
+        var link = await _db.Links.Where(e => e.Id == model.LinkModelId).SingleOrDefaultAsync();
         if (link == null) return;
 
         var total = await _db.PaymentTransactions
         .Where(e => e.LinkModelId == link.Id)
         .Where(e => e.Status == TransactionStatusEnum.Completed)
         .Where(e => e.TransactionType == TransactionTypeEnum.Profit)
-        .Where(e => e.CreatedAt.Date >= weekAgo && e.CreatedAt.Date <= DateTime.UtcNow.Date)
+        .Where(e => e.CreatedAt.Date >= weekAgo && e.CreatedAt.Date <= DateTime.UtcNow.Date.AddDays(-1))
         .Select(e => e.Amount)
         .SumAsync();
 
         model.Value = total;
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;
+        model.ExpiredAt = DateTime.UtcNow.AddDays(1);
 
         _db.EarnLastWeekOnLinks.Update(model);
         await _db.SaveChangesAsync();
@@ -92,7 +94,7 @@ public partial class DataRepository
 
     private async Task Update(EarnTodayOnLinkModel model)
     {
-        var link = await _db.Links.Where(e => e.Id == model.Id).SingleOrDefaultAsync();
+        var link = await _db.Links.Where(e => e.Id == model.LinkModelId).SingleOrDefaultAsync();
         if (link == null) return;
 
         var total = await _db.PaymentTransactions
@@ -106,6 +108,7 @@ public partial class DataRepository
         model.Value = total;
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;
+        model.ExpiredAt = DateTime.UtcNow.AddDays(1);
 
         _db.EarnTodayOnLinks.Update(model);
         await _db.SaveChangesAsync();
@@ -141,26 +144,20 @@ public partial class DataRepository
 
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;
+        model.ExpiredAt = DateTime.UtcNow.AddDays(1);
+
         _db.HistoryClicksByCountriesOnLinks.Update(model);
         await _db.SaveChangesAsync();
-
     }
 
     private async Task Update(HistoryEarnByCountriesOnLinkModel model)
     {
-        // var links = await _db.Links
-        // .Include(e => e.Transactions)
-        // .ThenInclude(e => e.Link)
-        // .ThenInclude(e => e.Hits)
-        // .Where(e => e.Id == model.LinkModelId).ToListAsync();
-
         var trans = await _db.PaymentTransactions
         .Include(e => e.Link)
         .ThenInclude(e => e.Hits)
         .Where(e => e.TransactionType == TransactionTypeEnum.Profit)
         .Where(e => e.LinkModelId == model.LinkModelId)
         .ToListAsync();
-
 
         var list = trans.GroupBy(e => e.Link?.Hits?.FirstOrDefault()?.Country).Select(group => new
         {
@@ -170,20 +167,7 @@ public partial class DataRepository
         .OrderByDescending(e => e.Profit)
         .Take(10)
         .ToList();
-
-        // var list = links
-        // .Where(e => e.Transactions != null)
-        // .SelectMany(e => e.Transactions.Select(t => new { t.Link, t.Amount }))
-        // .GroupBy(trans => trans.Link?.Hits?.FirstOrDefault()?.Country)
-        // .Select(group => new
-        // {
-        //     Country = group.Key,
-        //     Profit = group.Sum(e => e.Amount)
-        // })
-        // .OrderByDescending(e => e.Profit)
-        // .Take(10)
-        // .ToList();
-
+        
         if (list.Count >= 1) { model.L0 = list[0].Country; model.X0 = list[0].Profit; } else { model.L0 = ""; }
         if (list.Count >= 2) { model.L1 = list[1].Country; model.X1 = list[1].Profit; } else { model.L1 = ""; }
         if (list.Count >= 3) { model.L2 = list[2].Country; model.X2 = list[2].Profit; } else { model.L2 = ""; }
@@ -197,9 +181,10 @@ public partial class DataRepository
 
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;
+        model.ExpiredAt = DateTime.UtcNow.AddDays(1);
+
         _db.HistoryEarnByCountriesOnLinks.Update(model);
         await _db.SaveChangesAsync();
-
     }
 
     private async Task Update(HistoryEarnOnLinkModel model)
@@ -236,6 +221,8 @@ public partial class DataRepository
 
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;
+        model.ExpiredAt = DateTime.UtcNow.AddDays(1);
+        
         _db.HistoryEarnOnLinks.Update(model);
         await _db.SaveChangesAsync();
     }
@@ -272,6 +259,8 @@ public partial class DataRepository
 
         model.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
         model.LastModified = DateTime.UtcNow;
+        model.ExpiredAt = DateTime.UtcNow.AddDays(1);
+
         _db.HistoryClicksOnLinkModels.Update(model);
         await _db.SaveChangesAsync();
     }

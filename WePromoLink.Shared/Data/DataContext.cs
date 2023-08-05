@@ -39,7 +39,7 @@ public class DataContext : DbContext
     public virtual DbSet<HistoryClicksByCountriesOnCampaignUserModel> HistoryClicksByCountriesOnCampaignUsers { get; set; }
     public virtual DbSet<HistoryClicksByCountriesOnLinkUserModel> HistoryClicksByCountriesOnLinkUsers { get; set; }
     public virtual DbSet<HistoryClicksOnCampaignUserModel> HistoryClicksOnCampaignUsers { get; set; }
-    public virtual DbSet<HistoryClicksOnLinkUserModel> HistoryClicksOnLinkUsers { get; set; }
+    // public virtual DbSet<HistoryClicksOnLinkUserModel> HistoryClicksOnLinkUsers { get; set; }
     public virtual DbSet<HistoryClicksOnSharesUserModel> HistoryClicksOnSharesUsers { get; set; }
     public virtual DbSet<HistoryEarnByCountriesUserModel> HistoryEarnByCountriesUsers { get; set; }
     public virtual DbSet<HistoryEarnOnLinksUserModel> HistoryEarnOnLinksUsers { get; set; }
@@ -227,6 +227,21 @@ public class DataContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.ExternalId);
             entity.Property(e => e.Amount).HasPrecision(10, 4);
+            
+            entity.HasOne(p => p.Link)
+            .WithMany(l => l.Transactions)
+            .HasForeignKey(p => p.LinkModelId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(p => p.Campaign)
+            .WithMany(l => l.Transactions)
+            .HasForeignKey(p => p.CampaignModelId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(p => p.User)
+            .WithMany(l => l.Transactions)
+            .HasForeignKey(p => p.UserModelId)
+            .OnDelete(DeleteBehavior.SetNull);
         });
 
         builder.Entity<CampaignModel>(entity =>
@@ -276,7 +291,7 @@ public class DataContext : DbContext
         builder.Entity<HistoryClicksByCountriesOnLinkUserModel>(entity => entity.HasKey(e => e.Id));
         builder.Entity<HistoryClicksOnCampaignModel>(entity => entity.HasKey(e => e.Id));
         builder.Entity<HistoryClicksOnCampaignUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryClicksOnLinkUserModel>(entity => entity.HasKey(e => e.Id));
+        // builder.Entity<HistoryClicksOnLinkUserModel>(entity => entity.HasKey(e => e.Id));
         builder.Entity<HistoryClicksOnSharesUserModel>(entity => entity.HasKey(e => e.Id));
         builder.Entity<HistoryEarnByCountriesOnLinkModel>(entity =>
         {
@@ -340,7 +355,7 @@ public class DataContext : DbContext
         builder.Entity<HistorySharedByUsersUserModel>(entity => entity.HasKey(e => e.Id));
         builder.Entity<HistorySharedOnCampaignModel>(entity => entity.HasKey(e => e.Id));
         builder.Entity<HistoryClicksOnLinksUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryClicksOnLinkUserModel>(entity => entity.HasKey(e => e.Id));
+        // builder.Entity<HistoryClicksOnLinkUserModel>(entity => entity.HasKey(e => e.Id));
         builder.Entity<LockedModel>(entity =>
         {
             entity.HasKey(e => e.Id);

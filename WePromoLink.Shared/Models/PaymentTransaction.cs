@@ -7,6 +7,8 @@ public class PaymentTransaction
     public string ExternalId { get; set; }
     public LinkModel? Link { get; set; }
     public Guid? LinkModelId { get; set; }
+    // public HitModel? Hit { get; set; }
+    // public Guid? HitModelId { get; set; }
     public UserModel? User { get; set; }
     public Guid? UserModelId { get; set; }
     public CampaignModel? Campaign { get; set; }

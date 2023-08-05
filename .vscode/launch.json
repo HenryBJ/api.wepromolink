@@ -13,6 +13,17 @@
             "console": "internalConsole"
         },
         {
+            "name": "StripeWorker (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/WePromoLink.StripeWorker/bin/Debug/net6.0/WePromoLink.StripeWorker.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
             "name": "HitWorker (console)",
             "type": "coreclr",
             "request": "launch",
