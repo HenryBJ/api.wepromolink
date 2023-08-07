@@ -455,17 +455,17 @@ public class CampaignService : ICampaignService
 
         var campaignId = await _db.Campaigns
         .Where(e => e.ExternalId == report.CampaignExternalId)
-        .Select(e=>e.Id)
+        .Select(e => e.Id)
         .SingleAsync();
-        
-        var abuseReportModel = new AbuseReportModel 
-        { 
+
+        var abuseReportModel = new AbuseReportModel
+        {
             Id = Guid.NewGuid(),
             UserId = userId,
             CampaignId = campaignId,
             Reason = report.Reason
         };
-        
+
         _db.AbuseReports.Add(abuseReportModel);
         await _db.SaveChangesAsync();
     }
@@ -572,5 +572,51 @@ public class CampaignService : ICampaignService
         campaignModel.Status = toStatus;
         _db.Campaigns.Update(campaignModel);
         await _db.SaveChangesAsync();
+    }
+
+    public async Task<PaginationList<MyCampaignWithImages>> GetAllWithImages(int? page, int? cant, string? filter)
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
+        if (userId == Guid.Empty) throw new Exception("User no found");
+
+        PaginationList<MyCampaignWithImages> list = new PaginationList<MyCampaignWithImages>();
+        page = page ?? 1;
+        page = page <= 0 ? 1 : page;
+        cant = cant ?? 25;
+
+        var query = _db.Campaigns
+        .Include(e => e.ImageData)
+        .Where(e => e.UserModelId == userId)
+        .Where(e => e.IsArchived == false);
+
+        if (!string.IsNullOrEmpty(filter))
+        {
+            query = query.Where(e => e.Title.ToLower().Contains(filter.ToLower()));
+        }
+
+        var counter = await query.CountAsync();
+
+        list.Items = await query
+        .OrderByDescending(e => e.CreatedAt)
+        .Skip((page.Value! - 1) * cant!.Value)
+        .Take(cant!.Value)
+        .Select(e => new MyCampaignWithImages
+        {
+            Budget = e.Budget,
+            EPM = e.EPM,
+            Id = e.ExternalId,
+            ImageBundle = e.ImageData != null ? e.ImageData.ConvertToImageData() : null,
+            Title = e.Title,
+            Url = e.Url,
+            Status = e.Status,
+            LastClick = e.LastClick,
+            LastShared = e.LastShared
+        })
+        .ToListAsync();
+        list.Pagination.Page = page.Value!;
+        list.Pagination.TotalPages = (int)Math.Ceiling((double)counter / (double)cant!.Value);
+        list.Pagination.Cant = list.Items.Count;
+        return list;
     }
 }

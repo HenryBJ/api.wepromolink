@@ -42,6 +42,23 @@ public class CampaignController : ControllerBase
 
     [HttpGet]
     [Authorize]
+    [Route("mobile/all/{page=1}/{cant=15}/{filter?}")]
+    public async Task<IActionResult> GetAllWithImages(int? page, int? cant, string? filter)
+    {
+        try
+        {
+            var results = await _campaignService.GetAllWithImages(page, cant, filter);
+            return new OkObjectResult(results);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
     [Route("detail/{id}")]
     public async Task<IActionResult> GetDetails(string id)
     {

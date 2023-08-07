@@ -7,6 +7,7 @@ public interface ICampaignService
 {
     Task<string> CreateCampaign(Campaign campaign);
     Task<PaginationList<MyCampaign>> GetAll(int? page, int? cant, string? filter);
+    Task<PaginationList<MyCampaignWithImages>> GetAllWithImages(int? page, int? cant, string? filter);
     Task<CampaignDetail> GetDetails(string id);
     Task Edit(string id, Campaign campaign);
     Task Delete(string id);

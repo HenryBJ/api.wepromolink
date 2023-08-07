@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: statsworker-container
-          image: cod4it/wepromolink.statsworker:1.0.105
+          image: cod4it/wepromolink.statsworker:1.0.106
           ports:
             - containerPort: 80
           envFrom:
@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
         - name: hitworker-container
-          image: cod4it/wepromolink.hitworker:1.0.105
+          image: cod4it/wepromolink.hitworker:1.0.106
           ports:
             - containerPort: 80
           envFrom:
@@ -60,7 +60,7 @@ spec:
     spec:
       containers:
         - name: stripeworker-container
-          image: cod4it/wepromolink.stripeworker:1.0.105
+          image: cod4it/wepromolink.stripeworker:1.0.106
           ports:
             - containerPort: 80
           envFrom:
@@ -103,7 +103,7 @@ spec:
     spec:
       containers:
         - name: webapi-container
-          image: cod4it/wepromolink:1.0.105
+          image: cod4it/wepromolink:1.0.106
           ports:
             - containerPort: 80
           envFrom:
