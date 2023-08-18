@@ -1,6 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: controller-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: controller-app
+  template:
+    metadata:
+      labels:
+        app: controller-app
+    spec:
+      containers:
+        - name: controller-container
+          image: cod4it/wepromolink.controller:1.0.106
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: my-configmap
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: statsworker-deployment
 spec:
   replicas: 1
@@ -83,7 +106,7 @@ spec:
     spec:
       containers:
         - name: webclient-container
-          image: cod4it/web.wepromolink:1.0.101
+          image: cod4it/web.wepromolink:1.0.103
           ports:
             - containerPort: 80
 ---
