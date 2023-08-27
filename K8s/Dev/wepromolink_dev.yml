@@ -278,7 +278,7 @@ spec:
     # The ACME server URL
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     # Email address used for ACME registration
-    email: jose.devops@gmail.com
+    email: henry.coolsoft@gmail.com
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
       name: letsencrypt-staging
@@ -299,7 +299,7 @@ spec:
     # The ACME server URL
     server: https://acme-v02.api.letsencrypt.org/directory
     # Email address used for ACME registration
-    email: jose.devops@gmail.com
+    email: henry.coolsoft@gmail.com
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
       name: letsencrypt-prod
@@ -352,8 +352,6 @@ spec:
                 name: webclient-service
                 port:
                   number: 80
-        annotations:
-          nginx.ingress.kubernetes.io/whitelist-source-range: "170.75.168.146/32"
     - host: dev.wepromolink.io
       http:
         paths:
@@ -364,3 +362,30 @@ spec:
                 name: webapi-service
                 port:
                   number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress-2
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/whitelist-source-range: "170.75.168.146/32"
+    nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+spec:
+  ingressClassName: nginx  # Especifica el nombre del controlador de Ingress que debe manejar las reglas definidas en este Ingress
+  tls:
+  - hosts:
+    - dev.wepromolink.com
+    secretName: wepromolink-tls
+  rules:
+    - host: dev.wepromolink.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webclient-service
+                port:
+                  number: 80 
