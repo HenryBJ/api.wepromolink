@@ -111,4 +111,4 @@ jobs:
             cd K8s/
             cd Dev/
             envsubst < wepromolink_dev.yml > wepromolink_dev_ready.yml
-            microk8s kubectl apply -f wepromolink_dev_ready
+            microk8s kubectl apply -f wepromolink_dev_ready.yml
