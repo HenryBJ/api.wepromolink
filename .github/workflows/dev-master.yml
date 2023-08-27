@@ -111,4 +111,4 @@ jobs:
             git pull
             cd K8s/
             cd Dev/
-            kubectl apply -f wepromolink_dev.yml
+            microk8s kubectl apply -f wepromolink_dev.yml
