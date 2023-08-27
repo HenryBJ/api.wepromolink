@@ -171,7 +171,7 @@ public class Worker : BackgroundService
                     Origin = origin
                 };
 
-                
+
                 _db.Hits.Add(model);
                 await _db.SaveChangesAsync();
 
@@ -182,6 +182,7 @@ public class Worker : BackgroundService
                 await _db.SaveChangesAsync();
 
                 // Actualizamos el profit del usuario del link
+                CheckProfitReachThreshold(userFromLink.Id, profitFromLink.Value, profitFromLink.Value + amount);
                 profitFromLink.Value += amount;
                 profitFromLink.LastModified = DateTime.UtcNow;
                 profitFromLink.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
@@ -281,6 +282,29 @@ public class Worker : BackgroundService
                 _logger.LogError(ex.Message);
                 return false;
             }
+        }
+    }
+
+    private void CheckProfitReachThreshold(Guid userId, decimal oldProfit, decimal newProfit)
+    {
+        var user = _db.Users
+        .Where(e => e.Id == userId)
+        .Include(e => e.Subscription)
+        .ThenInclude(e => e.SubscriptionPlan)
+        .SingleOrDefault();
+
+        var payoutMinimun = user?.Subscription.SubscriptionPlan.PayoutMinimun;
+        if (payoutMinimun == null) return;
+        if (payoutMinimun > oldProfit + newProfit) return;
+        if (payoutMinimun > oldProfit && payoutMinimun < (oldProfit + newProfit))
+        {
+            _eventSender.Send(new ProfitReachWihtdrawThresholdEvent
+            {
+                Name = user?.Fullname,
+                Profit = oldProfit + newProfit,
+                UserId = user?.Id ?? Guid.Empty,
+                WihtdrawThreshold = payoutMinimun ?? 0
+            });
         }
     }
 }
