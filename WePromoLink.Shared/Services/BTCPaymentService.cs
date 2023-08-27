@@ -12,9 +12,11 @@ using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json.Linq;
 using WePromoLink.Data;
 using WePromoLink.DTO.BTCPay;
+using WePromoLink.DTO.Events;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Settings;
+using WePromoLink.Shared.RabbitMQ;
 using static BTCPayServer.Client.Models.InvoiceDataBase;
 
 namespace WePromoLink.Services;
@@ -28,8 +30,9 @@ public class BTCPaymentService
     private readonly IUserService _userService;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly MessageBroker<BaseEvent> _senderEvent;
 
-    public BTCPaymentService(ILogger<BTCPaymentService> logger, IOptions<BTCPaySettings> settings, BTCPayServerClient client, DataContext bd, IUserService userService, IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
+    public BTCPaymentService(ILogger<BTCPaymentService> logger, IOptions<BTCPaySettings> settings, BTCPayServerClient client, DataContext bd, IUserService userService, IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, MessageBroker<BaseEvent> senderEvent)
     {
         _logger = logger;
         _settings = settings;
@@ -38,6 +41,7 @@ public class BTCPaymentService
         _userService = userService;
         _httpClientFactory = httpClientFactory;
         _httpContextAccessor = httpContextAccessor;
+        _senderEvent = senderEvent;
     }
 
     public async Task HandleWebHook(HttpContext ctx)
@@ -81,10 +85,36 @@ public class BTCPaymentService
                 var payment = _db.PaymentTransactions.Where(e => e.Id == paymentId).Single();
                 await ProcessPayment(invoiceData!, payment);
                 break;
+
+            case InvoiceExpired eve:
+                var invoiceDataFail = await _client.GetInvoice(_settings.Value.StoreId, eve.InvoiceId);
+                ProcessFailInvoice(invoiceDataFail, nameof(InvoiceExpired));
+                break;
+
+            case InvoiceInvalid evf:
+                var invoiceDataFail2 = await _client.GetInvoice(_settings.Value.StoreId, evf.InvoiceId);
+                ProcessFailInvoice(invoiceDataFail2, nameof(InvoiceInvalid));
+                break;
+
             default:
                 _logger.LogInformation(btcpayEvent?.ToString());
                 break;
         }
+    }
+
+    private void ProcessFailInvoice(InvoiceData invoiceDataFail, string reason)
+    {
+        var paymentId = invoiceDataFail?.Metadata["paymentId"]?.ToObject<Guid>();
+        var payment = _db.PaymentTransactions.Include(e => e.User).Where(e => e.Id == paymentId).Single();
+        _senderEvent.Send(new DepositFailureEvent
+        {
+            PaymentMethod = "Bitcoin",
+            Amount = invoiceDataFail?.Amount ?? 0,
+            FailureReason = reason,
+            Name = payment.User?.Fullname,
+            PaymentTransactionId = payment.Id,
+            UserId = payment.User?.Id ?? Guid.Empty
+        });
     }
 
     private async Task ProcessPayment(InvoiceData invoiceData, PaymentTransaction pay)

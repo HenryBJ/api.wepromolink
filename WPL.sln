@@ -17,6 +17,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WePromoLink.StatsWorker", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WePromoLink.Controller", "WePromoLink.Controller\WePromoLink.Controller.csproj", "{E99B81D3-298E-4558-AF0B-6BE249A63376}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WePromoLink.GeoLocationWorker", "WePromoLink.GeoLocationWorker\WePromoLink.GeoLocationWorker.csproj", "{7837B80A-E3F7-4F3A-A72C-7ABB4DCCCB9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WePromoLink.NotiWorker", "WePromoLink.NotiWorker\WePromoLink.NotiWorker.csproj", "{0B5ED8FC-A89E-471D-9180-566D868688F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WePromoLink.BtcpayWorker", "WePromoLink.BtcpayWorker\WePromoLink.BtcpayWorker.csproj", "{F56A6FD9-8A19-4AF6-885C-A6AD28C93BAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +60,17 @@ Global
 		{E99B81D3-298E-4558-AF0B-6BE249A63376}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E99B81D3-298E-4558-AF0B-6BE249A63376}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E99B81D3-298E-4558-AF0B-6BE249A63376}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7837B80A-E3F7-4F3A-A72C-7ABB4DCCCB9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7837B80A-E3F7-4F3A-A72C-7ABB4DCCCB9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7837B80A-E3F7-4F3A-A72C-7ABB4DCCCB9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7837B80A-E3F7-4F3A-A72C-7ABB4DCCCB9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B5ED8FC-A89E-471D-9180-566D868688F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B5ED8FC-A89E-471D-9180-566D868688F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B5ED8FC-A89E-471D-9180-566D868688F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B5ED8FC-A89E-471D-9180-566D868688F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F56A6FD9-8A19-4AF6-885C-A6AD28C93BAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F56A6FD9-8A19-4AF6-885C-A6AD28C93BAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F56A6FD9-8A19-4AF6-885C-A6AD28C93BAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F56A6FD9-8A19-4AF6-885C-A6AD28C93BAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

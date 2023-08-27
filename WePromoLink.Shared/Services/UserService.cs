@@ -1,11 +1,14 @@
+using System.Net.Mail;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WePromoLink.Data;
 using WePromoLink.DTO;
+using WePromoLink.DTO.Events;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Services.Email;
+using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.Services;
 
@@ -15,12 +18,30 @@ public class UserService : IUserService
     private readonly ILogger<UserService> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IEmailSender _emailSender;
-    public UserService(DataContext db, IHttpContextAccessor httpContextAccessor, ILogger<UserService> logger, IEmailSender emailSender)
+    private readonly MessageBroker<BaseEvent> _eventSender;
+    public UserService(DataContext db, IHttpContextAccessor httpContextAccessor, ILogger<UserService> logger, IEmailSender emailSender, MessageBroker<BaseEvent> eventSender)
     {
         _db = db;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
         _emailSender = emailSender;
+        _eventSender = eventSender;
+    }
+
+    public async Task BlockUser(string firebaseId, string reason)
+    {
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).SingleOrDefaultAsync();
+        if (user == null) throw new Exception("User does not exits");
+        user.IsBlocked = true;
+        _db.Users.Update(user);
+        await _db.SaveChangesAsync();
+        _eventSender.Send(new UserBlockedEvent
+        {
+            Email = user.Email,
+            Name = user.Fullname,
+            Reason = reason,
+            UserId = user.Id
+        });
     }
 
     public async Task Create(User user, bool isSubscribed = false, string firebaseId = "")
@@ -59,6 +80,7 @@ public class UserService : IUserService
             Locked = new LockedModel(),
             PayoutStat = new PayoutStatModel(),
             Profit = new ProfitModel(),
+            Push = new PushModel(),
             FirebaseId = firebaseId,
 
 
@@ -75,13 +97,9 @@ public class UserService : IUserService
                 SubscriptionPlanModelId = user.SubscriptionPlanModelId!.Value
             },
         };
-
-
         await _db.Users.AddAsync(newUser);
         await _db.SaveChangesAsync();
-
-        // Notificar por email (Welcome)
-        await _emailSender.Send(user.Fullname, user.Email, "Welcome to WePromoLink", Templates.Welcome(new { user = user.Fullname }));
+        _eventSender.Send(new UserRegisteredEvent { UserId = newUser.Id, Name = newUser.Fullname, Email = newUser.Email });
     }
 
     public async Task Deposit(PaymentTransaction payment)
@@ -107,25 +125,16 @@ public class UserService : IUserService
                 _db.Availables.Update(available);
                 await _db.SaveChangesAsync();
 
-                // Notificamos del Deposito
-                var noti = new NotificationModel
-                {
-                    Id = Guid.NewGuid(),
-                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
-                    Status = NotificationStatusEnum.Unread,
-                    UserModelId = payment.UserModelId!.Value,
-                    Title = "Deposit completed",
-                    Message = $"We are pleased to inform you that your deposit has been successfully processed. An amount of ${payment.Amount} USD has been credited to your account.",
-                };
-                await _db.Notifications.AddAsync(noti);
-                await _db.SaveChangesAsync();
-
-                // Enviamos un correo
-                var user = await _db.Users.Where(e => e.Id == payment.UserModelId).SingleOrDefaultAsync();
-                if (user == null) throw new Exception("User no found");
-                await _emailSender.Send(user.Fullname!, user.Email, "Deposit completed", Templates.Deposit(new { user = user.Fullname, amount = payment.Amount.ToString("C") }));
-
                 transaction.Commit();
+
+                _eventSender.Send(new DepositCompletedEvent
+                {
+                    Amount = payment.Amount,
+                    PaymentTransactionId = payment.Id,
+                    UserId = payment.UserModelId ?? Guid.Empty,
+                    Name = payment.User?.Fullname,
+                    Email = payment.User?.Email
+                });
             }
             catch (System.Exception ex)
             {
@@ -273,10 +282,15 @@ public class UserService : IUserService
     public async Task UpdateSubscription(SubscriptionInfo subscriptionInfo, string CustomerId)
     {
         // find user
-        var user = await _db.Users.Where(e => e.CustomerId == CustomerId).Include(e => e.Subscription).SingleOrDefaultAsync();
+        var user = await _db.Users
+        .Where(e => e.CustomerId == CustomerId)
+        .Include(e => e.Subscription)
+        .ThenInclude(e => e.SubscriptionPlan)
+        .SingleOrDefaultAsync();
+
         if (user == null)
         {
-            Console.WriteLine("Warning: Upddating Subscription from Stripe, user not found");
+            Console.WriteLine("Warning: Updating Subscription from Stripe, user not found");
         }
 
         var sub = user!.Subscription;
@@ -295,6 +309,7 @@ public class UserService : IUserService
                 sub.IsExpired = true;
                 sub.Status = subscriptionInfo.Status;
                 user.IsSubscribed = false;
+                SendEvent(user, subscriptionInfo.Status);
                 break;
 
             case "trialing":
@@ -314,5 +329,16 @@ public class UserService : IUserService
         _db.Subscriptions.Update(sub);
         _db.Users.Update(user);
         await _db.SaveChangesAsync();
+    }
+
+    private void SendEvent(UserModel user, string status)
+    {
+        _eventSender.Send(new UserSubscriptionExpiredEvent
+        {
+            Name = user.Fullname,
+            UserId = user.Id,
+            Subscription = user.SubscriptionModelId,
+            SubscriptionPlanName = user.Subscription.SubscriptionPlan.Title
+        });
     }
 }

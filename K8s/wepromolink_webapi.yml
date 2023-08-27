@@ -1,6 +1,98 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: backoffice-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backoffice-app
+  template:
+    metadata:
+      labels:
+        app: backoffice-app
+    spec:
+      containers:
+        - name: backoffice-container
+          image: cod4it/wepromolink.backoffice:1.0.106
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: my-configmap
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: btcpayworker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: btcpayworker-app
+  template:
+    metadata:
+      labels:
+        app: btcpayworker-app
+    spec:
+      containers:
+        - name: btcpayworker-container
+          image: cod4it/wepromolink.btcpayworker:1.0.106
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: my-configmap
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geolocationworker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geolocationworker-app
+  template:
+    metadata:
+      labels:
+        app: geolocationworker-app
+    spec:
+      containers:
+        - name: geolocationworker-container
+          image: cod4it/wepromolink.geolocationworker:1.0.106
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: my-configmap
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notiworker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notiworker-app
+  template:
+    metadata:
+      labels:
+        app: notiworker-app
+    spec:
+      containers:
+        - name: notiworker-container
+          image: cod4it/wepromolink.notiworker:1.0.106
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: my-configmap
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: controller-deployment
 spec:
   replicas: 1

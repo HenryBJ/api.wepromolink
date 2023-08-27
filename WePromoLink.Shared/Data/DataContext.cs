@@ -7,11 +7,11 @@ namespace WePromoLink.Data;
 public class DataContext : DbContext
 {
 
+    public virtual DbSet<PushModel> Pushes { get; set; }
     public virtual DbSet<SubscriptionFeatureModel> SubscriptionFeatures { get; set; }
     public virtual DbSet<ImageDataModel> ImageDatas { get; set; }
     public virtual DbSet<GeoDataModel> GeoDatas { get; set; }
     public virtual DbSet<GenericEventModel> GenericEvent { get; set; }
-    public virtual DbSet<BadgetModel> Badgets { get; set; }
     public virtual DbSet<StripeBillingMethod> StripeBillings { get; set; }
     public virtual DbSet<BitcoinBillingMethod> BitcoinBillings { get; set; }
     public virtual DbSet<SubscriptionModel> Subscriptions { get; set; }
@@ -91,6 +91,11 @@ public class DataContext : DbContext
         });
         });
 
+        builder.Entity<PushModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
         builder.Entity<ImageDataModel>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -138,11 +143,6 @@ public class DataContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-
-        builder.Entity<BadgetModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
         });
 
         builder.Entity<LinkModel>(entity =>
@@ -231,17 +231,17 @@ public class DataContext : DbContext
             entity.HasOne(p => p.Link)
             .WithMany(l => l.Transactions)
             .HasForeignKey(p => p.LinkModelId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne(p => p.Campaign)
             .WithMany(l => l.Transactions)
             .HasForeignKey(p => p.CampaignModelId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne(p => p.User)
             .WithMany(l => l.Transactions)
             .HasForeignKey(p => p.UserModelId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.NoAction);
         });
 
         builder.Entity<CampaignModel>(entity =>

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WePromoLink.Data;
 using WePromoLink.DTO;
+using WePromoLink.DTO.Events;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Repositories;
@@ -20,16 +21,24 @@ public class LinkService : ILinkService
     private readonly MessageBroker<Hit> _messageBroker;
     private readonly MessageBroker<UpdateUserMessage> _userMessageBroker;
     private readonly MessageBroker<UpdateCampaignMessage> _campaignMessageBroker;
+    private readonly MessageBroker<BaseEvent> _eventSender;
 
-    public LinkService(DataContext ctx, IHttpContextAccessor httpContextAccessor, ILogger<LinkService> logger, IServiceScopeFactory fac, MessageBroker<UpdateUserMessage> userMessageBroker, MessageBroker<UpdateCampaignMessage> campaignMessageBroker)
+    public LinkService(
+        DataContext ctx,
+        IHttpContextAccessor httpContextAccessor,
+        ILogger<LinkService> logger,
+        MessageBroker<UpdateUserMessage> userMessageBroker,
+        MessageBroker<UpdateCampaignMessage> campaignMessageBroker,
+        MessageBroker<BaseEvent> eventSender,
+        MessageBroker<Hit> messageBroker)
     {
-        var scope = fac.CreateScope();
-        _messageBroker = scope.ServiceProvider.GetRequiredService<MessageBroker<Hit>>();
         _db = ctx;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
         _userMessageBroker = userMessageBroker;
         _campaignMessageBroker = campaignMessageBroker;
+        _eventSender = eventSender;
+        _messageBroker = messageBroker;
     }
 
     public async Task<string> Create(string ExternalCampaignId)
@@ -93,20 +102,31 @@ public class LinkService : ILinkService
                 // Update User (campaign owner) Statistics
                 _userMessageBroker.Send(new UpdateUserMessage { Id = userB.Id });
 
-                //Create a Notification
-                var noti = new NotificationModel
-                {
-                    Id = Guid.NewGuid(),
-                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
-                    Status = NotificationStatusEnum.Unread,
-                    UserModelId = userB.Id,
-                    Title = "Campaign shared",
-                    Message = $"A link has been created to your campaign called '{campaign.Title}' by the user {userA.Fullname}",
-                };
-                await _db.Notifications.AddAsync(noti);
-                await _db.SaveChangesAsync();
-
                 transaction.Commit();
+
+                _eventSender.Send(new CampaignSharedEvent
+                {
+                    Amount = campaign.Budget,
+                    CampaignId = campaign.Id,
+                    CampaignName = campaign.Title,
+                    OwnerName = userB.Fullname,
+                    OwnerUserId = userB.Id,
+                    EPM = campaign.EPM,
+                    SharedByName = userA.Fullname,
+                    SharedByUserId = userA.Id
+                });
+
+                _eventSender.Send(new LinkCreatedEvent
+                {
+                    CampaignId = campaign.Id,
+                    CampaignName = campaign.Title,
+                    LinkCreatorName = userA.Fullname,
+                    LinkCreatorUserId = userA.Id,
+                    LinkId = link.Id,
+                    OwnerName = userB.Fullname,
+                    OwnerUserId = userB.Id
+                });
+
                 return link.Url;
             }
             catch (System.Exception ex)

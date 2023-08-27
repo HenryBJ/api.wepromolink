@@ -14,6 +14,4 @@ public interface ICampaignService
     Task Publish(string campaignId, bool toStatus);
     Task<IActionResult> Explore(int offset, int limit, long timestamp);
     Task ReportAbuse(AbuseReport report);
-
-    // Task<string> FundSponsoredLink(FundSponsoredLink fundLink);
 }

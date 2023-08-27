@@ -2,6 +2,7 @@ using System.Text;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using WePromoLink.DTO.Events;
 
 namespace WePromoLink.Shared.RabbitMQ;
 
@@ -13,7 +14,7 @@ public class MessageBrokerOptions
     public ushort Prefetch { get; set; } = 1;
 }
 
-public class MessageBroker<T> : IDisposable
+public class MessageBroker<T> : IDisposable where T:class
 {
     private readonly ConnectionFactory _factory;
     private IConnection _connection;
@@ -54,6 +55,7 @@ public class MessageBroker<T> : IDisposable
 
     }
 
+
     public async Task Receive(Func<T, bool> processMessage)
     {
         await Task.Yield();
@@ -66,6 +68,35 @@ public class MessageBroker<T> : IDisposable
             var obj = JsonConvert.DeserializeObject<T>(message);
 
             var shouldAck = processMessage!.Invoke(obj);
+
+            if (shouldAck)
+            {
+                _channel.BasicAck(ea.DeliveryTag, multiple: false); // Envía el ACK afirmativo
+            }
+            else
+            {
+                _channel.BasicNack(ea.DeliveryTag, multiple: false, requeue: true); // Rechaza el mensaje y lo reencola
+            }
+        };
+
+        _channel.BasicConsume(queue: typeof(T).Name.ToLower(), autoAck: false, consumer: consumer);
+    }
+
+    public async Task ReceiveBaseEvent(Func<T, bool> processMessage)
+    {
+        await Task.Yield();
+
+        var consumer = new EventingBasicConsumer(_channel);
+        consumer.Received += (model, ea) =>
+        {
+            var body = ea.Body.ToArray();
+            var message = Encoding.UTF8.GetString(body);
+
+            var obj = JsonConvert.DeserializeObject<BaseEvent>(message);
+            var eventType = Type.GetType(obj.EventType);
+            var derivedObj = JsonConvert.DeserializeObject(message, eventType) as T;
+
+            var shouldAck = processMessage!.Invoke(derivedObj);
 
             if (shouldAck)
             {

@@ -1,6 +1,8 @@
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using WePromoLink.Data;
+using WePromoLink.DTO.Events;
+using WePromoLink.DTO.Events.Commands;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Repositories;
@@ -20,9 +22,18 @@ public class Worker : BackgroundService
     private MessageBroker<UpdateCampaignMessage> _campaignMessageBroker;
     private MessageBroker<UpdateUserMessage> _userMessageBroker;
     private MessageBroker<UpdateLinkMessage> _linkMessageBroker;
+    private readonly MessageBroker<BaseEvent> _eventSender;
+    private readonly MessageBroker<GeoLocalizeHitCommand> _commandSender;
 
 
-    public Worker(IServiceScopeFactory fac, ILogger<Worker> logger, MessageBroker<UpdateCampaignMessage> campaignMessageBroker, MessageBroker<UpdateUserMessage> userMessageBroker, MessageBroker<UpdateLinkMessage> linkMessageBroker)
+    public Worker(
+        IServiceScopeFactory fac,
+        ILogger<Worker> logger,
+        MessageBroker<UpdateCampaignMessage> campaignMessageBroker,
+        MessageBroker<UpdateUserMessage> userMessageBroker,
+        MessageBroker<UpdateLinkMessage> linkMessageBroker,
+        MessageBroker<BaseEvent> eventSender,
+        MessageBroker<GeoLocalizeHitCommand> commandSender)
     {
         var scope = fac.CreateScope();
         _db = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -32,6 +43,8 @@ public class Worker : BackgroundService
         _campaignMessageBroker = campaignMessageBroker;
         _userMessageBroker = userMessageBroker;
         _linkMessageBroker = linkMessageBroker;
+        _eventSender = eventSender;
+        _commandSender = commandSender;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -65,7 +78,6 @@ public class Worker : BackgroundService
                 }
 
                 var origin = originIP.ToString();
-                var geoData = await _db.GeoDatas.Where(e => e.IP == origin).SingleOrDefaultAsync();
 
                 var link = await _db.Links
                 .Include(e => e.User)
@@ -89,26 +101,31 @@ public class Worker : BackgroundService
                     hit.Counter++;
                     hit.LastHitAt = DateTime.UtcNow;
 
-                    if (!hit.IsGeolocated)
-                    {
-                        hit.GeoData = geoData ?? await _service.Locate(hit.Origin!);
-                        if (hit.GeoData != null)
-                        {
-                            hit.Country = hit.GeoData?.Country;
-                            if (geoData == null)
-                            {
-                                await _db.GeoDatas.AddAsync(hit.GeoData!);
-                            }
-                            await _db.SaveChangesAsync();
-
-                            hit.IsGeolocated = true;
-                            hit.GeolocatedAt = DateTime.UtcNow;
-                        }
-                    }
-
                     _db.Hits.Update(hit);
                     await _db.SaveChangesAsync();
                     dbtrans.Commit();
+
+                    _eventSender.Send(new LinkClickedEvent
+                    {
+                        LinkId = link.Id,
+                        CampaignId = link.Campaign.Id,
+                        CampaignName = link.Campaign.Title,
+                        OwnerName = link.Campaign.User.Fullname,
+                        LinkCreatorName = link.User.Fullname,
+                        UserId = link.User.Id
+                    });
+
+                    _eventSender.Send(new HitClickedEvent
+                    {
+                        LinkId = link.Id,
+                        CampaignId = link.Campaign.Id,
+                        CampaignName = link.Campaign.Title,
+                        OwnerName = link.Campaign.User.Fullname,
+                        LinkCreatorName = link.User.Fullname,
+                        UserId = link.User.Id,
+                        IsCountable = false
+                    });
+
                     return true;
                 }
 
@@ -124,21 +141,17 @@ public class Worker : BackgroundService
                     campaign.LastUpdated = DateTime.UtcNow;
                     _db.Campaigns.Update(campaign);
                     await _db.SaveChangesAsync();
-
-                    // Crear Notificacion
-                    var noti = new NotificationModel
-                    {
-                        Id = Guid.NewGuid(),
-                        ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
-                        Status = NotificationStatusEnum.Unread,
-                        UserModelId = userFromCampaign.Id,
-                        Title = "Campaign deactivated",
-                        Message = $"Your campaign called '{campaign.Title}' has been deactivated due insufficient budget (${campaign.Budget.ToString("0.00")} USD)",
-                    };
-                    await _db.Notifications.AddAsync(noti);
-                    await _db.SaveChangesAsync();
-
                     dbtrans.Commit();
+
+                    _eventSender.Send(new CampaignSoldOutEvent
+                    {
+                        CampaignId = link.Campaign.Id,
+                        CampaignName = link.Campaign.Title,
+                        UserId = link.User.Id,
+                        Amount = link.Campaign.Budget,
+                        EPM = link.Campaign.EPM,
+                        Name = link.User.Fullname
+                    });
                     return true;
                 }
 
@@ -158,20 +171,7 @@ public class Worker : BackgroundService
                     Origin = origin
                 };
 
-                model.GeoData = geoData ?? await _service.Locate(model.Origin!);
-                if (model.GeoData != null)
-                {
-                    model.Country = model.GeoData?.Country;
-
-                    if (geoData == null)
-                    {
-                        await _db.GeoDatas.AddAsync(model.GeoData!);
-                    }
-                    await _db.SaveChangesAsync();
-
-                    model.IsGeolocated = true;
-                    model.GeolocatedAt = DateTime.UtcNow;
-                }
+                
                 _db.Hits.Add(model);
                 await _db.SaveChangesAsync();
 
@@ -229,6 +229,50 @@ public class Worker : BackgroundService
                 _linkMessageBroker.Send(new UpdateLinkMessage { Id = link.Id });
 
                 dbtrans.Commit();
+
+                _commandSender.Send(new GeoLocalizeHitCommand { HitId = model.Id });
+
+                _eventSender.Send(new LinkClickedEvent
+                {
+                    LinkId = link.Id,
+                    CampaignId = link.Campaign.Id,
+                    CampaignName = link.Campaign.Title,
+                    OwnerName = link.Campaign.User.Fullname,
+                    LinkCreatorName = link.User.Fullname,
+                    UserId = link.User.Id
+                });
+
+                _eventSender.Send(new HitCreatedEvent
+                {
+                    LinkId = link.Id,
+                    CampaignId = link.Campaign.Id,
+                    CampaignName = link.Campaign.Title,
+                    OwnerName = link.Campaign.User.Fullname,
+                    LinkCreatorName = link.User.Fullname,
+                    UserId = link.User.Id
+                });
+
+                _eventSender.Send(new HitClickedEvent
+                {
+                    LinkId = link.Id,
+                    CampaignId = link.Campaign.Id,
+                    CampaignName = link.Campaign.Title,
+                    OwnerName = link.Campaign.User.Fullname,
+                    LinkCreatorName = link.User.Fullname,
+                    UserId = link.User.Id,
+                    IsCountable = true
+                });
+
+                _eventSender.Send(new CampaignClickedEvent
+                {
+                    CampaignId = link.Campaign.Id,
+                    CampaignName = link.Campaign.Title,
+                    UserId = link.User.Id,
+                    Amount = link.Campaign.Budget,
+                    EPM = link.Campaign.EPM,
+                    Name = link.User.Fullname
+                });
+
                 return true;
             }
             catch (System.Exception ex)

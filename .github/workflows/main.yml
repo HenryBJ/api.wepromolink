@@ -17,28 +17,21 @@ jobs:
         with: 
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
-      - name: Get wepromolink tag
-        run: echo "WEPROMOLINK_TAG=$(cat wepromolink.txt)" >> $GITHUB_ENV
-        
-      - name: Get hit worker tag
-        run: echo "HITWORKER_TAG=$(cat hitworker.txt)" >> $GITHUB_ENV
-        
-      - name: Get stripe worker tag
-        run: echo "STRIPEWORKER_TAG=$(cat stripeworker.txt)" >> $GITHUB_ENV
 
-      - name: Get stats worker tag
-        run: echo "STATSWORKER_TAG=$(cat statworker.txt)" >> $GITHUB_ENV
+      - name: Install jq
+        run: sudo apt-get install jq
 
-      - name: Get controller tag
-        run: echo "CONTROLLER_TAG=$(cat controller.txt)" >> $GITHUB_ENV
+      - name: Read version file and set environment variables
+        run: |
+          versions=$(cat versions.json)
+          echo "$versions" | jq -r 'to_entries | .[] | "MICROSERVICE_\(.key | ascii_upcase)=\(.value)"' >> $GITHUB_ENV  
         
       - name: Build and Push Docker Image WePromolink
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
-          tags: cod4it/wepromolink:${{ env.WEPROMOLINK_TAG }}
+          tags: cod4it/wepromolink:${{ env.MICROSERVICE_WEPROMOLINK }}
           file: WePromoLink.Dockerfile
           
       - name: Build and Push Docker Image WePromolink.HitWorker
@@ -46,7 +39,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: cod4it/wepromolink.hitworker:${{ env.HITWORKER_TAG }}
+          tags: cod4it/wepromolink.hitworker:${{ env.MICROSERVICE_HITWORKER }}
           file: WePromoLink.HitWorker.Dockerfile
           
       - name: Build and Push Docker Image WePromolink.StripeWorker
@@ -54,7 +47,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: cod4it/wepromolink.stripeworker:${{ env.STRIPEWORKER_TAG }}
+          tags: cod4it/wepromolink.stripeworker:${{ env.MICROSERVICE_STRIPEWORKER }}
           file: WePromoLink.StripeWorker.Dockerfile
 
       - name: Build and Push Docker Image WePromolink.StatsWorker
@@ -62,7 +55,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: cod4it/wepromolink.statsworker:${{ env.STATSWORKER_TAG }}
+          tags: cod4it/wepromolink.statsworker:${{ env.MICROSERVICE_STATWORKER }}
           file: WePromoLink.StatsWorker.Dockerfile
 
       - name: Build and Push Docker Image WePromolink.Controller
@@ -70,6 +63,38 @@ jobs:
         with:
           context: .
           push: true
-          tags: cod4it/wepromolink.controller:${{ env.CONTROLLER_TAG }}
+          tags: cod4it/wepromolink.controller:${{ env.MICROSERVICE_CONTROLLER }}
           file: WePromoLink.Controller.Dockerfile
+      
+      - name: Build and Push Docker Image WePromolink.NotiWorker
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: cod4it/wepromolink.notiworker:${{ env.MICROSERVICE_NOTIWORKER }}
+          file: WePromoLink.NotiWorker.Dockerfile
+
+      - name: Build and Push Docker Image WePromolink.GeoLocationWorker
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: cod4it/wepromolink.geolocationworker:${{ env.MICROSERVICE_GEOLOCATIONWORKER }}
+          file: WePromoLink.GeoLocationWorker.Dockerfile
+
+      - name: Build and Push Docker Image WePromolink.BtcpayWorker
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: cod4it/wepromolink.btcpayworker:${{ env.MICROSERVICE_BTCPAYWORKER }}
+          file: WePromoLink.BtcpayWorker.Dockerfile
+
+      - name: Build and Push Docker Image WePromolink.Backoffice
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: cod4it/wepromolink.backoffice:${{ env.MICROSERVICE_BACKOFFICE }}
+          file: WePromoLink.Backoffice.Dockerfile
   

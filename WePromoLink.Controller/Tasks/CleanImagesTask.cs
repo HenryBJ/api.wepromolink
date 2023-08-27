@@ -1,8 +1,5 @@
 using Azure.Storage.Blobs;
-using Microsoft.EntityFrameworkCore;
 using WePromoLink.Data;
-using WePromoLink.Shared.DTO.Messages;
-using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.Controller.Tasks;
 

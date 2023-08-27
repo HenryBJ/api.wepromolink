@@ -8,10 +8,12 @@ using Newtonsoft.Json.Linq;
 using Stripe;
 using WePromoLink.Data;
 using WePromoLink.DTO;
+using WePromoLink.DTO.Events;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Services.Email;
 using WePromoLink.Settings;
+using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.Services;
 
@@ -21,12 +23,14 @@ public class StripeService
     private readonly IUserService _userService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private ILogger<StripeService> _logger { get; set; }
-    public StripeService(DataContext db, IHttpContextAccessor httpContextAccessor, IUserService userService, ILogger<StripeService> logger)
+    private readonly MessageBroker<BaseEvent> _messageBroker;
+    public StripeService(DataContext db, IHttpContextAccessor httpContextAccessor, IUserService userService, ILogger<StripeService> logger, MessageBroker<BaseEvent> messageBroker)
     {
         _db = db;
         _httpContextAccessor = httpContextAccessor;
         _userService = userService;
         _logger = logger;
+        _messageBroker = messageBroker;
     }
 
 
@@ -287,6 +291,34 @@ public class StripeService
         else
         {
             _logger.LogInformation("Receive invoice paid event without payment info, must be from subscription");
+        }
+
+    }
+
+    public async Task HandleInvoiceFailWebHook(Invoice invoice, string reason)
+    {
+        if (invoice.Metadata.ContainsKey("paymentId"))
+        {
+            var paymentId = invoice.Metadata["paymentId"];
+            var pay = await _db.PaymentTransactions
+            .Include(e => e.User)
+            .Where(e => e.ExternalId == paymentId)
+            .SingleOrDefaultAsync();
+
+            if (pay == null) throw new Exception("Payment transaction not found");
+            _messageBroker.Send(new DepositFailureEvent
+            {
+                PaymentTransactionId = pay.Id,
+                PaymentMethod = "Stripe",
+                Amount = invoice.AmountDue,
+                UserId = pay.User?.Id ?? Guid.Empty,
+                Name = pay.User?.Fullname,
+                FailureReason = reason
+            });
+        }
+        else
+        {
+            _logger.LogInformation("Receive invoice fail event without payment info, must be from subscription");
         }
 
     }

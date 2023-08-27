@@ -7,6 +7,7 @@ public interface IUserService
 {
     Task<bool> Exits(string email);
     Task<bool> IsBlocked();
+    Task BlockUser(string firebaseId, string reason);
     Task<bool> IsSubscribed();
     Task Create(User user, bool isSubscribed = false, string firebaseId = "");
     Task<bool> SignUp(SignUpData data);

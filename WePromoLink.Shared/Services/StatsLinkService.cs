@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using WePromoLink.Data;
 using WePromoLink.DTO;
+using WePromoLink.Services.Cache;
 
 namespace WePromoLink.Services;
 
@@ -9,10 +10,10 @@ public class StatsLinkService : IStatsLinkService
 {
     private const int CACHE_EXPIRATION_MIN = 10;
     private readonly DataContext _db;
-    private readonly IMemoryCache _cache;
+    private readonly IShareCache _cache;
     
 
-    public StatsLinkService(DataContext db, IMemoryCache memoryCache)
+    public StatsLinkService(DataContext db, IShareCache memoryCache)
     {
         _db = db;
         _cache = memoryCache;

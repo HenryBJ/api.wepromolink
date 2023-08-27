@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 using WePromoLink.Data;
+using WePromoLink.DTO.Events;
 using WePromoLink.Services;
 using WePromoLink.Services.Email;
 using WePromoLink.Shared.RabbitMQ;
@@ -34,6 +35,16 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<MessageBroker<Event>>(_ =>
         {
             return new MessageBroker<Event>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
+        });
+
+        services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
+        {
+            return new MessageBroker<BaseEvent>(new MessageBrokerOptions
             {
                 HostName = configuration["RabbitMQ:hostname"],
                 UserName = configuration["RabbitMQ:username"],

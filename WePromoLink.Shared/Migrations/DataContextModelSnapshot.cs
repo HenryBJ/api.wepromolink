@@ -64,7 +64,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasIndex("LinkModelId");
 
-                    b.ToTable("Hits", (string)null);
+                    b.ToTable("Hits");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.AbuseReportModel", b =>
@@ -92,7 +92,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AbuseReports", (string)null);
+                    b.ToTable("AbuseReports");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.AvailableModel", b =>
@@ -128,48 +128,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("Availables", (string)null);
-                });
-
-            modelBuilder.Entity("WePromoLink.Models.BadgetModel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Campaign")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Clicks")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Deposit")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Link")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Notification")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserModelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Withdraw")
-                        .HasColumnType("int");
-
-                    b.Property<string>("flag")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserModelId");
-
-                    b.ToTable("Badgets", (string)null);
+                    b.ToTable("Availables");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.BitcoinBillingMethod", b =>
@@ -201,7 +160,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("BitcoinBillings", (string)null);
+                    b.ToTable("BitcoinBillings");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.BudgetModel", b =>
@@ -237,7 +196,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("Budgets", (string)null);
+                    b.ToTable("Budgets");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.CampaignModel", b =>
@@ -304,7 +263,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasIndex("UserModelId");
 
-                    b.ToTable("Campaigns", (string)null);
+                    b.ToTable("Campaigns");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ClickLastWeekOnLinksUserModel", b =>
@@ -339,7 +298,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("ClickLastWeekOnLinksUsers", (string)null);
+                    b.ToTable("ClickLastWeekOnLinksUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ClicksLastWeekOnCampaignModel", b =>
@@ -374,7 +333,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("CampaignModelId")
                         .IsUnique();
 
-                    b.ToTable("ClicksLastWeekOnCampaigns", (string)null);
+                    b.ToTable("ClicksLastWeekOnCampaigns");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ClicksLastWeekOnCampaignUserModel", b =>
@@ -409,7 +368,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("ClicksLastWeekOnCampaignUsers", (string)null);
+                    b.ToTable("ClicksLastWeekOnCampaignUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ClicksLastWeekOnLinkModel", b =>
@@ -444,7 +403,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("LinkModelId")
                         .IsUnique();
 
-                    b.ToTable("ClicksLastWeekOnLinks", (string)null);
+                    b.ToTable("ClicksLastWeekOnLinks");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnCampaignModel", b =>
@@ -479,7 +438,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("CampaignModelId")
                         .IsUnique();
 
-                    b.ToTable("ClicksTodayOnCampaigns", (string)null);
+                    b.ToTable("ClicksTodayOnCampaigns");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnCampaignUserModel", b =>
@@ -514,7 +473,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("ClicksTodayOnCampaignUsers", (string)null);
+                    b.ToTable("ClicksTodayOnCampaignUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnLinkModel", b =>
@@ -549,7 +508,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("LinkModelId")
                         .IsUnique();
 
-                    b.ToTable("ClicksTodayOnLinks", (string)null);
+                    b.ToTable("ClicksTodayOnLinks");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ClicksTodayOnLinksUserModel", b =>
@@ -584,7 +543,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("ClicksTodayOnLinksUsers", (string)null);
+                    b.ToTable("ClicksTodayOnLinksUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.EarnLastWeekOnLinkModel", b =>
@@ -620,7 +579,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("LinkModelId")
                         .IsUnique();
 
-                    b.ToTable("EarnLastWeekOnLinks", (string)null);
+                    b.ToTable("EarnLastWeekOnLinks");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.EarnLastWeekUserModel", b =>
@@ -656,7 +615,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("EarnLastWeekUsers", (string)null);
+                    b.ToTable("EarnLastWeekUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.EarnTodayOnLinkModel", b =>
@@ -692,7 +651,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("LinkModelId")
                         .IsUnique();
 
-                    b.ToTable("EarnTodayOnLinks", (string)null);
+                    b.ToTable("EarnTodayOnLinks");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.EarnTodayUserModel", b =>
@@ -728,7 +687,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("EarnTodayUsers", (string)null);
+                    b.ToTable("EarnTodayUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.GenericEventModel", b =>
@@ -754,7 +713,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GenericEvent", (string)null);
+                    b.ToTable("GenericEvent");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.GeoDataModel", b =>
@@ -806,7 +765,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GeoDatas", (string)null);
+                    b.ToTable("GeoDatas");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnCampaignModel", b =>
@@ -901,7 +860,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("CampaignModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryClicksByCountriesOnCampaigns", (string)null);
+                    b.ToTable("HistoryClicksByCountriesOnCampaigns");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnCampaignUserModel", b =>
@@ -996,7 +955,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryClicksByCountriesOnCampaignUsers", (string)null);
+                    b.ToTable("HistoryClicksByCountriesOnCampaignUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnLinkModel", b =>
@@ -1091,7 +1050,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("LinkModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryClicksByCountriesOnLinks", (string)null);
+                    b.ToTable("HistoryClicksByCountriesOnLinks");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksByCountriesOnLinkUserModel", b =>
@@ -1186,7 +1145,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryClicksByCountriesOnLinkUsers", (string)null);
+                    b.ToTable("HistoryClicksByCountriesOnLinkUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnCampaignModel", b =>
@@ -1281,7 +1240,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("CampaignModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryClicksOnCampaigns", (string)null);
+                    b.ToTable("HistoryClicksOnCampaigns");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnCampaignUserModel", b =>
@@ -1376,7 +1335,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryClicksOnCampaignUsers", (string)null);
+                    b.ToTable("HistoryClicksOnCampaignUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinkModel", b =>
@@ -1471,7 +1430,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("LinkModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryClicksOnLinkModels", (string)null);
+                    b.ToTable("HistoryClicksOnLinkModels");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinksUserModel", b =>
@@ -1566,101 +1525,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryClicksOnLinksUsers", (string)null);
-                });
-
-            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinkUserModel", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Etag")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ExpiredAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L0")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L1")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L2")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L3")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L4")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L5")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L6")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L7")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L8")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("L9")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("LinkModelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<TimeSpan?>("MaxAge")
-                        .HasColumnType("time");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("X0")
-                        .HasColumnType("int");
-
-                    b.Property<int>("X1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("X2")
-                        .HasColumnType("int");
-
-                    b.Property<int>("X3")
-                        .HasColumnType("int");
-
-                    b.Property<int>("X4")
-                        .HasColumnType("int");
-
-                    b.Property<int>("X5")
-                        .HasColumnType("int");
-
-                    b.Property<int>("X6")
-                        .HasColumnType("int");
-
-                    b.Property<int>("X7")
-                        .HasColumnType("int");
-
-                    b.Property<int>("X8")
-                        .HasColumnType("int");
-
-                    b.Property<int>("X9")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LinkModelId");
-
-                    b.ToTable("HistoryClicksOnLinkUsers", (string)null);
+                    b.ToTable("HistoryClicksOnLinksUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnSharesUserModel", b =>
@@ -1755,7 +1620,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryClicksOnSharesUsers", (string)null);
+                    b.ToTable("HistoryClicksOnSharesUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryEarnByCountriesOnLinkModel", b =>
@@ -1860,7 +1725,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("LinkModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryEarnByCountriesOnLinks", (string)null);
+                    b.ToTable("HistoryEarnByCountriesOnLinks");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryEarnByCountriesUserModel", b =>
@@ -1965,7 +1830,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryEarnByCountriesUsers", (string)null);
+                    b.ToTable("HistoryEarnByCountriesUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryEarnOnLinkModel", b =>
@@ -2070,7 +1935,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("LinkModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryEarnOnLinks", (string)null);
+                    b.ToTable("HistoryEarnOnLinks");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistoryEarnOnLinksUserModel", b =>
@@ -2175,7 +2040,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("HistoryEarnOnLinksUsers", (string)null);
+                    b.ToTable("HistoryEarnOnLinksUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistorySharedByUsersOnCampaignModel", b =>
@@ -2270,7 +2135,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("CampaignModelId")
                         .IsUnique();
 
-                    b.ToTable("HistorySharedByUsersOnCampaigns", (string)null);
+                    b.ToTable("HistorySharedByUsersOnCampaigns");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistorySharedByUsersUserModel", b =>
@@ -2365,7 +2230,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("HistorySharedByUsersUsers", (string)null);
+                    b.ToTable("HistorySharedByUsersUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.HistorySharedOnCampaignModel", b =>
@@ -2460,7 +2325,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("CampaignModelId")
                         .IsUnique();
 
-                    b.ToTable("HistorySharedOnCampaigns", (string)null);
+                    b.ToTable("HistorySharedOnCampaigns");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ImageDataModel", b =>
@@ -2530,7 +2395,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ImageDatas", (string)null);
+                    b.ToTable("ImageDatas");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.LinkModel", b =>
@@ -2570,7 +2435,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasIndex("UserModelId");
 
-                    b.ToTable("Links", (string)null);
+                    b.ToTable("Links");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.LockedModel", b =>
@@ -2606,7 +2471,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("Lockeds", (string)null);
+                    b.ToTable("Lockeds");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.NotificationModel", b =>
@@ -2655,7 +2520,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasIndex("UserModelId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.PaymentTransaction", b =>
@@ -2715,7 +2580,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasIndex("UserModelId");
 
-                    b.ToTable("PaymentTransactions", (string)null);
+                    b.ToTable("PaymentTransactions");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.PayoutStatModel", b =>
@@ -2751,7 +2616,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("PayoutStats", (string)null);
+                    b.ToTable("PayoutStats");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.ProfitModel", b =>
@@ -2787,7 +2652,49 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("Profits", (string)null);
+                    b.ToTable("Profits");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.PushModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Campaign")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Clicks")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Deposit")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Etag")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Links")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Notification")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Withdraw")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("Pushes");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.SharedLastWeekOnCampaignModel", b =>
@@ -2822,7 +2729,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("CampaignModelId")
                         .IsUnique();
 
-                    b.ToTable("SharedLastWeekOnCampaigns", (string)null);
+                    b.ToTable("SharedLastWeekOnCampaigns");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.SharedLastWeekUserModel", b =>
@@ -2857,7 +2764,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("SharedLastWeekUsers", (string)null);
+                    b.ToTable("SharedLastWeekUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.SharedTodayOnCampaignModel", b =>
@@ -2892,7 +2799,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("CampaignModelId")
                         .IsUnique();
 
-                    b.ToTable("SharedTodayOnCampaigns", (string)null);
+                    b.ToTable("SharedTodayOnCampaigns");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.SharedTodayUserModel", b =>
@@ -2927,7 +2834,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("SharedTodayUsers", (string)null);
+                    b.ToTable("SharedTodayUsers");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.StripeBillingMethod", b =>
@@ -2959,7 +2866,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("UserModelId")
                         .IsUnique();
 
-                    b.ToTable("StripeBillings", (string)null);
+                    b.ToTable("StripeBillings");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.SubscriptionFeatureModel", b =>
@@ -2985,22 +2892,22 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasIndex("SubscriptionPlanModelId");
 
-                    b.ToTable("SubscriptionFeatures", (string)null);
+                    b.ToTable("SubscriptionFeatures");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e4aedea1-35e2-4f33-8694-e3e39e02fcb4"),
+                            Id = new Guid("6a6036ef-fe91-4656-af4d-c1271797a14f"),
                             BoolValue = true,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("9cbeeb9b-b5ce-4aed-92ee-c2fd134cfa7d")
+                            SubscriptionPlanModelId = new Guid("f8046edb-ed28-41c9-a49c-0f2a443cdb48")
                         },
                         new
                         {
-                            Id = new Guid("407d2bd6-c17b-4986-8701-9ae40ac8bfb9"),
+                            Id = new Guid("a3a2d13f-7d5c-4ec0-a00c-5b71c9a0b94f"),
                             BoolValue = false,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("e77ddb77-0694-494d-bfe2-2f36fcfd9c30")
+                            SubscriptionPlanModelId = new Guid("1966d3f1-c7be-4f2c-a7f9-6956d6448a99")
                         });
                 });
 
@@ -3048,7 +2955,7 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasIndex("SubscriptionPlanModelId");
 
-                    b.ToTable("Subscriptions", (string)null);
+                    b.ToTable("Subscriptions");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.SubscriptionPlanModel", b =>
@@ -3121,18 +3028,18 @@ namespace WePromoLink.Shared.Migrations
 
                     b.HasIndex("ExternalId");
 
-                    b.ToTable("SubscriptionPlans", (string)null);
+                    b.ToTable("SubscriptionPlans");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e77ddb77-0694-494d-bfe2-2f36fcfd9c30"),
+                            Id = new Guid("1966d3f1-c7be-4f2c-a7f9-6956d6448a99"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "wIPpdj60R5Gk",
+                            ExternalId = "BgXX5kU2zkNx",
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
@@ -3145,13 +3052,13 @@ namespace WePromoLink.Shared.Migrations
                         },
                         new
                         {
-                            Id = new Guid("9cbeeb9b-b5ce-4aed-92ee-c2fd134cfa7d"),
+                            Id = new Guid("f8046edb-ed28-41c9-a49c-0f2a443cdb48"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "EcsLUL3FBeoo",
+                            ExternalId = "sROzAi9ch1gK",
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",
@@ -3213,7 +3120,7 @@ namespace WePromoLink.Shared.Migrations
                     b.HasIndex("SubscriptionModelId")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("WePromoLink.HitModel", b =>
@@ -3255,17 +3162,6 @@ namespace WePromoLink.Shared.Migrations
                     b.HasOne("WePromoLink.Models.UserModel", "User")
                         .WithOne("Available")
                         .HasForeignKey("WePromoLink.Models.AvailableModel", "UserModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WePromoLink.Models.BadgetModel", b =>
-                {
-                    b.HasOne("WePromoLink.Models.UserModel", "User")
-                        .WithMany()
-                        .HasForeignKey("UserModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -3529,17 +3425,6 @@ namespace WePromoLink.Shared.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnLinkUserModel", b =>
-                {
-                    b.HasOne("WePromoLink.Models.LinkModel", "Link")
-                        .WithMany()
-                        .HasForeignKey("LinkModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Link");
-                });
-
             modelBuilder.Entity("WePromoLink.Models.HistoryClicksOnSharesUserModel", b =>
                 {
                     b.HasOne("WePromoLink.Models.UserModel", "User")
@@ -3673,15 +3558,18 @@ namespace WePromoLink.Shared.Migrations
                 {
                     b.HasOne("WePromoLink.Models.CampaignModel", "Campaign")
                         .WithMany("Transactions")
-                        .HasForeignKey("CampaignModelId");
+                        .HasForeignKey("CampaignModelId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("WePromoLink.Models.LinkModel", "Link")
                         .WithMany("Transactions")
-                        .HasForeignKey("LinkModelId");
+                        .HasForeignKey("LinkModelId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("WePromoLink.Models.UserModel", "User")
                         .WithMany("Transactions")
-                        .HasForeignKey("UserModelId");
+                        .HasForeignKey("UserModelId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Campaign");
 
@@ -3706,6 +3594,17 @@ namespace WePromoLink.Shared.Migrations
                     b.HasOne("WePromoLink.Models.UserModel", "User")
                         .WithOne("Profit")
                         .HasForeignKey("WePromoLink.Models.ProfitModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.PushModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithOne("Push")
+                        .HasForeignKey("WePromoLink.Models.PushModel", "UserModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -3939,6 +3838,9 @@ namespace WePromoLink.Shared.Migrations
                         .IsRequired();
 
                     b.Navigation("Profit")
+                        .IsRequired();
+
+                    b.Navigation("Push")
                         .IsRequired();
 
                     b.Navigation("SharedLastWeek")

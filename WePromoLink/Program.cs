@@ -18,6 +18,9 @@ using WePromoLink.Services.Email;
 using Azure.Storage.Blobs;
 using WePromoLink.Shared.RabbitMQ;
 using WePromoLink.Shared.DTO.Messages;
+using WePromoLink.Services.Cache;
+using WePromoLink.Services.SignalR;
+using WePromoLink.DTO.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
@@ -43,6 +46,19 @@ builder.Services.AddScoped<IPStackService>(_ =>
 builder.Services.AddScoped<CampaignValidator>();
 builder.Services.AddScoped<FundSponsoredLinkValidator>();
 builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<IShareCache>(x =>
+{
+    return new RedisCache(
+        builder.Configuration["Redis:Host"],
+        builder.Configuration["Redis:Port"],
+        builder.Configuration["Redis:Password"]);
+});
+
+builder.Services.AddSingleton<IAdminDashboardHub>(x =>
+{
+    var cache = x.GetRequiredService<IShareCache>();
+    return new AdminDashboardHub(builder.Configuration["SignalR:ConnectionString"], cache);
+});
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<BTCPaymentService>();
@@ -59,6 +75,17 @@ builder.Services.AddScoped<BTCPayServerClient>(x =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<ILinkService, LinkService>();
+builder.Services.AddTransient<IPushService, PushService>();
+
+builder.Services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
+{
+    return new MessageBroker<BaseEvent>(new MessageBrokerOptions
+    {
+        HostName = builder.Configuration["RabbitMQ:hostname"],
+        UserName = builder.Configuration["RabbitMQ:username"],
+        Password = builder.Configuration["RabbitMQ:password"]
+    });
+});
 
 builder.Services.AddSingleton<MessageBroker<Hit>>(sp =>
 {

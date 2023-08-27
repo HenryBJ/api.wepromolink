@@ -11,6 +11,9 @@ using WePromoLink.Extension;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using WePromoLink.Services.Cache;
+using WePromoLink.Shared.RabbitMQ;
+using WePromoLink.DTO.Events;
 
 namespace WePromoLink.Services;
 
@@ -21,8 +24,9 @@ public class CampaignService : ICampaignService
     private readonly DataContext _db;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<CampaignService> _logger;
-    private readonly IMemoryCache _cache;
-    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, BTCPaymentService client, IHttpContextAccessor httpContextAccessor, ILogger<CampaignService> logger, IMemoryCache cache)
+    private readonly IShareCache _cache;
+    private readonly MessageBroker<BaseEvent> _eventSender;
+    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, BTCPaymentService client, IHttpContextAccessor httpContextAccessor, ILogger<CampaignService> logger, IShareCache cache, MessageBroker<BaseEvent> eventSender)
     {
         _db = db;
         _options = options;
@@ -30,6 +34,7 @@ public class CampaignService : ICampaignService
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
         _cache = cache;
+        _eventSender = eventSender;
     }
 
     public async Task<string> CreateCampaign(Campaign campaign)
@@ -44,8 +49,6 @@ public class CampaignService : ICampaignService
 
         var externalId = await Nanoid.Nanoid.GenerateAsync(size: 12);
         var available = user.Available;
-
-
 
         using (var transaction = _db.Database.BeginTransaction())
         {
@@ -113,32 +116,17 @@ public class CampaignService : ICampaignService
                 await _db.PaymentTransactions.AddAsync(paymentTrans);
                 await _db.SaveChangesAsync();
 
-                //Create a Notification
-                var noti = new NotificationModel
-                {
-                    Id = Guid.NewGuid(),
-                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
-                    Status = NotificationStatusEnum.Unread,
-                    UserModelId = user.Id,
-                    Title = "Campaign created",
-                    Message = $"Your campaign called '{item.Title}' has been successfully created. It has been assigned a budget of {campaign.Budget.ToString("0.00")} USD. You have {available.Value.ToString("0.00")} USD remaining in your account.",
-                };
-                await _db.Notifications.AddAsync(noti);
-                await _db.SaveChangesAsync();
-
-                //Create generic event
-                var gEvent = new GenericEventModel
-                {
-                    Id = Guid.NewGuid(),
-                    CreatedAt = DateTime.UtcNow,
-                    EventType = "INFO",
-                    Message = $"{user.Fullname} created campaign {campaign.Title} with {campaign.Budget} USD, balance remaining {available.Value} USD",
-                    Source = "WePromoLink"
-                };
-                await _db.GenericEvent.AddAsync(gEvent);
-                await _db.SaveChangesAsync();
-
                 transaction.Commit();
+
+                _eventSender.Send(new CampaignCreatedEvent
+                {
+                    CampaignId = item.Id,
+                    CampaignName = item.Title,
+                    EPM = item.EPM,
+                    InitialAmount = item.Budget,
+                    Name = user.Fullname,
+                    UserId = user.Id
+                });
                 return externalId;
             }
             catch (System.Exception ex)
@@ -200,32 +188,16 @@ public class CampaignService : ICampaignService
                 _db.Campaigns.Update(campaignModel);
                 await _db.SaveChangesAsync();
 
-                //Create a Notification
-                var noti = new NotificationModel
-                {
-                    Id = Guid.NewGuid(),
-                    ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
-                    Status = NotificationStatusEnum.Unread,
-                    UserModelId = user.Id,
-                    Title = "Campaign deleted",
-                    Message = $"Your campaign called '{campaignModel.Title}' has been deleted, remaining campaign budget has been added to the available balance",
-                };
-                await _db.Notifications.AddAsync(noti);
-                await _db.SaveChangesAsync();
-
-                //Create generic event
-                var gEvent = new GenericEventModel
-                {
-                    Id = Guid.NewGuid(),
-                    CreatedAt = DateTime.UtcNow,
-                    EventType = "INFO",
-                    Message = $"{user.Fullname} delete campaign {campaignModel.Title} with {campaignModel.Budget} USD",
-                    Source = "WePromoLink"
-                };
-                await _db.GenericEvent.AddAsync(gEvent);
-                await _db.SaveChangesAsync();
-
                 transaction.Commit();
+
+                _eventSender.Send(new CampaignDeletedEvent
+                {
+                    CampaignId = campaignModel.Id,
+                    Amount = campaignModel.Budget,
+                    CampaignName = campaignModel.Title,
+                    Name = user.Fullname,
+                    UserId = user.Id
+                });
             }
             catch (System.Exception ex)
             {
@@ -251,6 +223,8 @@ public class CampaignService : ICampaignService
         if (campaignModel == null) throw new Exception("Campaign does not exits");
         if (campaignModel.IsArchived) throw new Exception("Campaing deleted");
         var oldbudget = campaignModel.Budget;
+        var oldEPM = campaignModel.EPM;
+        var oldTitle = campaignModel.Title;
         var available = user.Available;
 
         using (var transaction = _db.Database.BeginTransaction())
@@ -313,35 +287,20 @@ public class CampaignService : ICampaignService
                     };
                     await _db.PaymentTransactions.AddAsync(paymentTrans);
                     await _db.SaveChangesAsync();
-
-
-                    //Create a Notification
-                    var noti = new NotificationModel
-                    {
-                        Id = Guid.NewGuid(),
-                        ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
-                        Status = NotificationStatusEnum.Unread,
-                        UserModelId = user.Id,
-                        Title = "Campaign edited",
-                        Message = $"Your campaign called '{campaign.Title}' has been successfully edited. It has been assigned a new budget of {campaign.Budget.ToString("0.00")} USD. You have {available.Value.ToString("0.00")} USD remaining in your account.",
-                    };
-                    await _db.Notifications.AddAsync(noti);
-                    await _db.SaveChangesAsync();
                 }
-
-                //Create generic event
-                var gEvent = new GenericEventModel
-                {
-                    Id = Guid.NewGuid(),
-                    CreatedAt = DateTime.UtcNow,
-                    EventType = "INFO",
-                    Message = $"{user.Fullname} edited campaign {campaign.Title} with {campaign.Budget} USD, balance remaining {available.Value} USD",
-                    Source = "WePromoLink"
-                };
-                await _db.GenericEvent.AddAsync(gEvent);
-                await _db.SaveChangesAsync();
-
                 transaction.Commit();
+                _eventSender.Send(new CampaignEditedEvent
+                {
+                    CampaignId = campaignModel.Id,
+                    AmountNew = campaignModel.Budget,
+                    CampaignNameNew = campaignModel.Title,
+                    EPMNew = campaignModel.EPM,
+                    UserId = user.Id,
+                    Name = user.Fullname,
+                    AmountOld = oldbudget,
+                    EPMOld = oldEPM,
+                    CampaignNameOld = oldTitle
+                });
             }
             catch (System.Exception ex)
             {
@@ -450,24 +409,39 @@ public class CampaignService : ICampaignService
     public async Task ReportAbuse(AbuseReport report)
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        var userId = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Id).SingleOrDefaultAsync();
-        if (userId == Guid.Empty) throw new Exception("User no found");
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).SingleOrDefaultAsync();
+        if (user == null) throw new Exception("User no found");
 
-        var campaignId = await _db.Campaigns
+        var campaign = await _db.Campaigns
+        .Include(e => e.ImageData)
+        .Include(e => e.User)
         .Where(e => e.ExternalId == report.CampaignExternalId)
-        .Select(e => e.Id)
         .SingleAsync();
 
         var abuseReportModel = new AbuseReportModel
         {
             Id = Guid.NewGuid(),
-            UserId = userId,
-            CampaignId = campaignId,
+            UserId = user.Id,
+            CampaignId = campaign.Id,
             Reason = report.Reason
         };
 
         _db.AbuseReports.Add(abuseReportModel);
         await _db.SaveChangesAsync();
+
+        _eventSender.Send(new CampaignAbuseReportedEvent
+        {
+            OwnerUserId = campaign.User.Id,
+            Amount = campaign.Budget,
+            CampaignDescription = campaign.Description,
+            CampaignId = campaign.Id,
+            CampaignName = campaign.Title,
+            EPM = campaign.EPM,
+            ImageUrl = campaign.ImageData?.Compressed,
+            OwnerName = campaign.User.Fullname,
+            ReporterUserId = user.Id,
+            ReporterName = user.Fullname
+        });
     }
 
 
@@ -568,6 +542,29 @@ public class CampaignService : ICampaignService
             if (campaignModel.Budget <= (campaignModel.EPM / 1000)) throw new Exception("Insufficient budget");
         }
 
+        if (toStatus)
+        {
+            _eventSender.Send(new CampaignPublishedEvent
+            {
+                CampaignId = campaignModel.Id,
+                Amount = campaignModel.Budget,
+                CampaignName = campaignModel.Title,
+                Name = user.Fullname,
+                UserId = user.Id
+            });
+        }
+        else
+        {
+            _eventSender.Send(new CampaignUnPublishedEvent
+            {
+                CampaignId = campaignModel.Id,
+                Amount = campaignModel.Budget,
+                CampaignName = campaignModel.Title,
+                Name = user.Fullname,
+                UserId = user.Id
+            });
+
+        }
 
         campaignModel.Status = toStatus;
         _db.Campaigns.Update(campaignModel);

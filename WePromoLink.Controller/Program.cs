@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WePromoLink.Controller;
 using WePromoLink.Controller.Tasks;
 using WePromoLink.Data;
+using WePromoLink.DTO.Events;
 using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 
@@ -46,6 +47,16 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<MessageBroker<UpdateLinkMessage>>(_ =>
         {
             return new MessageBroker<UpdateLinkMessage>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
+        });
+
+        services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
+        {
+            return new MessageBroker<BaseEvent>(new MessageBrokerOptions
             {
                 HostName = configuration["RabbitMQ:hostname"],
                 UserName = configuration["RabbitMQ:username"],

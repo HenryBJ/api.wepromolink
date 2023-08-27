@@ -24,6 +24,17 @@
             "console": "internalConsole"
         },
         {
+            "name": "NotiWorker (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/WePromoLink.NotiWorker/bin/Debug/net6.0/WePromoLink.NotiWorker.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
             "name": "StripeWorker (console)",
             "type": "coreclr",
             "request": "launch",

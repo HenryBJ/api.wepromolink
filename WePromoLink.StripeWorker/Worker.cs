@@ -21,7 +21,7 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-       
+
         await _messageBroker.Receive((ev) => ProcessEvent(ev).Result);
 
         while (true)
@@ -60,6 +60,12 @@ public class Worker : BackgroundService
                 case Events.InvoicePaid:
                     var invoice = item.Data.Object as Invoice;
                     await _stripeService.HandleInvoiceWebHook(invoice!);
+                    break;
+                case Events.InvoiceFinalizationError:
+                case Events.InvoiceFinalizationFailed:
+                case Events.InvoicePaymentFailed:
+                    var invoiceFail = item.Data.Object as Invoice;
+                    await _stripeService.HandleInvoiceFailWebHook(invoiceFail!, item.Type);
                     break;
 
                 default:
