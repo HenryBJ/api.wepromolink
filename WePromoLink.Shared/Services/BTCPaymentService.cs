@@ -82,7 +82,7 @@ public class BTCPaymentService
             case InvoiceSettled ev:
                 var invoiceData = await _client.GetInvoice(_settings.Value.StoreId, ev.InvoiceId);
                 var paymentId = invoiceData?.Metadata["paymentId"]?.ToObject<Guid>();
-                var payment = _db.PaymentTransactions.Where(e => e.Id == paymentId).Single();
+                var payment = _db.PaymentTransactions.Include(e=>e.User).Where(e => e.Id == paymentId).Single();
                 await ProcessPayment(invoiceData!, payment);
                 break;
 

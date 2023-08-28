@@ -283,6 +283,7 @@ public class StripeService
         {
             var paymentId = invoice.Metadata["paymentId"];
             var pay = await _db.PaymentTransactions
+            .Include(e => e.User)
             .Where(e => e.ExternalId == paymentId)
             .SingleOrDefaultAsync();
             if (pay == null) throw new Exception("Payment transaction not found");
