@@ -21,6 +21,7 @@ using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Services.Cache;
 using WePromoLink.Services.SignalR;
 using WePromoLink.DTO.Events;
+using WePromoLink.DTO.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
@@ -54,11 +55,6 @@ builder.Services.AddSingleton<IShareCache>(x =>
         builder.Configuration["Redis:Password"]);
 });
 
-builder.Services.AddSingleton<IAdminDashboardHub>(x =>
-{
-    var cache = x.GetRequiredService<IShareCache>();
-    return new AdminDashboardHub(builder.Configuration["SignalR:ConnectionString"], cache);
-});
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<BTCPaymentService>();
@@ -73,9 +69,11 @@ builder.Services.AddScoped<BTCPayServerClient>(x =>
     return cc;
 });
 
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<IPushService, PushService>();
+
+
+
 
 builder.Services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
 {
@@ -144,14 +142,9 @@ builder.Services.AddTransient<BlobServiceClient>(_ =>
 {
     return new BlobServiceClient(builder.Configuration["Azure:blob:connectionstring"]);
 });
-builder.Services.AddTransient<IEmailSender, EmailSender>(_ =>
-{
-    return new EmailSender(
-        builder.Configuration["Email:Server"],
-        Convert.ToInt32(builder.Configuration["Email:Port"]),
-        builder.Configuration["Email:Sender"],
-        builder.Configuration["Email:Password"]);
-});
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddTransient<IPricingService, PricingService>();
 builder.Services.AddTransient<IUserService, UserService>();
@@ -210,13 +203,6 @@ app.MapGet("/{link}", async (string link, HttpContext ctx, ILinkService service)
     });
     return String.IsNullOrEmpty(url) ? Results.NotFound() : Results.Redirect(url);
 });
-
-//BTCPay webhook
-// app.MapPost("/webhook", async (HttpContext ctx, IPaymentService service) =>
-// {
-//     await service.HandleWebHook(ctx);
-//     return Results.Ok();
-// });
 
 app.MapControllers();
 app.Run();

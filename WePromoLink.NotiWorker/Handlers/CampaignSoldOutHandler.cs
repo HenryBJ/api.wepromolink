@@ -10,14 +10,17 @@ namespace WePromoLink.Handlers;
 public class CampaignSoldOutHandler : IRequestHandler<CampaignSoldOutEvent, bool>
 {
     private readonly IEmailSender _senderEmail;
-    private readonly DataContext _db;
-    public CampaignSoldOutHandler(IEmailSender senderEmail, DataContext db)
+    private readonly IServiceScopeFactory _fac;
+    public CampaignSoldOutHandler(IEmailSender senderEmail)
     {
         _senderEmail = senderEmail;
-        _db = db;
     }
     public Task<bool> Handle(CampaignSoldOutEvent request, CancellationToken cancellationToken)
     {
+
+        using var scope = _fac.CreateScope();
+        var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         // Crear Notificacion
         var noti = new NotificationModel
         {

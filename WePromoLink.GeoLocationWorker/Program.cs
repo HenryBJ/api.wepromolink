@@ -4,6 +4,7 @@ using WePromoLink.DTO.Events;
 using WePromoLink.DTO.Events.Commands;
 using WePromoLink.GeoLocationWorker;
 using WePromoLink.Services;
+using WePromoLink.Services.Cache;
 using WePromoLink.Shared.RabbitMQ;
 
 IHost host = Host.CreateDefaultBuilder(args)
@@ -17,7 +18,16 @@ IHost host = Host.CreateDefaultBuilder(args)
         var connectionString = configuration.GetConnectionString("Default");
         services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
 
-       
+        services.AddSingleton<IShareCache>(x =>
+        {
+            return new RedisCache(
+                configuration["Redis:Host"],
+                configuration["Redis:Port"],
+                configuration["Redis:Password"]);
+        });
+
+        services.AddTransient<IPushService, PushService>();
+
         services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
         {
             return new MessageBroker<BaseEvent>(new MessageBrokerOptions

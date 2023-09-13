@@ -79,7 +79,8 @@ public class Worker : BackgroundService
                     Country = geoData.Country,
                     FlagUrl = geoData.CountryFlagUrl,
                     Latitud = geoData.Latitude,
-                    Longitud = geoData.Longitude
+                    Longitud = geoData.Longitude,
+                    FirstTime = true
                 });
                 return true;
             }

@@ -1,24 +1,30 @@
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MimeKit;
 
 namespace WePromoLink.Services.Email;
 
 public class EmailSender : IEmailSender
 {
+    private readonly ILogger<IEmailSender> _logger;
     private readonly SmtpClient _client;
     private readonly string _server;
     private readonly int _port;
     private readonly string _sender;
     private readonly string _password;
+    private readonly IConfiguration _config;
 
 
-    public EmailSender(string server, int port, string sender, string password)
+    public EmailSender(IConfiguration config, ILogger<IEmailSender> logger)
     {
+        _config = config;
         _client = new SmtpClient();
-        _server = server;
-        _port = port;
-        _sender = sender;
-        _password = password;
+        _server = _config["Email:Server"];
+        _port = Convert.ToInt32(_config["Email:Port"]);
+        _sender = _config["Email:Sender"];
+        _password = _config["Email:Password"];
+        _logger = logger;
     }
 
     public async Task Send(string recipentName, string recipentEmail, string subject, string body)
@@ -40,8 +46,9 @@ public class EmailSender : IEmailSender
             await _client.DisconnectAsync(true);
 
         }
-        catch (System.Exception)
+        catch (System.Exception ex)
         {
+            _logger.LogError(ex.Message);
             throw;
         }
     }

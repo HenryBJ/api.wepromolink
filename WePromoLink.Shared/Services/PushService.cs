@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WePromoLink.Data;
 using WePromoLink.DTO.PushNotification;
@@ -14,12 +15,16 @@ public class PushService : IPushService
     private readonly ILogger<PushService> _logger;
     private readonly IShareCache _cache;
 
-    public PushService(DataContext db, IHttpContextAccessor httpContextAccessor, ILogger<PushService> logger, IShareCache cache)
+    private readonly IServiceScopeFactory _fac;
+
+    public PushService(IHttpContextAccessor httpContextAccessor, ILogger<PushService> logger, IShareCache cache, IServiceScopeFactory fac)
     {
-        _db = db;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
         _cache = cache;
+        _fac = fac;
+        var scope = _fac.CreateScope();
+        _db = scope.ServiceProvider.GetRequiredService<DataContext>();
     }
 
     public async Task<PushNotification> GetPushNotification()
@@ -121,24 +126,28 @@ public class PushService : IPushService
 
     public async Task<PushNotification> UpdatePushNotification(PushNotification newNotification)
     {
-        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        string key = $"push_{firebaseId}";
-        var pushModel = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Push).SingleAsync();
+        // var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        // Action<PushNotification> pushReducer = (e)
+        // SetPushNotification(firebaseId,)
+        return newNotification; // TODO: remove this
 
-        newNotification.Etag = Nanoid.Nanoid.Generate(size: 12);
+        // string key = $"push_{firebaseId}";
+        // var pushModel = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Push).SingleAsync();
 
-        pushModel.Campaign = newNotification.Campaign;
-        pushModel.Clicks = newNotification.Clicks;
-        pushModel.Deposit = newNotification.Deposit;
-        pushModel.Etag = newNotification.Etag;
-        pushModel.LastModified = DateTime.UtcNow;
-        pushModel.Links = newNotification.Links;
-        pushModel.Notification = newNotification.Notification;
-        pushModel.Withdraw = newNotification.Withdraw;
+        // newNotification.Etag = Nanoid.Nanoid.Generate(size: 12);
 
-        _db.Pushes.Update(pushModel);
-        await _db.SaveChangesAsync();
-        _cache.Set(key, newNotification);
-        return newNotification;
+        // pushModel.Campaign = newNotification.Campaign;
+        // pushModel.Clicks = newNotification.Clicks;
+        // pushModel.Deposit = newNotification.Deposit;
+        // pushModel.Etag = newNotification.Etag;
+        // pushModel.LastModified = DateTime.UtcNow;
+        // pushModel.Links = newNotification.Links;
+        // pushModel.Notification = newNotification.Notification;
+        // pushModel.Withdraw = newNotification.Withdraw;
+
+        // _db.Pushes.Update(pushModel);
+        // await _db.SaveChangesAsync();
+        // _cache.Set(key, newNotification);
+        // return newNotification;
     }
 }

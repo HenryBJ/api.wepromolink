@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WePromoLink.Data;
@@ -22,6 +23,7 @@ public class LinkService : ILinkService
     private readonly MessageBroker<UpdateUserMessage> _userMessageBroker;
     private readonly MessageBroker<UpdateCampaignMessage> _campaignMessageBroker;
     private readonly MessageBroker<BaseEvent> _eventSender;
+    private readonly IConfiguration _config;
 
     public LinkService(
         DataContext ctx,
@@ -30,7 +32,8 @@ public class LinkService : ILinkService
         MessageBroker<UpdateUserMessage> userMessageBroker,
         MessageBroker<UpdateCampaignMessage> campaignMessageBroker,
         MessageBroker<BaseEvent> eventSender,
-        MessageBroker<Hit> messageBroker)
+        MessageBroker<Hit> messageBroker,
+        IConfiguration config)
     {
         _db = ctx;
         _httpContextAccessor = httpContextAccessor;
@@ -39,6 +42,7 @@ public class LinkService : ILinkService
         _campaignMessageBroker = campaignMessageBroker;
         _eventSender = eventSender;
         _messageBroker = messageBroker;
+        _config = config;
     }
 
     public async Task<string> Create(string ExternalCampaignId)
@@ -78,7 +82,7 @@ public class LinkService : ILinkService
                 LinkModel link = new LinkModel
                 {
                     Id = Guid.NewGuid(),
-                    Url = $"https://wepromolink.io/{externalLinkId}",
+                    Url = $"https://{_config["Link:Domain"]}/{externalLinkId}",
                     CampaignModelId = campaign.Id,
                     ExternalId = externalLinkId,
                     ClicksLastWeekOnLink = new ClicksLastWeekOnLinkModel(),

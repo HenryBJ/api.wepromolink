@@ -7,6 +7,7 @@ using WePromoLink.Services;
 using WePromoLink.Services.Email;
 using WePromoLink.Services.Cache;
 using WePromoLink.Services.SignalR;
+using WePromoLink.DTO.SignalR;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((hostContext, config) =>
@@ -18,6 +19,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         IConfiguration configuration = hostContext.Configuration;
         var connectionString = configuration.GetConnectionString("Default");
         services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
+        services.AddHttpContextAccessor();
 
         services.AddMediatR(cfg =>
         {
@@ -44,21 +46,18 @@ IHost host = Host.CreateDefaultBuilder(args)
             });
         });
 
-        services.AddSingleton<IAdminDashboardHub>(x =>
-        {
-            var cache = x.GetRequiredService<IShareCache>();
-            return new AdminDashboardHub(configuration["SignalR:ConnectionString"], cache);
-        });
 
-        services.AddTransient<IEmailSender, EmailSender>(_ =>
+        services.AddSingleton<MessageBroker<DashboardStatus>>(sp =>
         {
-            return new EmailSender(
-                configuration["Email:Server"],
-                Convert.ToInt32(configuration["Email:Port"]),
-                configuration["Email:Sender"],
-                configuration["Email:Password"]);
+            return new MessageBroker<DashboardStatus>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
         });
-
+        
+        services.AddTransient<IEmailSender, EmailSender>();
         services.AddHostedService<Worker>();
     })
     .Build();

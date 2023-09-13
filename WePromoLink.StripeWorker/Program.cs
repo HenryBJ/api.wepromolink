@@ -3,6 +3,7 @@ using Stripe;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events;
 using WePromoLink.Services;
+using WePromoLink.Services.Cache;
 using WePromoLink.Services.Email;
 using WePromoLink.Shared.RabbitMQ;
 using WePromoLink.StripeWorker;
@@ -20,17 +21,20 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddHttpContextAccessor();
         services.AddTransient<StripeService>();
         services.AddTransient<IUserService, UserService>();
-        services.AddTransient<IEmailSender, EmailSender>(_ =>
-        {
-            return new EmailSender(
-                configuration["Email:Server"],
-                Convert.ToInt32(configuration["Email:Port"]),
-                configuration["Email:Sender"],
-                configuration["Email:Password"]);
-        });
+        services.AddTransient<IEmailSender, EmailSender>();
 
         var connectionString = configuration.GetConnectionString("Default");
         services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
+
+        services.AddSingleton<IShareCache>(x =>
+        {
+            return new RedisCache(
+                configuration["Redis:Host"],
+                configuration["Redis:Port"],
+                configuration["Redis:Password"]);
+        });
+
+        services.AddTransient<IPushService, PushService>();
 
         services.AddSingleton<MessageBroker<Event>>(_ =>
         {

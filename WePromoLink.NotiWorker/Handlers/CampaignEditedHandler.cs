@@ -10,14 +10,17 @@ namespace WePromoLink.Handlers;
 public class CampaignEditedHandler : IRequestHandler<CampaignEditedEvent, bool>
 {
     private readonly IEmailSender _senderEmail;
-    private readonly DataContext _db;
-    public CampaignEditedHandler(IEmailSender senderEmail, DataContext db)
+    private readonly IServiceScopeFactory _fac;
+    public CampaignEditedHandler(IEmailSender senderEmail, IServiceScopeFactory fac)
     {
         _senderEmail = senderEmail;
-        _db = db;
+        _fac = fac;
     }
     public Task<bool> Handle(CampaignEditedEvent request, CancellationToken cancellationToken)
     {
+        using var scope = _fac.CreateScope();
+        var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
+        
         //Create a Notification
         var noti = new NotificationModel
         {

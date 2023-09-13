@@ -231,6 +231,24 @@ spec:
       name: https
   type: ClusterIP  # Cambia esto según el tipo de servicio que desees
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backoffice-service
+spec:
+  selector:
+    app: backoffice-app
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+      name: http
+    - port: 443
+      protocol: TCP
+      targetPort: 443
+      name: https
+  type: ClusterIP  # Cambia esto según el tipo de servicio que desees
+---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -288,6 +306,9 @@ spec:
     - dev.api.wepromolink.com
     secretName: api-wepromolink-tls
   - hosts:
+    - admin.api.wepromolink.com
+    secretName: admin-wepromolink-tls
+  - hosts:
     - dev.wepromolink.io
     secretName: wepromolink-io-tls
   rules:
@@ -299,6 +320,16 @@ spec:
             backend:
               service:
                 name: webapi-service
+                port:
+                  number: 80
+    - host: admin.api.wepromolink.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backoffice-service
                 port:
                   number: 80
     - host: dev.wepromolink.io

@@ -13,6 +13,7 @@ public class HitGeoLocalizedSuccessEvent : BaseEvent, IRequest<bool>
     public string? FlagUrl { get; set; }
     public decimal? Longitud { get; set; }
     public decimal? Latitud { get; set; }
+    public bool FirstTime { get; set; }
 
     public HitGeoLocalizedSuccessEvent()
     {

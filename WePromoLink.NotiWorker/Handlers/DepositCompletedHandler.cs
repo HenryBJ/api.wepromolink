@@ -1,23 +1,31 @@
 using MediatR;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events;
+using WePromoLink.DTO.SignalR;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Services.Email;
+using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.Handlers;
 
 public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bool>
 {
-    private readonly DataContext _db;
+    private readonly IServiceScopeFactory _fac;
+    private readonly MessageBroker<DashboardStatus> _senderDashboard;
     private readonly IEmailSender _senderEmail;
-    public DepositCompletedHandler(IEmailSender senderEmail, DataContext db)
+    public DepositCompletedHandler(IEmailSender senderEmail, IServiceScopeFactory fac, MessageBroker<DashboardStatus> senderDashboard)
     {
         _senderEmail = senderEmail;
-        _db = db;
+        _fac = fac;
+        _senderDashboard = senderDashboard;
     }
     public Task<bool> Handle(DepositCompletedEvent request, CancellationToken cancellationToken)
     {
+        
+        using var scope = _fac.CreateScope();
+        var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         // Notificamos del Deposito
         var noti = new NotificationModel
         {
@@ -33,6 +41,25 @@ public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bo
 
         // Enviamos un correo
         _senderEmail.Send(request.Name!, request.Email!, "Deposit completed", Templates.Deposit(new { user = request.Name, amount = request.Amount.ToString("C") })).GetAwaiter().GetResult();
+
+        _senderDashboard.Send(new DashboardStatus
+        {
+            Clicks = 0,
+            CampaignBudget = 0,
+            Campaigns = 0,
+            Deposit = 1,
+            GeoLocations = 0,
+            Hits = 0,
+            RegisteredUsers = 0,
+            Shareds = 0,
+            TotalAvailable = 0,
+            TotalProfit = 0,
+            Transactions = 0,
+            UnVerifiedUsers = 0,
+            VerifiedUsers = 0,
+            Withdraw = 0,
+            CampaignReported = 0,
+        });
 
         return Task.FromResult(true);
     }
