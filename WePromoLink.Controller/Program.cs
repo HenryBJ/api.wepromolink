@@ -20,6 +20,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         var connectionString = configuration.GetConnectionString("Default");
         services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
 
+        services.AddHttpContextAccessor();
         services.AddSingleton<IShareCache>(x =>
         {
             return new RedisCache(
