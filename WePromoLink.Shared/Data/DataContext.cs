@@ -7,7 +7,6 @@ namespace WePromoLink.Data;
 public class DataContext : DbContext
 {
 
-    public virtual DbSet<PushModel> Pushes { get; set; }
     public virtual DbSet<SubscriptionFeatureModel> SubscriptionFeatures { get; set; }
     public virtual DbSet<ImageDataModel> ImageDatas { get; set; }
     public virtual DbSet<GeoDataModel> GeoDatas { get; set; }
@@ -89,11 +88,6 @@ public class DataContext : DbContext
                 new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = true,SubscriptionPlanModelId = subPlanCommunity},
                 new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional}
         });
-        });
-
-        builder.Entity<PushModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
         });
 
         builder.Entity<ImageDataModel>(entity =>

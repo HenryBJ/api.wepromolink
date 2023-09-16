@@ -395,11 +395,11 @@ public class CampaignService : ICampaignService
         if (timestamp != 0)
         {
             // Agrega los datos a la caché
-            _cache.Set(cacheKey, campaigns, new MemoryCacheEntryOptions { Size = 1 });
+            _cache.Set(cacheKey, campaigns, TimeSpan.FromMinutes(30));
 
             string newETag = await Nanoid.Nanoid.GenerateAsync(size: 12);
             _httpContextAccessor.HttpContext.Response.Headers["ETag"] = newETag;
-            _cache.Set(cacheKeyETag, newETag, new MemoryCacheEntryOptions { Size = 1 }); // Almacena el nuevo ETag en la caché
+            _cache.Set(cacheKeyETag, newETag, TimeSpan.FromMinutes(30)); // Almacena el nuevo ETag en la caché
         }
 
         // Devuelve los datos obtenidos

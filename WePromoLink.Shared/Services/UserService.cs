@@ -80,7 +80,6 @@ public class UserService : IUserService
             Locked = new LockedModel(),
             PayoutStat = new PayoutStatModel(),
             Profit = new ProfitModel(),
-            Push = new PushModel(),
             FirebaseId = firebaseId,
 
 

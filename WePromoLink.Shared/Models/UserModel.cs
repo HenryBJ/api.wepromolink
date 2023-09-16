@@ -19,7 +19,6 @@ public class UserModel
     public virtual SubscriptionModel Subscription { get; set; }
     public Guid SubscriptionModelId { get; set; }
     public DateTime CreatedAt { get; set; }
-    public PushModel Push { get; set; }
     public AvailableModel Available { get; set; }
     public BudgetModel Budget { get; set; }
     public LockedModel Locked { get; set; }

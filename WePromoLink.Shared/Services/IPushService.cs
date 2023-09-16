@@ -10,5 +10,4 @@ public interface IPushService
     Task SetPushNotification(Guid UserId, Action<PushNotification> pushReducer);
     Task SetPushNotification(string firebaseId, Action<PushNotification> pushReducer);
 
-    Task<PushNotification> UpdatePushNotification(PushNotification newNotification);
 }

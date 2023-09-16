@@ -35,6 +35,11 @@ public class RedisCache : IShareCache, IDisposable
         _db.StringSet(key, JsonConvert.SerializeObject(value));
     }
 
+    public void Set<T>(string key, T value, TimeSpan ttl) where T : class
+    {
+        _db.StringSet(key, JsonConvert.SerializeObject(value), ttl);
+    }
+
     public bool TryGetValue<T>(string key, out T? value) where T : class
     {
         if (_db.KeyExists(key))

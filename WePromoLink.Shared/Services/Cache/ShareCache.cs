@@ -26,6 +26,11 @@ public class ShareCache : IShareCache
         _memoryCache.Set(key, value, options as MemoryCacheEntryOptions);
     }
 
+    public void Set<T>(string key, T value, TimeSpan ttl) where T : class
+    {
+        throw new NotImplementedException();
+    }
+
     public bool TryGetValue<T>(string key, out T? value) where T:class
     {
         return _memoryCache.TryGetValue(key, out value);

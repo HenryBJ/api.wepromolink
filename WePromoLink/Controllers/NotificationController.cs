@@ -15,7 +15,7 @@ public class NotificationController : ControllerBase
     private readonly INotificationService _service;
     private readonly ILogger<NotificationController> _logger;
 
-    public NotificationController(INotificationService service, IHttpContextAccessor httpContextAccessor, ILogger<NotificationController> logger)
+    public NotificationController(INotificationService service, ILogger<NotificationController> logger)
     {
         _service = service;
         _logger = logger;

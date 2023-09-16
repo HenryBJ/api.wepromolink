@@ -35,45 +35,26 @@ public class PushService : IPushService
         if (_cache.TryGetValue(key, out PushNotification push))
         {
             _logger.LogInformation("Read from cache");
-            return push;
         }
 
-        var pushModel = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Push).SingleAsync();
-        push = new PushNotification
+        var newPush = new PushNotification
         {
-            Campaign = pushModel.Campaign,
-            Clicks = pushModel.Clicks,
-            Deposit = pushModel.Deposit,
-            Etag = pushModel.Etag,
-            Links = pushModel.Links,
+            Campaign = 0,
+            Etag = Nanoid.Nanoid.Generate(size:12),
+            Links = 0,
             Messages = new List<string>(),
-            Notification = pushModel.Notification,
-            Withdraw = pushModel.Withdraw
+            Notification = 0,
+            Transaction = 0
         };
-        _cache.Set(key, push);
-        _logger.LogInformation("Read from DB");
-        return push;
+        _cache.Set(key, newPush);
+        _logger.LogInformation("Read empty push notification");
+        return push ?? newPush;
     }
 
     // This method does not get call from client only from server
     public async Task SetPushNotification(string firebaseId, PushNotification newPush)
     {
         string key = $"push_{firebaseId}";
-        var pushModel = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Push).SingleAsync();
-
-        newPush.Etag = Nanoid.Nanoid.Generate(size: 12);
-
-        pushModel.Campaign = newPush.Campaign;
-        pushModel.Clicks = newPush.Clicks;
-        pushModel.Deposit = newPush.Deposit;
-        pushModel.Etag = newPush.Etag;
-        pushModel.LastModified = DateTime.UtcNow;
-        pushModel.Links = newPush.Links;
-        pushModel.Notification = newPush.Notification;
-        pushModel.Withdraw = newPush.Withdraw;
-
-        _db.Pushes.Update(pushModel);
-        await _db.SaveChangesAsync();
         _cache.Set(key, newPush);
     }
 
@@ -97,17 +78,13 @@ public class PushService : IPushService
         }
         else
         {
-            var pushModel = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Push).SingleAsync();
             push = new PushNotification
             {
-                Campaign = pushModel.Campaign,
-                Clicks = pushModel.Clicks,
-                Deposit = pushModel.Deposit,
-                Etag = pushModel.Etag,
-                Links = pushModel.Links,
+                Campaign = 0,
+                Links = 0,
+                Transaction = 0,
                 Messages = new List<string>(),
-                Notification = pushModel.Notification,
-                Withdraw = pushModel.Withdraw
+                Notification = 0
             };
             pushReducer(push);
             push.Etag = Nanoid.Nanoid.Generate(size: 12);
@@ -124,30 +101,4 @@ public class PushService : IPushService
         await SetPushNotification(firebaseId, pushReducer);
     }
 
-    public async Task<PushNotification> UpdatePushNotification(PushNotification newNotification)
-    {
-        // var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        // Action<PushNotification> pushReducer = (e)
-        // SetPushNotification(firebaseId,)
-        return newNotification; // TODO: remove this
-
-        // string key = $"push_{firebaseId}";
-        // var pushModel = await _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.Push).SingleAsync();
-
-        // newNotification.Etag = Nanoid.Nanoid.Generate(size: 12);
-
-        // pushModel.Campaign = newNotification.Campaign;
-        // pushModel.Clicks = newNotification.Clicks;
-        // pushModel.Deposit = newNotification.Deposit;
-        // pushModel.Etag = newNotification.Etag;
-        // pushModel.LastModified = DateTime.UtcNow;
-        // pushModel.Links = newNotification.Links;
-        // pushModel.Notification = newNotification.Notification;
-        // pushModel.Withdraw = newNotification.Withdraw;
-
-        // _db.Pushes.Update(pushModel);
-        // await _db.SaveChangesAsync();
-        // _cache.Set(key, newNotification);
-        // return newNotification;
-    }
 }

@@ -39,22 +39,4 @@ public class PushController : ControllerBase
         }
     }
 
-    [HttpPut]
-    [Authorize]
-    [Route("put")]
-    public async Task<IActionResult> Put(PushNotification push)
-    {
-        try
-        {
-            await _service.UpdatePushNotification(push);
-            return new OkResult();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-
 }
