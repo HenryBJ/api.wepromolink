@@ -4,6 +4,7 @@ using WePromoLink.DTO.Events;
 using WePromoLink.DTO.SignalR;
 using WePromoLink.Enums;
 using WePromoLink.Models;
+using WePromoLink.Services;
 using WePromoLink.Services.Email;
 using WePromoLink.Shared.RabbitMQ;
 
@@ -14,15 +15,17 @@ public class CampaignCreatedHandler : IRequestHandler<CampaignCreatedEvent, bool
     private readonly IEmailSender _senderEmail;
     private readonly MessageBroker<DashboardStatus> _senderDashboard;
     private readonly IServiceScopeFactory _fac;
-    public CampaignCreatedHandler(IEmailSender senderEmail, IServiceScopeFactory fac, MessageBroker<DashboardStatus> senderDashboard)
+    private readonly IPushService _pushService;
+    public CampaignCreatedHandler(IEmailSender senderEmail, IServiceScopeFactory fac, MessageBroker<DashboardStatus> senderDashboard, IPushService pushService)
     {
         _senderEmail = senderEmail;
         _fac = fac;
         _senderDashboard = senderDashboard;
+        _pushService = pushService;
     }
     public Task<bool> Handle(CampaignCreatedEvent request, CancellationToken cancellationToken)
     {
-
+        _pushService.SetPushNotification(request.UserId, e => e.Notification++);
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
@@ -57,7 +60,7 @@ public class CampaignCreatedHandler : IRequestHandler<CampaignCreatedEvent, bool
             Withdraw = 0,
             CampaignReported = 0,
         });
-        
+
         return Task.FromResult(true);
     }
 }

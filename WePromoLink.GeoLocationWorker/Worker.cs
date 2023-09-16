@@ -80,7 +80,8 @@ public class Worker : BackgroundService
                     FlagUrl = geoData.CountryFlagUrl,
                     Latitud = geoData.Latitude,
                     Longitud = geoData.Longitude,
-                    FirstTime = true
+                    FirstTime = true,
+                    LinkOwnerId = _db.Hits.Where(e=>e.Id == hit.Id).Select(e=>e.Link.UserModelId).Single()
                 });
                 return true;
             }
@@ -117,7 +118,8 @@ public class Worker : BackgroundService
                 Country = geoData.Country,
                 FlagUrl = geoData.CountryFlagUrl,
                 Latitud = geoData.Latitude,
-                Longitud = geoData.Longitude
+                Longitud = geoData.Longitude,
+                LinkOwnerId = _db.Hits.Where(e=>e.Id == hit.Id).Select(e=>e.Link.UserModelId).Single()
             });
             return true;
         }

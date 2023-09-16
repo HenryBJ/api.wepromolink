@@ -1,12 +1,12 @@
 {
-    "wepromolink": "1.0.110",
-    "hitworker": "1.0.110",
-    "stripeworker": "1.0.110",
-    "statworker": "1.0.110",
-    "controller": "1.0.110",
-    "notiworker": "1.0.110",
-    "geolocationworker": "1.0.110",
-    "btcpayworker": "1.0.110",
-    "backoffice": "1.0.110"
+    "wepromolink": "1.0.111",
+    "hitworker": "1.0.111",
+    "stripeworker": "1.0.111",
+    "statworker": "1.0.111",
+    "controller": "1.0.111",
+    "notiworker": "1.0.111",
+    "geolocationworker": "1.0.111",
+    "btcpayworker": "1.0.111",
+    "backoffice": "1.0.111"
   }
   

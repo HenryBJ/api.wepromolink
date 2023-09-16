@@ -127,6 +127,19 @@ public class CampaignService : ICampaignService
                     Name = user.Fullname,
                     UserId = user.Id
                 });
+
+                if (campaign.Budget >= 10)
+                {
+                    _eventSender.Send(new CampaignPublishedEvent
+                    {
+                        CampaignId = item.Id,
+                        Amount = item.Budget,
+                        CampaignName = item.Title,
+                        Name = user.Fullname,
+                        UserId = user.Id
+                    });
+                }
+
                 return externalId;
             }
             catch (System.Exception ex)

@@ -3,6 +3,7 @@ using WePromoLink.Data;
 using WePromoLink.DTO.Events;
 using WePromoLink.Enums;
 using WePromoLink.Models;
+using WePromoLink.Services;
 using WePromoLink.Services.Email;
 
 namespace WePromoLink.Handlers;
@@ -11,12 +12,16 @@ public class CampaignSoldOutHandler : IRequestHandler<CampaignSoldOutEvent, bool
 {
     private readonly IEmailSender _senderEmail;
     private readonly IServiceScopeFactory _fac;
-    public CampaignSoldOutHandler(IEmailSender senderEmail)
+    private readonly IPushService _pushService;
+    public CampaignSoldOutHandler(IEmailSender senderEmail, IPushService pushService)
     {
         _senderEmail = senderEmail;
+        _pushService = pushService;
     }
     public Task<bool> Handle(CampaignSoldOutEvent request, CancellationToken cancellationToken)
     {
+
+        _pushService.SetPushNotification(request.UserId, e => e.Notification++);
 
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();

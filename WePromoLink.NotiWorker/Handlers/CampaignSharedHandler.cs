@@ -27,8 +27,9 @@ public class CampaignSharedHandler : IRequestHandler<CampaignSharedEvent, bool>
     {
         _pushService.SetPushNotification(request.OwnerUserId, e =>
         {
-            if(e.Messages == null) e.Messages = new List<string>();
-            e.Messages.Add($"<b>{request.SharedByName}</b> ha compartido la campaña <b>{request.CampaignName}</b> &#x1F389;");
+            e.Notification++;
+            if (e.Messages == null) e.Messages = new List<string>();
+            e.Messages.Add($"<b>{request.SharedByName}</b> shared your campaign <b>{request.CampaignName}</b> &#x1F389;");
         });
 
 

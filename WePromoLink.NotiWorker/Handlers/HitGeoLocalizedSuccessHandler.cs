@@ -1,6 +1,7 @@
 using MediatR;
 using WePromoLink.DTO.Events;
 using WePromoLink.DTO.SignalR;
+using WePromoLink.Services;
 using WePromoLink.Services.Email;
 using WePromoLink.Shared.RabbitMQ;
 
@@ -10,13 +11,28 @@ public class HitGeoLocalizedSuccessHandler : IRequestHandler<HitGeoLocalizedSucc
 {
     private readonly IEmailSender _senderEmail;
     private readonly MessageBroker<DashboardStatus> _senderDashboard;
-    public HitGeoLocalizedSuccessHandler(IEmailSender senderEmail, MessageBroker<DashboardStatus> senderDashboard)
+    private readonly IPushService _pushService;
+    public HitGeoLocalizedSuccessHandler(IEmailSender senderEmail, MessageBroker<DashboardStatus> senderDashboard, IPushService pushService)
     {
         _senderEmail = senderEmail;
         _senderDashboard = senderDashboard;
+        _pushService = pushService;
     }
     public Task<bool> Handle(HitGeoLocalizedSuccessEvent request, CancellationToken cancellationToken)
     {
+
+        _pushService.SetPushNotification(request.UserId, e =>
+        {
+            e.Messages ??= new List<string>();
+            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\"> to campaign <b>{request.CampaignName}</b> &#x1F973;");
+        });
+
+        _pushService.SetPushNotification(request.LinkOwnerId, e =>
+        {
+            e.Messages ??= new List<string>();
+            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\"> to your link of <b>{request.CampaignName}</b> &#x1F4B0;");
+        });
+
         if (request.FirstTime)
             _senderDashboard.Send(new DashboardStatus
             {

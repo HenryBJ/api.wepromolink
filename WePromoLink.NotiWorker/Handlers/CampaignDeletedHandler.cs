@@ -4,6 +4,7 @@ using WePromoLink.DTO.Events;
 using WePromoLink.DTO.SignalR;
 using WePromoLink.Enums;
 using WePromoLink.Models;
+using WePromoLink.Services;
 using WePromoLink.Services.Email;
 using WePromoLink.Shared.RabbitMQ;
 
@@ -12,16 +13,18 @@ namespace WePromoLink.Handlers;
 public class CampaignDeletedHandler : IRequestHandler<CampaignDeletedEvent, bool>
 {
     private readonly IEmailSender _senderEmail;
-
+    private readonly IPushService _pushService;
     private readonly MessageBroker<DashboardStatus> _senderDashboard;
     private readonly IServiceScopeFactory _fac;
-    public CampaignDeletedHandler(IEmailSender senderEmail, MessageBroker<DashboardStatus> senderDashboard)
+    public CampaignDeletedHandler(IEmailSender senderEmail, MessageBroker<DashboardStatus> senderDashboard, IPushService pushService)
     {
         _senderEmail = senderEmail;
         _senderDashboard = senderDashboard;
+        _pushService = pushService;
     }
     public Task<bool> Handle(CampaignDeletedEvent request, CancellationToken cancellationToken)
     {
+        _pushService.SetPushNotification(request.UserId, e => e.Notification++);
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
 

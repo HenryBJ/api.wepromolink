@@ -5,6 +5,7 @@ namespace WePromoLink.DTO.Events;
 public class HitGeoLocalizedSuccessEvent : BaseEvent, IRequest<bool>
 {
     public Guid UserId { get; set; }
+    public Guid LinkOwnerId { get; set; }
     public Guid CampaignId { get; set; }
     public Guid LinkId { get; set; }
     public string? OwnerName { get; set; }

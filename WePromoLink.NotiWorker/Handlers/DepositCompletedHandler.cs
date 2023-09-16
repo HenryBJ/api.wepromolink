@@ -4,6 +4,7 @@ using WePromoLink.DTO.Events;
 using WePromoLink.DTO.SignalR;
 using WePromoLink.Enums;
 using WePromoLink.Models;
+using WePromoLink.Services;
 using WePromoLink.Services.Email;
 using WePromoLink.Shared.RabbitMQ;
 
@@ -14,15 +15,17 @@ public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bo
     private readonly IServiceScopeFactory _fac;
     private readonly MessageBroker<DashboardStatus> _senderDashboard;
     private readonly IEmailSender _senderEmail;
-    public DepositCompletedHandler(IEmailSender senderEmail, IServiceScopeFactory fac, MessageBroker<DashboardStatus> senderDashboard)
+    private readonly IPushService _pushService;
+    public DepositCompletedHandler(IEmailSender senderEmail, IServiceScopeFactory fac, MessageBroker<DashboardStatus> senderDashboard, IPushService pushService)
     {
         _senderEmail = senderEmail;
         _fac = fac;
         _senderDashboard = senderDashboard;
+        _pushService = pushService;
     }
     public Task<bool> Handle(DepositCompletedEvent request, CancellationToken cancellationToken)
     {
-        
+        _pushService.SetPushNotification(request.UserId, e => { e.Transaction++; e.Notification++; });
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
