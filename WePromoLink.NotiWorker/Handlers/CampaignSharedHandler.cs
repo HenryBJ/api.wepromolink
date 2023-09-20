@@ -29,7 +29,7 @@ public class CampaignSharedHandler : IRequestHandler<CampaignSharedEvent, bool>
         {
             e.Notification++;
             if (e.Messages == null) e.Messages = new List<string>();
-            e.Messages.Add($"<b>{request.SharedByName}</b> shared your campaign <b>{request.CampaignName}</b> &#x1F389;");
+            e.Messages.Add($"<b>{request.SharedByName}</b> shares your campaign <b>{request.CampaignName}</b> &#x1F389;");
         });
 
 
