@@ -4,6 +4,7 @@ public class SubscriptionPlanModel
 {
     public Guid Id { get; set; }
     public string ExternalId { get; set; }
+    public int Level { get; set; }
     public string? MonthlyProductId { get; set; }
     public string? AnnualyProductId { get; set; }
     public string MonthlyPaymantLink { get; set; }
@@ -14,9 +15,6 @@ public class SubscriptionPlanModel
     public decimal Monthly { get; set; }
     public decimal Annually { get; set; }
     public decimal Discount { get; set; }
-    public decimal DepositFee { get; set; }
-    public decimal PayoutFee { get; set; }
-    public decimal PayoutMinimun { get; set; }
     public string PaymentMethod { get; set; }
     public string Tag { get; set; }
     public List<SubscriptionFeatureModel> Features { get; set; }

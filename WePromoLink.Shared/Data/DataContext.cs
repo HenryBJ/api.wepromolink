@@ -6,7 +6,12 @@ namespace WePromoLink.Data;
 
 public class DataContext : DbContext
 {
-
+    public virtual DbSet<AffiliatedUserModel> AffiliatedUsers { get; set; }
+    public virtual DbSet<ProfileModel> Profiles { get; set; }
+    public virtual DbSet<MyPageModel> MyPages { get; set; }
+    public virtual DbSet<SettingModel> Settings { get; set; }
+    public virtual DbSet<PrivacyModel> Privacies { get; set; }
+    public virtual DbSet<AffiliateModel> AffiliatePrograms { get; set; }
     public virtual DbSet<SubscriptionFeatureModel> SubscriptionFeatures { get; set; }
     public virtual DbSet<ImageDataModel> ImageDatas { get; set; }
     public virtual DbSet<GeoDataModel> GeoDatas { get; set; }
@@ -90,6 +95,41 @@ public class DataContext : DbContext
         });
         });
 
+
+        builder.Entity<AffiliatedUserModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.User)
+            .WithMany(e => e.AffiliatedUsers)
+            .HasForeignKey(e => e.UserModelId)
+            .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        builder.Entity<ProfileModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<MyPageModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<SettingModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<PrivacyModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<AffiliateModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
         builder.Entity<ImageDataModel>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -155,10 +195,7 @@ public class DataContext : DbContext
             entity.HasIndex(e => e.ExternalId);
             entity.Property(e => e.Monthly).HasPrecision(10, 4);
             entity.Property(e => e.Annually).HasPrecision(10, 4);
-            entity.Property(e => e.DepositFee).HasPrecision(10, 4);
             entity.Property(e => e.Discount).HasPrecision(10, 4);
-            entity.Property(e => e.PayoutFee).HasPrecision(10, 4);
-            entity.Property(e => e.PayoutMinimun).HasPrecision(10, 4);
 
             entity.HasData(new[]{
                 new SubscriptionPlanModel {
@@ -168,10 +205,8 @@ public class DataContext : DbContext
                     Annually = 244,
                     Monthly = 24,
                     Discount = 15,
-                    DepositFee = 0,
-                    PayoutFee = 0,
+                    Level = 2,
                     PaymentMethod = "stripe",
-                    PayoutMinimun = 50,
                     Tag = "Popular",
                     Title = "Professional",
                     MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
@@ -186,10 +221,8 @@ public class DataContext : DbContext
                     Annually = 0,
                     Monthly = 0,
                     Discount = 0,
-                    DepositFee = 9,
-                    PayoutFee = 9,
+                    Level = 1,
                     PaymentMethod = "bitcoin",
-                    PayoutMinimun = 100,
                     Tag = "",
                     Title = "Community",
                     MonthlyPaymantLink = "",
@@ -221,7 +254,7 @@ public class DataContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.ExternalId);
             entity.Property(e => e.Amount).HasPrecision(10, 4);
-            
+
             entity.HasOne(p => p.Link)
             .WithMany(l => l.Transactions)
             .HasForeignKey(p => p.LinkModelId)

@@ -83,6 +83,7 @@ namespace WePromoLink.Shared.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExternalId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Level = table.Column<int>(type: "int", nullable: false),
                     MonthlyProductId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AnnualyProductId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MonthlyPaymantLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -92,9 +93,6 @@ namespace WePromoLink.Shared.Migrations
                     Monthly = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     Annually = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     Discount = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
-                    DepositFee = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
-                    PayoutFee = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
-                    PayoutMinimun = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Tag = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Metadata = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -176,6 +174,60 @@ namespace WePromoLink.Shared.Migrations
                         name: "FK_Users_Subscriptions_SubscriptionModelId",
                         column: x => x.SubscriptionModelId,
                         principalTable: "Subscriptions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AffiliatedUsers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    TotalPayments = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    NumberPayments = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AffiliatedUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AffiliatedUsers_Users_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AffiliatedUsers_Users_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AffiliatePrograms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    AffiliateLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Affiliates = table.Column<int>(type: "int", nullable: false),
+                    Profit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MRR = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    OTR = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AffiliatePrograms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AffiliatePrograms_Users_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -809,6 +861,33 @@ namespace WePromoLink.Shared.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MyPages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    Visited = table.Column<int>(type: "int", nullable: false),
+                    Conversion = table.Column<int>(type: "int", nullable: false),
+                    CallOfAction = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    QRUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Template = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MyPages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MyPages_Users_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Notifications",
                 columns: table => new
                 {
@@ -860,6 +939,60 @@ namespace WePromoLink.Shared.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Privacies",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ShowEmailOnProfile = table.Column<bool>(type: "bit", nullable: false),
+                    ShowSocialsOnProfile = table.Column<bool>(type: "bit", nullable: false),
+                    ShowCampaignsOnProfile = table.Column<bool>(type: "bit", nullable: false),
+                    ShowLinksOnProfile = table.Column<bool>(type: "bit", nullable: false),
+                    ShowProfitOnProfile = table.Column<bool>(type: "bit", nullable: false),
+                    ShowAffiliateLinkOnProfile = table.Column<bool>(type: "bit", nullable: false),
+                    ShowQRUrlOnProfile = table.Column<bool>(type: "bit", nullable: false),
+                    PublicMyPage = table.Column<bool>(type: "bit", nullable: false),
+                    ShowAffiliateLinkOnMyPage = table.Column<bool>(type: "bit", nullable: false),
+                    ShowCallOfActionOnMyPage = table.Column<bool>(type: "bit", nullable: false),
+                    ShowLinksOnMyPage = table.Column<bool>(type: "bit", nullable: false),
+                    ShowSocialsOnMyPage = table.Column<bool>(type: "bit", nullable: false),
+                    UseMyPageTemplate = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Privacies", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Privacies_Users_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Profiles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Social = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MyPageId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Profiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Profiles_Users_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Profits",
                 columns: table => new
                 {
@@ -877,6 +1010,59 @@ namespace WePromoLink.Shared.Migrations
                     table.PrimaryKey("PK_Profits", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Profits_Users_UserModelId",
+                        column: x => x.UserModelId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Settings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Language = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CampaignLanguages = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CampaignClickedOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignClickedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignClickedOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignCreatedOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignCreatedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignCreatedOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignDeletedOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignDeletedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignDeletedOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignEditedOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignEditedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignEditedOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignPublishedOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignPublishedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignPublishedOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignSharedOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignSharedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignSharedOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignSoldOutOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignSoldOutOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignSoldOutOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignUnPublishedOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignUnPublishedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    CampaignUnPublishedOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    LinkClickedOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    LinkClickedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    LinkClickedOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    LinkCreatedOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    LinkCreatedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    LinkCreatedOnEmail = table.Column<bool>(type: "bit", nullable: false),
+                    HitGeoLocalizedSuccessOnNotification = table.Column<bool>(type: "bit", nullable: false),
+                    HitGeoLocalizedSuccessOnRealTime = table.Column<bool>(type: "bit", nullable: false),
+                    HitGeoLocalizedSuccessOnEmail = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Settings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Settings_Users_UserModelId",
                         column: x => x.UserModelId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -1626,23 +1812,23 @@ namespace WePromoLink.Shared.Migrations
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
-                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("a47863c6-fea0-4de2-8216-ac65a3053986"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 0m, 15m, "qcTXnN0JeIZ0", null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", 0m, 50m, "Popular", "Professional" });
+                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "Tag", "Title" },
+                values: new object[] { new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4"), 0m, "", "", 0m, "SOks5GRn4l0U", 1, null, 0m, "", "", 1, "bitcoin", "", "Community" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
-                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "DepositFee", "Discount", "ExternalId", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "PayoutFee", "PayoutMinimun", "Tag", "Title" },
-                values: new object[] { new Guid("ed3d7e4d-f701-472d-86ad-2b07a1c75150"), 0m, "", "", 9m, 0m, "LEKiSP4dG248", null, 0m, "", "", 1, "bitcoin", 9m, 100m, "", "Community" });
+                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "Tag", "Title" },
+                values: new object[] { new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 15m, "0B0wpjmqQIlD", 2, null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", "Popular", "Professional" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("21ba70ec-5a56-4ab7-b987-c7a23dbab362"), false, "Contain ads", new Guid("a47863c6-fea0-4de2-8216-ac65a3053986"), null });
+                values: new object[] { new Guid("721d6c59-3f1d-4489-8761-5db7e50ba83e"), false, "Contain ads", new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37"), null });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("ea82fafe-d6a8-450c-90c0-b3cf4306c398"), true, "Contain ads", new Guid("ed3d7e4d-f701-472d-86ad-2b07a1c75150"), null });
+                values: new object[] { new Guid("b893be68-4a00-41e3-83ce-dd8da502f46d"), true, "Contain ads", new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4"), null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AbuseReports_CampaignId",
@@ -1653,6 +1839,22 @@ namespace WePromoLink.Shared.Migrations
                 name: "IX_AbuseReports_UserId",
                 table: "AbuseReports",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AffiliatedUsers_ParentId",
+                table: "AffiliatedUsers",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AffiliatedUsers_UserModelId",
+                table: "AffiliatedUsers",
+                column: "UserModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AffiliatePrograms_UserModelId",
+                table: "AffiliatePrograms",
+                column: "UserModelId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Availables_UserModelId",
@@ -1887,6 +2089,12 @@ namespace WePromoLink.Shared.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_MyPages_UserModelId",
+                table: "MyPages",
+                column: "UserModelId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notifications_ExternalId",
                 table: "Notifications",
                 column: "ExternalId");
@@ -1923,8 +2131,26 @@ namespace WePromoLink.Shared.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Privacies_UserModelId",
+                table: "Privacies",
+                column: "UserModelId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Profiles_UserModelId",
+                table: "Profiles",
+                column: "UserModelId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Profits_UserModelId",
                 table: "Profits",
+                column: "UserModelId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Settings_UserModelId",
+                table: "Settings",
                 column: "UserModelId",
                 unique: true);
 
@@ -1994,6 +2220,12 @@ namespace WePromoLink.Shared.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AbuseReports");
+
+            migrationBuilder.DropTable(
+                name: "AffiliatedUsers");
+
+            migrationBuilder.DropTable(
+                name: "AffiliatePrograms");
 
             migrationBuilder.DropTable(
                 name: "Availables");
@@ -2098,6 +2330,9 @@ namespace WePromoLink.Shared.Migrations
                 name: "Lockeds");
 
             migrationBuilder.DropTable(
+                name: "MyPages");
+
+            migrationBuilder.DropTable(
                 name: "Notifications");
 
             migrationBuilder.DropTable(
@@ -2107,7 +2342,16 @@ namespace WePromoLink.Shared.Migrations
                 name: "PayoutStats");
 
             migrationBuilder.DropTable(
+                name: "Privacies");
+
+            migrationBuilder.DropTable(
+                name: "Profiles");
+
+            migrationBuilder.DropTable(
                 name: "Profits");
+
+            migrationBuilder.DropTable(
+                name: "Settings");
 
             migrationBuilder.DropTable(
                 name: "SharedLastWeekOnCampaigns");

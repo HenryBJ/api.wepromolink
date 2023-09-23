@@ -293,8 +293,7 @@ public class Worker : BackgroundService
         .ThenInclude(e => e.SubscriptionPlan)
         .SingleOrDefault();
 
-        var payoutMinimun = user?.Subscription.SubscriptionPlan.PayoutMinimun;
-        if (payoutMinimun == null) return;
+        var payoutMinimun = 50;
         if (payoutMinimun > oldProfit + newProfit) return;
         if (payoutMinimun > oldProfit && payoutMinimun < (oldProfit + newProfit))
         {
@@ -303,7 +302,7 @@ public class Worker : BackgroundService
                 Name = user?.Fullname,
                 Profit = oldProfit + newProfit,
                 UserId = user?.Id ?? Guid.Empty,
-                WihtdrawThreshold = payoutMinimun ?? 0
+                WihtdrawThreshold = payoutMinimun
             });
         }
     }

@@ -81,7 +81,12 @@ public class UserService : IUserService
             PayoutStat = new PayoutStatModel(),
             Profit = new ProfitModel(),
             FirebaseId = firebaseId,
-
+            AffiliateProgram = new AffiliateModel(),
+            Privacy = new PrivacyModel(),
+            Setting = new SettingModel(),
+            Profile = new ProfileModel(),
+            MyPage = new MyPageModel(),
+            AffiliatedUsers = new List<AffiliatedUserModel>(),
 
             Subscription = new SubscriptionModel
             {

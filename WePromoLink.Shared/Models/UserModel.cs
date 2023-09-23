@@ -42,5 +42,11 @@ public class UserModel
     public HistoryClicksOnLinksUserModel HistoryClicksOnLinksUser { get; set; }
     public BitcoinBillingMethod BitcoinBillingMethod { get; set; }
     public StripeBillingMethod StripeBillingMethod { get; set; }
+    public ProfileModel Profile { get; set; }
+    public MyPageModel MyPage { get; set; }
+    public SettingModel Setting { get; set; }
+    public PrivacyModel Privacy { get; set; }
+    public AffiliateModel AffiliateProgram { get; set; }
+    public List<AffiliatedUserModel> AffiliatedUsers { get; set; }
 
 }

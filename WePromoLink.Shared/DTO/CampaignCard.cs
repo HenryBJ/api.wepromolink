@@ -9,6 +9,7 @@ public class CampaignCard
     public ImageData? ImageBundle { get; set; }
     public string? AutorImageUrl { get; set; }
     public string? AutorName { get; set; }
+    public string? AutorExternalId { get; set; }
     public long LastModified { get; set; }
     
 }

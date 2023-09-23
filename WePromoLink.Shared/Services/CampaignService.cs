@@ -364,6 +364,7 @@ public class CampaignService : ICampaignService
             campaigns = items
             .Select(e => new CampaignCard
             {
+                AutorExternalId = e.User.ExternalId,
                 AutorName = e.User.Fullname,
                 AutorImageUrl = e.User.ThumbnailImageUrl,
                 Description = e.Description,
@@ -393,6 +394,7 @@ public class CampaignService : ICampaignService
             campaigns = items
             .Select(e => new CampaignCard
             {
+                AutorExternalId = e.User.ExternalId,
                 AutorName = e.User.Fullname,
                 AutorImageUrl = e.User.ThumbnailImageUrl,
                 Description = e.Description,

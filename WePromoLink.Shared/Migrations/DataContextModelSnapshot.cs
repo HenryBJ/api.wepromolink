@@ -95,6 +95,81 @@ namespace WePromoLink.Shared.Migrations
                     b.ToTable("AbuseReports");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.AffiliatedUserModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("NumberPayments")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("TotalPayments")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("UserModelId");
+
+                    b.ToTable("AffiliatedUsers");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.AffiliateModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AffiliateLink")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Affiliates")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("MRR")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("OTR")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Profit")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("AffiliatePrograms");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.AvailableModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2474,6 +2549,56 @@ namespace WePromoLink.Shared.Migrations
                     b.ToTable("Lockeds");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.MyPageModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CallOfAction")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Conversion")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageHeaderUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QRUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Template")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Visited")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("MyPages");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.NotificationModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2619,6 +2744,97 @@ namespace WePromoLink.Shared.Migrations
                     b.ToTable("PayoutStats");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.PrivacyModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("PublicMyPage")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowAffiliateLinkOnMyPage")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowAffiliateLinkOnProfile")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowCallOfActionOnMyPage")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowCampaignsOnProfile")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowEmailOnProfile")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowLinksOnMyPage")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowLinksOnProfile")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowProfitOnProfile")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowQRUrlOnProfile")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowSocialsOnMyPage")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowSocialsOnProfile")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("UseMyPageTemplate")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("Privacies");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ProfileModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageHeaderUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MyPageId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Social")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("Profiles");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.ProfitModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2653,6 +2869,130 @@ namespace WePromoLink.Shared.Migrations
                         .IsUnique();
 
                     b.ToTable("Profits");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SettingModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("CampaignClickedOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignClickedOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignClickedOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignCreatedOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignCreatedOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignCreatedOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignDeletedOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignDeletedOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignDeletedOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignEditedOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignEditedOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignEditedOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CampaignLanguages")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("CampaignPublishedOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignPublishedOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignPublishedOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignSharedOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignSharedOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignSharedOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignSoldOutOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignSoldOutOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignSoldOutOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignUnPublishedOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignUnPublishedOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CampaignUnPublishedOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HitGeoLocalizedSuccessOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HitGeoLocalizedSuccessOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("HitGeoLocalizedSuccessOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LinkClickedOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LinkClickedOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LinkClickedOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LinkCreatedOnEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LinkCreatedOnNotification")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LinkCreatedOnRealTime")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("UserModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserModelId")
+                        .IsUnique();
+
+                    b.ToTable("Settings");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.SharedLastWeekOnCampaignModel", b =>
@@ -2855,17 +3195,17 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("ea82fafe-d6a8-450c-90c0-b3cf4306c398"),
+                            Id = new Guid("b893be68-4a00-41e3-83ce-dd8da502f46d"),
                             BoolValue = true,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("ed3d7e4d-f701-472d-86ad-2b07a1c75150")
+                            SubscriptionPlanModelId = new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4")
                         },
                         new
                         {
-                            Id = new Guid("21ba70ec-5a56-4ab7-b987-c7a23dbab362"),
+                            Id = new Guid("721d6c59-3f1d-4489-8761-5db7e50ba83e"),
                             BoolValue = false,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("a47863c6-fea0-4de2-8216-ac65a3053986")
+                            SubscriptionPlanModelId = new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37")
                         });
                 });
 
@@ -2933,10 +3273,6 @@ namespace WePromoLink.Shared.Migrations
                     b.Property<string>("AnnualyProductId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("DepositFee")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("decimal(10,4)");
-
                     b.Property<decimal>("Discount")
                         .HasPrecision(10, 4)
                         .HasColumnType("decimal(10,4)");
@@ -2944,6 +3280,9 @@ namespace WePromoLink.Shared.Migrations
                     b.Property<string>("ExternalId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
 
                     b.Property<string>("Metadata")
                         .HasColumnType("nvarchar(max)");
@@ -2966,14 +3305,6 @@ namespace WePromoLink.Shared.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("PayoutFee")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("decimal(10,4)");
-
-                    b.Property<decimal>("PayoutMinimun")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("decimal(10,4)");
-
                     b.Property<string>("Tag")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -2991,39 +3322,35 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a47863c6-fea0-4de2-8216-ac65a3053986"),
+                            Id = new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
-                            DepositFee = 0m,
                             Discount = 15m,
-                            ExternalId = "qcTXnN0JeIZ0",
+                            ExternalId = "0B0wpjmqQIlD",
+                            Level = 2,
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
                             MonthlyProductId = "prod_NpnKrvEvvWJtqG",
                             Order = 2,
                             PaymentMethod = "stripe",
-                            PayoutFee = 0m,
-                            PayoutMinimun = 50m,
                             Tag = "Popular",
                             Title = "Professional"
                         },
                         new
                         {
-                            Id = new Guid("ed3d7e4d-f701-472d-86ad-2b07a1c75150"),
+                            Id = new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
-                            DepositFee = 9m,
                             Discount = 0m,
-                            ExternalId = "LEKiSP4dG248",
+                            ExternalId = "SOks5GRn4l0U",
+                            Level = 1,
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
                             MonthlyProductId = "",
                             Order = 1,
                             PaymentMethod = "bitcoin",
-                            PayoutFee = 9m,
-                            PayoutMinimun = 100m,
                             Tag = "",
                             Title = "Community"
                         });
@@ -3113,6 +3440,36 @@ namespace WePromoLink.Shared.Migrations
                     b.Navigation("Campaign");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.AffiliatedUserModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WePromoLink.Models.UserModel", "User")
+                        .WithMany("AffiliatedUsers")
+                        .HasForeignKey("UserModelId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.AffiliateModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "UserModel")
+                        .WithOne("AffiliateProgram")
+                        .HasForeignKey("WePromoLink.Models.AffiliateModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserModel");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.AvailableModel", b =>
@@ -3501,6 +3858,17 @@ namespace WePromoLink.Shared.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.MyPageModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "UserModel")
+                        .WithOne("MyPage")
+                        .HasForeignKey("WePromoLink.Models.MyPageModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserModel");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.NotificationModel", b =>
                 {
                     b.HasOne("WePromoLink.Models.UserModel", "User")
@@ -3547,6 +3915,28 @@ namespace WePromoLink.Shared.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.PrivacyModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "UserModel")
+                        .WithOne("Privacy")
+                        .HasForeignKey("WePromoLink.Models.PrivacyModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserModel");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.ProfileModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "UserModel")
+                        .WithOne("Profile")
+                        .HasForeignKey("WePromoLink.Models.ProfileModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserModel");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.ProfitModel", b =>
                 {
                     b.HasOne("WePromoLink.Models.UserModel", "User")
@@ -3556,6 +3946,17 @@ namespace WePromoLink.Shared.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SettingModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.UserModel", "UserModel")
+                        .WithOne("Setting")
+                        .HasForeignKey("WePromoLink.Models.SettingModel", "UserModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserModel");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.SharedLastWeekOnCampaignModel", b =>
@@ -3721,6 +4122,11 @@ namespace WePromoLink.Shared.Migrations
 
             modelBuilder.Entity("WePromoLink.Models.UserModel", b =>
                 {
+                    b.Navigation("AffiliateProgram")
+                        .IsRequired();
+
+                    b.Navigation("AffiliatedUsers");
+
                     b.Navigation("Available")
                         .IsRequired();
 
@@ -3779,12 +4185,24 @@ namespace WePromoLink.Shared.Migrations
                     b.Navigation("Locked")
                         .IsRequired();
 
+                    b.Navigation("MyPage")
+                        .IsRequired();
+
                     b.Navigation("Notifications");
 
                     b.Navigation("PayoutStat")
                         .IsRequired();
 
+                    b.Navigation("Privacy")
+                        .IsRequired();
+
+                    b.Navigation("Profile")
+                        .IsRequired();
+
                     b.Navigation("Profit")
+                        .IsRequired();
+
+                    b.Navigation("Setting")
                         .IsRequired();
 
                     b.Navigation("SharedLastWeek")

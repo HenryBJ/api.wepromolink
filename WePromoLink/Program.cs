@@ -22,6 +22,7 @@ using WePromoLink.Services.Cache;
 using WePromoLink.Services.SignalR;
 using WePromoLink.DTO.Events;
 using WePromoLink.DTO.SignalR;
+using WePromoLink.Services.Profile;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
@@ -71,6 +72,7 @@ builder.Services.AddScoped<BTCPayServerClient>(x =>
 
 builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<IPushService, PushService>();
+builder.Services.AddTransient<IProfileService, ProfileService>();
 
 
 
