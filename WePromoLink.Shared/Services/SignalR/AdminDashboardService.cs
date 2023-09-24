@@ -53,8 +53,8 @@ public class AdminDashboardService: IAdminDashboardHub
             TotalAvailable = await _db.Availables.Select(e => e.Value).SumAsync(),
             TotalProfit = await _db.Profits.Select(e => e.Value).SumAsync(),
             Transactions = await _db.PaymentTransactions.LongCountAsync(),
-            UnVerifiedUsers = await _db.BitcoinBillings.Where(e => !e.IsVerified).LongCountAsync() + await _db.StripeBillings.Where(e => !e.IsVerified).LongCountAsync(),
-            VerifiedUsers = await _db.BitcoinBillings.Where(e => e.IsVerified).LongCountAsync() + await _db.StripeBillings.Where(e => e.IsVerified).LongCountAsync(),
+            UnVerifiedUsers = await _db.StripeBillings.Where(e => !e.IsVerified).LongCountAsync(),
+            VerifiedUsers = await _db.StripeBillings.Where(e => e.IsVerified).LongCountAsync(),
             CampaignReported = await _db.AbuseReports.LongCountAsync(),
             LastModified = DateTime.UtcNow
         };

@@ -3,7 +3,7 @@ namespace WePromoLink.Models;
 public class ProfileModel
 {
     public Guid Id { get; set; }
-    public UserModel UserModel { get; set; }
+    public virtual UserModel UserModel { get; set; }
     public Guid UserModelId { get; set; }
     public string? ImageUrl { get; set; }
     public string ImageHeaderUrl { get; set; }

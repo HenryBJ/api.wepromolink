@@ -3,7 +3,7 @@ namespace WePromoLink.Models;
 public class AffiliateModel
 {
     public Guid Id { get; set; }
-    public UserModel UserModel { get; set; }
+    public virtual UserModel UserModel { get; set; }
     public Guid UserModelId { get; set; }
     public bool Active { get; set; }
     public string AffiliateLink { get; set; }

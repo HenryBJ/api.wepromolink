@@ -3,7 +3,7 @@ namespace WePromoLink.Models;
 public class SettingModel
 {
     public Guid Id { get; set; }
-    public UserModel UserModel { get; set; }
+    public virtual UserModel UserModel { get; set; }
     public Guid UserModelId { get; set; }
     public string Language { get; set; }
     public string CampaignLanguages { get; set; }

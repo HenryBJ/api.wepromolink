@@ -3,7 +3,7 @@ namespace WePromoLink.Models;
 public class PrivacyModel
 {
     public Guid Id { get; set; }
-    public UserModel UserModel { get; set; }
+    public virtual UserModel UserModel { get; set; }
     public Guid UserModelId { get; set; }
 
     // Profile
