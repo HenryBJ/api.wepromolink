@@ -214,9 +214,9 @@ namespace WePromoLink.Shared.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
-                    AffiliateLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AffiliateLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Affiliates = table.Column<int>(type: "int", nullable: false),
-                    Profit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Profit = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     MRR = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     OTR = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -869,12 +869,12 @@ namespace WePromoLink.Shared.Migrations
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     Visited = table.Column<int>(type: "int", nullable: false),
                     Conversion = table.Column<int>(type: "int", nullable: false),
-                    CallOfAction = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    QRUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Template = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CallOfAction = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    QRUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Template = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -976,10 +976,10 @@ namespace WePromoLink.Shared.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Social = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MyPageId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Social = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MyPageId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1022,8 +1022,8 @@ namespace WePromoLink.Shared.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Language = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CampaignLanguages = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Language = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CampaignLanguages = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CampaignClickedOnNotification = table.Column<bool>(type: "bit", nullable: false),
                     CampaignClickedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
                     CampaignClickedOnEmail = table.Column<bool>(type: "bit", nullable: false),
@@ -1813,22 +1813,22 @@ namespace WePromoLink.Shared.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "Tag", "Title" },
-                values: new object[] { new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4"), 0m, "", "", 0m, "SOks5GRn4l0U", 1, null, 0m, "", "", 1, "bitcoin", "", "Community" });
+                values: new object[] { new Guid("15d45f84-5e65-4f43-804a-f10a05d61b46"), 0m, "", "", 0m, "1OOTIdZwPLdN", 1, null, 0m, "", "", 1, "bitcoin", "", "Community" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "Tag", "Title" },
-                values: new object[] { new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 15m, "0B0wpjmqQIlD", 2, null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", "Popular", "Professional" });
+                values: new object[] { new Guid("e1f8daa3-22ed-486a-984b-f916ddcead32"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 15m, "ryTKpTK_SjF_", 2, null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", "Popular", "Professional" });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("721d6c59-3f1d-4489-8761-5db7e50ba83e"), false, "Contain ads", new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37"), null });
+                values: new object[] { new Guid("55fb5c25-79d9-43df-b851-f609e0162990"), false, "Contain ads", new Guid("e1f8daa3-22ed-486a-984b-f916ddcead32"), null });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("b893be68-4a00-41e3-83ce-dd8da502f46d"), true, "Contain ads", new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4"), null });
+                values: new object[] { new Guid("dc130297-3061-4fc0-ab7e-4dd25cc8e6b2"), true, "Contain ads", new Guid("15d45f84-5e65-4f43-804a-f10a05d61b46"), null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AbuseReports_CampaignId",

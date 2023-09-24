@@ -5,8 +5,8 @@ public class SettingModel
     public Guid Id { get; set; }
     public virtual UserModel UserModel { get; set; }
     public Guid UserModelId { get; set; }
-    public string Language { get; set; }
-    public string CampaignLanguages { get; set; }
+    public string? Language { get; set; }
+    public string? CampaignLanguages { get; set; }
 
     // Notifications
     public bool CampaignClickedOnNotification { get; set; }

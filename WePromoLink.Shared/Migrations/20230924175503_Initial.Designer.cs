@@ -12,7 +12,7 @@ using WePromoLink.Data;
 namespace WePromoLink.Shared.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230923151725_Initial")]
+    [Migration("20230924175503_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -143,7 +143,6 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("AffiliateLink")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Affiliates")
@@ -158,7 +157,7 @@ namespace WePromoLink.Shared.Migrations
                     b.Property<decimal?>("OTR")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("Profit")
+                    b.Property<decimal?>("Profit")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("UserModelId")
@@ -2561,30 +2560,24 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("CallOfAction")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Conversion")
                         .HasColumnType("int");
 
                     b.Property<string>("ImageHeaderUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("QRUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Template")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Text")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserModelId")
@@ -2812,18 +2805,15 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageHeaderUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MyPageId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Social")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserModelId")
@@ -2916,7 +2906,6 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("CampaignLanguages")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("CampaignPublishedOnEmail")
@@ -2965,7 +2954,6 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Language")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LinkClickedOnEmail")
@@ -3197,17 +3185,17 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b893be68-4a00-41e3-83ce-dd8da502f46d"),
+                            Id = new Guid("dc130297-3061-4fc0-ab7e-4dd25cc8e6b2"),
                             BoolValue = true,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4")
+                            SubscriptionPlanModelId = new Guid("15d45f84-5e65-4f43-804a-f10a05d61b46")
                         },
                         new
                         {
-                            Id = new Guid("721d6c59-3f1d-4489-8761-5db7e50ba83e"),
+                            Id = new Guid("55fb5c25-79d9-43df-b851-f609e0162990"),
                             BoolValue = false,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37")
+                            SubscriptionPlanModelId = new Guid("e1f8daa3-22ed-486a-984b-f916ddcead32")
                         });
                 });
 
@@ -3324,12 +3312,12 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37"),
+                            Id = new Guid("e1f8daa3-22ed-486a-984b-f916ddcead32"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             Discount = 15m,
-                            ExternalId = "0B0wpjmqQIlD",
+                            ExternalId = "ryTKpTK_SjF_",
                             Level = 2,
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
@@ -3341,12 +3329,12 @@ namespace WePromoLink.Shared.Migrations
                         },
                         new
                         {
-                            Id = new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4"),
+                            Id = new Guid("15d45f84-5e65-4f43-804a-f10a05d61b46"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             Discount = 0m,
-                            ExternalId = "SOks5GRn4l0U",
+                            ExternalId = "1OOTIdZwPLdN",
                             Level = 1,
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
