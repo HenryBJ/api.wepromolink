@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using WePromoLink.DTO;
+using WePromoLink.DTO.Marketing;
 using WePromoLink.Services;
 using WePromoLink.Services.Marketing;
 using WePromoLink.Validators;
@@ -26,12 +27,12 @@ public class MarketingController : ControllerBase
 
     [HttpPost]
     [Route("join")]
-    public async Task<IActionResult> JoinWaitingList(string email)
+    public async Task<IActionResult> JoinWaitingList([FromBody] JoinEmail data)
     {
         try
         {
             // var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-            await _service.JoinWaitingList(email);
+            await _service.JoinWaitingList(data.Email);
             return new OkResult();
         }
         catch (System.Exception ex)
@@ -43,12 +44,12 @@ public class MarketingController : ControllerBase
 
     [HttpPost]
     [Route("datapoint")]
-    public async Task<IActionResult> AddDatapoint(Guid question, Guid answer)
+    public async Task<IActionResult> AddDatapoint([FromBody] Datapoint data)
     {
         try
         {
             // var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-            await _service.AddSurveyEntry(question, answer);
+            await _service.AddSurveyEntry(data.Question, data.Answer);
             return new OkResult();
         }
         catch (System.Exception ex)
