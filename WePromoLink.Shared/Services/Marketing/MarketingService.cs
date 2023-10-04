@@ -46,6 +46,7 @@ public class MarketingService : IMarketingService
                         var percent = dps.Count() > 0 ? (dps.Count() * 100) / total_answers : 0;
                         return new SurveyItem
                         {
+                            Id = e.Id,
                             Response = e.Value,
                             Percent = percent,
                             Value = value
