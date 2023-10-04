@@ -77,7 +77,6 @@ public class MarketingController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
     [Route("surveysummary")]
     public async Task<IActionResult> GetSurveySummary()
     {
@@ -93,6 +92,5 @@ public class MarketingController : ControllerBase
             return new StatusCodeResult(500);
         }
     }
-
 
 }

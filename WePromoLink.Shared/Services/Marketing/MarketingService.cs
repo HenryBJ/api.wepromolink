@@ -23,6 +23,7 @@ public class MarketingService : IMarketingService
         await _db.SaveChangesAsync();
     }
 
+
     public async Task<SurveySummary> GetSurveySummary()
     {
         SurveySummary result = new();
@@ -33,6 +34,7 @@ public class MarketingService : IMarketingService
         {
             var item = new SurveyData
             {
+                Id = question.Id,
                 Question = question.Value,
                 Answers = question.Answers.Select(e =>
                 {
@@ -51,6 +53,7 @@ public class MarketingService : IMarketingService
                     }
                     return new SurveyItem
                     {
+                        Id = e.Id,
                         Response = e.Value,
                         Percent = 0,
                         Value = 0

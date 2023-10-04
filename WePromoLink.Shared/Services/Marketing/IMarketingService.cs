@@ -7,5 +7,5 @@ public interface IMarketingService
     Task JoinWaitingList(string email);
     Task AddSurveyEntry(Guid question, Guid response);
     Task<string[]> GetWaitingList();
-    Task<SurveySummary> GetSurveySummary(); 
+    Task<SurveySummary> GetSurveySummary();
 }
