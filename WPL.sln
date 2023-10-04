@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WePromoLink.NotiWorker", "W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WePromoLink.BtcpayWorker", "WePromoLink.BtcpayWorker\WePromoLink.BtcpayWorker.csproj", "{F56A6FD9-8A19-4AF6-885C-A6AD28C93BAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WePromoLink.Test", "WePromoLink.Test\WePromoLink.Test.csproj", "{CE03E606-1E03-4512-B2B9-B97F459F21EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,9 @@ Global
 		{F56A6FD9-8A19-4AF6-885C-A6AD28C93BAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F56A6FD9-8A19-4AF6-885C-A6AD28C93BAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F56A6FD9-8A19-4AF6-885C-A6AD28C93BAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE03E606-1E03-4512-B2B9-B97F459F21EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE03E606-1E03-4512-B2B9-B97F459F21EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE03E606-1E03-4512-B2B9-B97F459F21EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE03E606-1E03-4512-B2B9-B97F459F21EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

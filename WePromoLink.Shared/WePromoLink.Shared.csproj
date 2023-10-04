@@ -37,6 +37,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Services\Email\Templates\Welcome.scriban-html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\Email\Templates\JoinWaitingList.scriban-html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Assets\logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

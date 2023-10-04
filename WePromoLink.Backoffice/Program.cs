@@ -34,6 +34,7 @@ builder.Services.AddSingleton<AdminDashboardService>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddTransient<IPushService, PushService>();
+builder.Services.AddTransient<StripeService>();
 
 builder.Services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
 {

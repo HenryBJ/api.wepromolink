@@ -1,11 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Polly;
+using Scriban.Syntax;
 using WePromoLink.Models;
 
 namespace WePromoLink.Data;
 
 public class DataContext : DbContext
 {
+    public virtual DbSet<JoinWaitingListModel> JoinWaitingLists { get; set; }
+    public virtual DbSet<SurveyQuestionModel> SurveyQuestions { get; set; }
+    public virtual DbSet<SurveyAnswerModel> SurveyAnswers { get; set; }
+    public virtual DbSet<SurveyDatapointModel> SurveyDatapoints { get; set; }
     public virtual DbSet<AffiliatedUserModel> AffiliatedUsers { get; set; }
     public virtual DbSet<ProfileModel> Profiles { get; set; }
     public virtual DbSet<MyPageModel> MyPages { get; set; }
@@ -95,6 +100,73 @@ public class DataContext : DbContext
         });
         });
 
+        var key1 = Guid.NewGuid();
+        var key2 = Guid.NewGuid();
+        var key3 = Guid.NewGuid();
+        var key4 = Guid.NewGuid();
+        var key5 = Guid.NewGuid();
+
+        builder.Entity<SurveyQuestionModel>(entity =>
+        {
+
+            entity.HasKey(e => e.Id);
+            entity.HasData(new[]
+            {
+                new SurveyQuestionModel {Id=key1, Group=1, Value="What motivates you to use a platform like WePromoLink?"},
+                new SurveyQuestionModel {Id=key2, Group=2, Value="Which payment methods do you prefer for platform subscriptions and earnings withdrawals?"},
+                new SurveyQuestionModel {Id=key3, Group=3, Value="Do you prefer a monthly subscription fee or paying a commission on earnings?"},
+                new SurveyQuestionModel {Id=key4 ,Group=4, Value="How useful do you find the WePromoLink platform for your advertising needs?"},
+                new SurveyQuestionModel {Id=key5, Group=5, Value="What additional features or improvements would you like to see on the WePromoLink platform?"},
+            });
+        });
+
+        builder.Entity<SurveyAnswerModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasData(new[]
+            {
+                new SurveyAnswerModel { SurveyQuestionModelId=key1, Id=Guid.NewGuid(),Value = "Earning money through affiliate marketing" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key1, Id=Guid.NewGuid(),Value = "Promoting my products or services" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key1, Id=Guid.NewGuid(),Value = "Exploring new advertising opportunities" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key1, Id=Guid.NewGuid(),Value = "Connecting with other users and businesses" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key2, Id=Guid.NewGuid(),Value = "Credit/Debit card" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key2, Id=Guid.NewGuid(),Value = "PayPal" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key2, Id=Guid.NewGuid(),Value = "Stripe" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key2, Id=Guid.NewGuid(), Value = "Bank transfer" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key3, Id=Guid.NewGuid(),Value = "Monthly subscription fee" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key3, Id=Guid.NewGuid(),Value = "Commission on earnings" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key3, Id=Guid.NewGuid(),Value = "I'm not sure" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key4, Id=Guid.NewGuid(),Value = "Extremely useful" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key4, Id=Guid.NewGuid(),Value = "Very useful" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key4, Id=Guid.NewGuid(),Value = "Somewhat useful" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key4, Id=Guid.NewGuid(),Value = "Not very useful" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key4, Id=Guid.NewGuid(),Value = "Not useful at all" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key5, Id=Guid.NewGuid(),Value = "More campaign customization options" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key5, Id=Guid.NewGuid(),Value = "Advanced analytics and reporting" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key5, Id=Guid.NewGuid(),Value = "Integration with other advertising platforms" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key5, Id=Guid.NewGuid(),Value = "Improved user interface and navigation" },
+                new SurveyAnswerModel { SurveyQuestionModelId=key5, Id=Guid.NewGuid(),Value = "I'm not sure" },
+
+            });
+        });
+
+        builder.Entity<SurveyDatapointModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.SurveyQuestionModel)
+            .WithMany(e => e.Datapoints)
+            .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(e => e.SurveyAnswerModel)
+            .WithMany(e => e.Datapoints)
+            .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        builder.Entity<JoinWaitingListModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
 
         builder.Entity<AffiliatedUserModel>(entity =>
         {

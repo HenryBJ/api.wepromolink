@@ -358,4 +358,45 @@ public class StripeService
             Console.WriteLine("Warning: ProductId is null");
         }
     }
+
+    // Backoffice methods
+
+    public async Task<PaginationList<WithdrawRequest>> GetAllWitdrawRequests(int? page, int? cant)
+    {
+        PaginationList<WithdrawRequest> list = new();
+        page ??= 1;
+        page = page <= 0 ? 1 : page;
+        cant ??= 25;
+
+        var query = _db.PaymentTransactions
+        .Include(e => e.User)
+        .ThenInclude(e => e.Available)
+       .Where(e => e.Status == TransactionStatusEnum.Requesting && e.TransactionType == TransactionTypeEnum.Withdraw);
+
+        var counter = await query.CountAsync();
+
+        list.Items = await query
+       .OrderByDescending(e => e.CreatedAt)
+       .Skip((page.Value! - 1) * cant!.Value)
+       .Take(cant!.Value)
+       .Select(e => new WithdrawRequest
+       {
+           Id = e.ExternalId,
+           Amount = e.Amount,
+           CreatedAt = e.CreatedAt,
+           Status = e.Status,
+           Title = e.Title,
+           Available = e.User != null ? e.User.Available.Value : 0,
+           UserImageUrl = e.User != null ? e.User.ThumbnailImageUrl : "",
+           UserName = e.User!.Fullname!
+       })
+       .ToListAsync();
+
+        list.Pagination.Page = page.Value!;
+        list.Pagination.TotalPages = (int)Math.Ceiling((double)counter / (double)cant!.Value);
+        list.Pagination.Cant = list.Items.Count;
+        return list;
+    }
+
+
 }

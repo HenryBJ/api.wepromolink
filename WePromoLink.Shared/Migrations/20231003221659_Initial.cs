@@ -78,6 +78,19 @@ namespace WePromoLink.Shared.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "JoinWaitingLists",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JoinWaitingLists", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SubscriptionPlans",
                 columns: table => new
                 {
@@ -100,6 +113,19 @@ namespace WePromoLink.Shared.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SubscriptionPlans", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SurveyQuestions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Group = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SurveyQuestions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -151,6 +177,25 @@ namespace WePromoLink.Shared.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SurveyAnswers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SurveyQuestionModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SurveyAnswers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SurveyAnswers_SurveyQuestions_SurveyQuestionModelId",
+                        column: x => x.SurveyQuestionModelId,
+                        principalTable: "SurveyQuestions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -176,6 +221,30 @@ namespace WePromoLink.Shared.Migrations
                         principalTable: "Subscriptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SurveyDatapoints",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SurveyAnswerModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SurveyQuestionModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SurveyDatapoints", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SurveyDatapoints_SurveyAnswers_SurveyAnswerModelId",
+                        column: x => x.SurveyAnswerModelId,
+                        principalTable: "SurveyAnswers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SurveyDatapoints_SurveyQuestions_SurveyQuestionModelId",
+                        column: x => x.SurveyQuestionModelId,
+                        principalTable: "SurveyQuestions",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -214,9 +283,9 @@ namespace WePromoLink.Shared.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false),
-                    AffiliateLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AffiliateLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Affiliates = table.Column<int>(type: "int", nullable: false),
-                    Profit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Profit = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     MRR = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     OTR = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     LastModified = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -869,12 +938,12 @@ namespace WePromoLink.Shared.Migrations
                     Active = table.Column<bool>(type: "bit", nullable: false),
                     Visited = table.Column<int>(type: "int", nullable: false),
                     Conversion = table.Column<int>(type: "int", nullable: false),
-                    CallOfAction = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    QRUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Template = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CallOfAction = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    QRUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Template = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -976,10 +1045,10 @@ namespace WePromoLink.Shared.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageHeaderUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Social = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MyPageId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Social = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MyPageId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1022,8 +1091,8 @@ namespace WePromoLink.Shared.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Language = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CampaignLanguages = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Language = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CampaignLanguages = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CampaignClickedOnNotification = table.Column<bool>(type: "bit", nullable: false),
                     CampaignClickedOnRealTime = table.Column<bool>(type: "bit", nullable: false),
                     CampaignClickedOnEmail = table.Column<bool>(type: "bit", nullable: false),
@@ -1813,22 +1882,60 @@ namespace WePromoLink.Shared.Migrations
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
                 columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "Tag", "Title" },
-                values: new object[] { new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4"), 0m, "", "", 0m, "SOks5GRn4l0U", 1, null, 0m, "", "", 1, "bitcoin", "", "Community" });
+                values: new object[,]
+                {
+                    { new Guid("36bd6851-325b-47f1-8fb2-f7bebccdfff2"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 15m, "RdZhF_GhMK75", 2, null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", "Popular", "Professional" },
+                    { new Guid("ac7de61d-55d9-4ffb-8016-81789a26c2ee"), 0m, "", "", 0m, "AiZKq-4dL-6n", 1, null, 0m, "", "", 1, "bitcoin", "", "Community" }
+                });
 
             migrationBuilder.InsertData(
-                table: "SubscriptionPlans",
-                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "Tag", "Title" },
-                values: new object[] { new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 15m, "0B0wpjmqQIlD", 2, null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", "Popular", "Professional" });
+                table: "SurveyQuestions",
+                columns: new[] { "Id", "Group", "Value" },
+                values: new object[,]
+                {
+                    { new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), 4, "How useful do you find the WePromoLink platform for your advertising needs?" },
+                    { new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), 2, "Which payment methods do you prefer for platform subscriptions and earnings withdrawals?" },
+                    { new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"), 3, "Do you prefer a monthly subscription fee or paying a commission on earnings?" },
+                    { new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), 5, "What additional features or improvements would you like to see on the WePromoLink platform?" },
+                    { new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), 1, "What motivates you to use a platform like WePromoLink?" }
+                });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("721d6c59-3f1d-4489-8761-5db7e50ba83e"), false, "Contain ads", new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37"), null });
+                values: new object[,]
+                {
+                    { new Guid("04c14326-f7b4-4cac-af4f-29a8bfa81376"), false, "Contain ads", new Guid("36bd6851-325b-47f1-8fb2-f7bebccdfff2"), null },
+                    { new Guid("4d250b37-5bc6-4a9c-9c13-6a95d9b4aa75"), true, "Contain ads", new Guid("ac7de61d-55d9-4ffb-8016-81789a26c2ee"), null }
+                });
 
             migrationBuilder.InsertData(
-                table: "SubscriptionFeatures",
-                columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
-                values: new object[] { new Guid("b893be68-4a00-41e3-83ce-dd8da502f46d"), true, "Contain ads", new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4"), null });
+                table: "SurveyAnswers",
+                columns: new[] { "Id", "SurveyQuestionModelId", "Value" },
+                values: new object[,]
+                {
+                    { new Guid("0a8b12ce-7666-4714-9905-c09f2875cf89"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Somewhat useful" },
+                    { new Guid("1e047dd9-b39b-466e-963b-a5816ef2f9f8"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Extremely useful" },
+                    { new Guid("3547ea36-c291-4bfa-8c57-e7549a846ab4"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "I'm not sure" },
+                    { new Guid("3ba37a3d-62ee-4024-b86c-6767fdeeec3b"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Not useful at all" },
+                    { new Guid("3dfbc43e-395d-422f-895b-d309ef0d5361"), new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"), "I'm not sure" },
+                    { new Guid("51aeedae-1573-4559-9f74-a0a4b13f0ded"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "Advanced analytics and reporting" },
+                    { new Guid("5fb9c1ba-65eb-499e-a1ea-a85685b73ddc"), new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), "PayPal" },
+                    { new Guid("636011ee-5ca0-4a04-ba44-d3955fa72aad"), new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), "Stripe" },
+                    { new Guid("6b776504-8994-4d71-ade3-aaf982a3c53c"), new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"), "Commission on earnings" },
+                    { new Guid("8567d9ac-52ba-4cf4-ba34-d5983de804b4"), new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), "Connecting with other users and businesses" },
+                    { new Guid("94fb9766-7eb7-4540-bb0a-050d327759e6"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Not very useful" },
+                    { new Guid("a4d39b2b-aadd-4e90-915c-b289c1341b28"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Very useful" },
+                    { new Guid("ab2b77fa-3867-472b-b77f-1a15721f6723"), new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), "Credit/Debit card" },
+                    { new Guid("c78a5ece-f26a-4128-b4a5-99dcf5887de8"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "Improved user interface and navigation" },
+                    { new Guid("d00ab3bc-d7e4-40e8-befc-4b74650a31c5"), new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"), "Monthly subscription fee" },
+                    { new Guid("d1ce3276-f208-49eb-a9de-edb7a45c8da4"), new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), "Bank transfer" },
+                    { new Guid("d5364342-05e2-43e7-b816-588047bd9899"), new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), "Promoting my products or services" },
+                    { new Guid("e16346ef-b4cd-4e6b-9743-c53fb7e7e022"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "Integration with other advertising platforms" },
+                    { new Guid("e865a2bc-d576-45bc-b23a-56de71073748"), new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), "Earning money through affiliate marketing" },
+                    { new Guid("ece25c47-265b-4dcc-a8c0-cfb3578850e7"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "More campaign customization options" },
+                    { new Guid("fcdab328-8201-43c8-a52d-17805c49372b"), new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), "Exploring new advertising opportunities" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AbuseReports_CampaignId",
@@ -2205,6 +2312,21 @@ namespace WePromoLink.Shared.Migrations
                 column: "SubscriptionPlanModelId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SurveyAnswers_SurveyQuestionModelId",
+                table: "SurveyAnswers",
+                column: "SurveyQuestionModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SurveyDatapoints_SurveyAnswerModelId",
+                table: "SurveyDatapoints",
+                column: "SurveyAnswerModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SurveyDatapoints_SurveyQuestionModelId",
+                table: "SurveyDatapoints",
+                column: "SurveyQuestionModelId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_ExternalId",
                 table: "Users",
                 column: "ExternalId");
@@ -2327,6 +2449,9 @@ namespace WePromoLink.Shared.Migrations
                 name: "Hits");
 
             migrationBuilder.DropTable(
+                name: "JoinWaitingLists");
+
+            migrationBuilder.DropTable(
                 name: "Lockeds");
 
             migrationBuilder.DropTable(
@@ -2372,13 +2497,22 @@ namespace WePromoLink.Shared.Migrations
                 name: "SubscriptionFeatures");
 
             migrationBuilder.DropTable(
+                name: "SurveyDatapoints");
+
+            migrationBuilder.DropTable(
                 name: "GeoDatas");
 
             migrationBuilder.DropTable(
                 name: "Links");
 
             migrationBuilder.DropTable(
+                name: "SurveyAnswers");
+
+            migrationBuilder.DropTable(
                 name: "Campaigns");
+
+            migrationBuilder.DropTable(
+                name: "SurveyQuestions");
 
             migrationBuilder.DropTable(
                 name: "ImageDatas");

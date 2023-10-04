@@ -141,7 +141,6 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("AffiliateLink")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Affiliates")
@@ -156,7 +155,7 @@ namespace WePromoLink.Shared.Migrations
                     b.Property<decimal?>("OTR")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("Profit")
+                    b.Property<decimal?>("Profit")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("UserModelId")
@@ -2473,6 +2472,24 @@ namespace WePromoLink.Shared.Migrations
                     b.ToTable("ImageDatas");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.JoinWaitingListModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JoinWaitingLists");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.LinkModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2559,30 +2576,24 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("CallOfAction")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Conversion")
                         .HasColumnType("int");
 
                     b.Property<string>("ImageHeaderUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("QRUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Template")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Text")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserModelId")
@@ -2810,18 +2821,15 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageHeaderUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MyPageId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Social")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserModelId")
@@ -2914,7 +2922,6 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("CampaignLanguages")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("CampaignPublishedOnEmail")
@@ -2963,7 +2970,6 @@ namespace WePromoLink.Shared.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Language")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LinkClickedOnEmail")
@@ -3195,17 +3201,17 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b893be68-4a00-41e3-83ce-dd8da502f46d"),
+                            Id = new Guid("4d250b37-5bc6-4a9c-9c13-6a95d9b4aa75"),
                             BoolValue = true,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4")
+                            SubscriptionPlanModelId = new Guid("ac7de61d-55d9-4ffb-8016-81789a26c2ee")
                         },
                         new
                         {
-                            Id = new Guid("721d6c59-3f1d-4489-8761-5db7e50ba83e"),
+                            Id = new Guid("04c14326-f7b4-4cac-af4f-29a8bfa81376"),
                             BoolValue = false,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37")
+                            SubscriptionPlanModelId = new Guid("36bd6851-325b-47f1-8fb2-f7bebccdfff2")
                         });
                 });
 
@@ -3322,12 +3328,12 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e60952b8-ee79-43f9-8df2-e886d5cbdc37"),
+                            Id = new Guid("36bd6851-325b-47f1-8fb2-f7bebccdfff2"),
                             Annually = 244m,
                             AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
                             AnnualyProductId = "prod_NpuAflpfqloJa9",
                             Discount = 15m,
-                            ExternalId = "0B0wpjmqQIlD",
+                            ExternalId = "RdZhF_GhMK75",
                             Level = 2,
                             Monthly = 24m,
                             MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
@@ -3339,12 +3345,12 @@ namespace WePromoLink.Shared.Migrations
                         },
                         new
                         {
-                            Id = new Guid("8ae6798e-b144-432f-a78a-3cf552b46eb4"),
+                            Id = new Guid("ac7de61d-55d9-4ffb-8016-81789a26c2ee"),
                             Annually = 0m,
                             AnnualyPaymantLink = "",
                             AnnualyProductId = "",
                             Discount = 0m,
-                            ExternalId = "SOks5GRn4l0U",
+                            ExternalId = "AiZKq-4dL-6n",
                             Level = 1,
                             Monthly = 0m,
                             MonthlyPaymantLink = "",
@@ -3353,6 +3359,228 @@ namespace WePromoLink.Shared.Migrations
                             PaymentMethod = "bitcoin",
                             Tag = "",
                             Title = "Community"
+                        });
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SurveyAnswerModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SurveyQuestionModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SurveyQuestionModelId");
+
+                    b.ToTable("SurveyAnswers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("e865a2bc-d576-45bc-b23a-56de71073748"),
+                            SurveyQuestionModelId = new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"),
+                            Value = "Earning money through affiliate marketing"
+                        },
+                        new
+                        {
+                            Id = new Guid("d5364342-05e2-43e7-b816-588047bd9899"),
+                            SurveyQuestionModelId = new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"),
+                            Value = "Promoting my products or services"
+                        },
+                        new
+                        {
+                            Id = new Guid("fcdab328-8201-43c8-a52d-17805c49372b"),
+                            SurveyQuestionModelId = new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"),
+                            Value = "Exploring new advertising opportunities"
+                        },
+                        new
+                        {
+                            Id = new Guid("8567d9ac-52ba-4cf4-ba34-d5983de804b4"),
+                            SurveyQuestionModelId = new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"),
+                            Value = "Connecting with other users and businesses"
+                        },
+                        new
+                        {
+                            Id = new Guid("ab2b77fa-3867-472b-b77f-1a15721f6723"),
+                            SurveyQuestionModelId = new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"),
+                            Value = "Credit/Debit card"
+                        },
+                        new
+                        {
+                            Id = new Guid("5fb9c1ba-65eb-499e-a1ea-a85685b73ddc"),
+                            SurveyQuestionModelId = new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"),
+                            Value = "PayPal"
+                        },
+                        new
+                        {
+                            Id = new Guid("636011ee-5ca0-4a04-ba44-d3955fa72aad"),
+                            SurveyQuestionModelId = new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"),
+                            Value = "Stripe"
+                        },
+                        new
+                        {
+                            Id = new Guid("d1ce3276-f208-49eb-a9de-edb7a45c8da4"),
+                            SurveyQuestionModelId = new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"),
+                            Value = "Bank transfer"
+                        },
+                        new
+                        {
+                            Id = new Guid("d00ab3bc-d7e4-40e8-befc-4b74650a31c5"),
+                            SurveyQuestionModelId = new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"),
+                            Value = "Monthly subscription fee"
+                        },
+                        new
+                        {
+                            Id = new Guid("6b776504-8994-4d71-ade3-aaf982a3c53c"),
+                            SurveyQuestionModelId = new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"),
+                            Value = "Commission on earnings"
+                        },
+                        new
+                        {
+                            Id = new Guid("3dfbc43e-395d-422f-895b-d309ef0d5361"),
+                            SurveyQuestionModelId = new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"),
+                            Value = "I'm not sure"
+                        },
+                        new
+                        {
+                            Id = new Guid("1e047dd9-b39b-466e-963b-a5816ef2f9f8"),
+                            SurveyQuestionModelId = new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"),
+                            Value = "Extremely useful"
+                        },
+                        new
+                        {
+                            Id = new Guid("a4d39b2b-aadd-4e90-915c-b289c1341b28"),
+                            SurveyQuestionModelId = new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"),
+                            Value = "Very useful"
+                        },
+                        new
+                        {
+                            Id = new Guid("0a8b12ce-7666-4714-9905-c09f2875cf89"),
+                            SurveyQuestionModelId = new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"),
+                            Value = "Somewhat useful"
+                        },
+                        new
+                        {
+                            Id = new Guid("94fb9766-7eb7-4540-bb0a-050d327759e6"),
+                            SurveyQuestionModelId = new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"),
+                            Value = "Not very useful"
+                        },
+                        new
+                        {
+                            Id = new Guid("3ba37a3d-62ee-4024-b86c-6767fdeeec3b"),
+                            SurveyQuestionModelId = new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"),
+                            Value = "Not useful at all"
+                        },
+                        new
+                        {
+                            Id = new Guid("ece25c47-265b-4dcc-a8c0-cfb3578850e7"),
+                            SurveyQuestionModelId = new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"),
+                            Value = "More campaign customization options"
+                        },
+                        new
+                        {
+                            Id = new Guid("51aeedae-1573-4559-9f74-a0a4b13f0ded"),
+                            SurveyQuestionModelId = new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"),
+                            Value = "Advanced analytics and reporting"
+                        },
+                        new
+                        {
+                            Id = new Guid("e16346ef-b4cd-4e6b-9743-c53fb7e7e022"),
+                            SurveyQuestionModelId = new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"),
+                            Value = "Integration with other advertising platforms"
+                        },
+                        new
+                        {
+                            Id = new Guid("c78a5ece-f26a-4128-b4a5-99dcf5887de8"),
+                            SurveyQuestionModelId = new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"),
+                            Value = "Improved user interface and navigation"
+                        },
+                        new
+                        {
+                            Id = new Guid("3547ea36-c291-4bfa-8c57-e7549a846ab4"),
+                            SurveyQuestionModelId = new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"),
+                            Value = "I'm not sure"
+                        });
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SurveyDatapointModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SurveyAnswerModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SurveyQuestionModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SurveyAnswerModelId");
+
+                    b.HasIndex("SurveyQuestionModelId");
+
+                    b.ToTable("SurveyDatapoints");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SurveyQuestionModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Group")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SurveyQuestions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"),
+                            Group = 1,
+                            Value = "What motivates you to use a platform like WePromoLink?"
+                        },
+                        new
+                        {
+                            Id = new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"),
+                            Group = 2,
+                            Value = "Which payment methods do you prefer for platform subscriptions and earnings withdrawals?"
+                        },
+                        new
+                        {
+                            Id = new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"),
+                            Group = 3,
+                            Value = "Do you prefer a monthly subscription fee or paying a commission on earnings?"
+                        },
+                        new
+                        {
+                            Id = new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"),
+                            Group = 4,
+                            Value = "How useful do you find the WePromoLink platform for your advertising needs?"
+                        },
+                        new
+                        {
+                            Id = new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"),
+                            Group = 5,
+                            Value = "What additional features or improvements would you like to see on the WePromoLink platform?"
                         });
                 });
 
@@ -4034,6 +4262,36 @@ namespace WePromoLink.Shared.Migrations
                     b.Navigation("SubscriptionPlan");
                 });
 
+            modelBuilder.Entity("WePromoLink.Models.SurveyAnswerModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.SurveyQuestionModel", "SurveyQuestionModel")
+                        .WithMany("Answers")
+                        .HasForeignKey("SurveyQuestionModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SurveyQuestionModel");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SurveyDatapointModel", b =>
+                {
+                    b.HasOne("WePromoLink.Models.SurveyAnswerModel", "SurveyAnswerModel")
+                        .WithMany("Datapoints")
+                        .HasForeignKey("SurveyAnswerModelId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("WePromoLink.Models.SurveyQuestionModel", "SurveyQuestionModel")
+                        .WithMany("Datapoints")
+                        .HasForeignKey("SurveyQuestionModelId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("SurveyAnswerModel");
+
+                    b.Navigation("SurveyQuestionModel");
+                });
+
             modelBuilder.Entity("WePromoLink.Models.UserModel", b =>
                 {
                     b.HasOne("WePromoLink.Models.SubscriptionModel", "Subscription")
@@ -4118,6 +4376,18 @@ namespace WePromoLink.Shared.Migrations
                     b.Navigation("Features");
 
                     b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SurveyAnswerModel", b =>
+                {
+                    b.Navigation("Datapoints");
+                });
+
+            modelBuilder.Entity("WePromoLink.Models.SurveyQuestionModel", b =>
+                {
+                    b.Navigation("Answers");
+
+                    b.Navigation("Datapoints");
                 });
 
             modelBuilder.Entity("WePromoLink.Models.UserModel", b =>
