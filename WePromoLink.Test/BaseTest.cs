@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using WePromoLink.Data;
 using WePromoLink.Services.Email;
 using WePromoLink.Services.Marketing;
+using WePromoLink.Services.SubscriptionPlan;
 
 namespace WePromoLink.Test;
 
@@ -27,7 +28,9 @@ public abstract class BaseTest
             .AddSingleton(_config)
             .AddDbContext<DataContext>(x => x.UseSqlServer(_config["ConnectionStrings:Default"]!))
             .AddSingleton<ILogger<IEmailSender>>(loggerFactory.CreateLogger<IEmailSender>())
+            .AddSingleton<ILogger<ISubPlanService>>(loggerFactory.CreateLogger<ISubPlanService>())
             .AddScoped<IMarketingService, MarketingService>()
+            .AddScoped<ISubPlanService, SubPlanService>()
             .AddScoped<IEmailSender, EmailSender>()
             .BuildServiceProvider();
 

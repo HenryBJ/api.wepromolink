@@ -294,7 +294,7 @@ public class DataContext : DbContext
                     Monthly = 0,
                     Discount = 0,
                     Level = 1,
-                    PaymentMethod = "bitcoin",
+                    PaymentMethod = "stripe",
                     Tag = "",
                     Title = "Community",
                     MonthlyPaymantLink = "",

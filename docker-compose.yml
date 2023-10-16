@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+
+  website:
+    image: cod4it/wepromolink:1.0
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    volumes:
+      - /home/centos/wepromolink/Secrets:/root/.microsoft/usersecrets/310d3c99-f000-4003-b50b-bc06ded5b546/
