@@ -112,7 +112,7 @@ app.UseCors(builder =>
    {
        builder.WithOrigins("https://admin.wepromolink.com", "http://localhost:3000")
            .AllowAnyHeader()
-           .WithMethods("GET", "POST")
+           .WithMethods("GET", "POST", "PUT", "DELETE")
            .AllowCredentials();
    });
 

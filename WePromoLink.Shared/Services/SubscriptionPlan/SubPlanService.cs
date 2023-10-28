@@ -95,6 +95,7 @@ public class SubPlanService : ISubPlanService
         item.MonthlyPaymantLink = subPlan.MonthlyPaymantLink;
         item.MonthlyProductId = subPlan.MonthlyProductId;
         item.Order = subPlan.Order;
+        item.Level = subPlan.Level;
         item.PaymentMethod = subPlan.PaymentMethod;
         item.Tag = subPlan.Tag;
         item.Title = subPlan.Title;
@@ -134,6 +135,7 @@ public class SubPlanService : ISubPlanService
             Order = item.Order,
             PaymentMethod = item.PaymentMethod,
             Tag = item.Tag,
+            Level = item.Level,
             Title = item.Title,
             Features = item.Features.Select(e => new SubscriptionPlanFeatureRead
             {

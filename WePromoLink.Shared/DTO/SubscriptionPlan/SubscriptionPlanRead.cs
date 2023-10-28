@@ -9,6 +9,7 @@ public class SubscriptionPlanRead
     public string MonthlyPaymantLink { get; set; }
     public string AnnualyPaymantLink { get; set; }
     public int Order { get; set; }
+    public int Level { get; set; }
     public string Title { get; set; }
     public decimal Annually { get; set; }
     public decimal Discount { get; set; }

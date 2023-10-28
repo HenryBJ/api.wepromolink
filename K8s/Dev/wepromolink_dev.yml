@@ -1,6 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: staticpage-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: staticpage-app
+  template:
+    metadata:
+      labels:
+        app: staticpage-app
+    spec:
+      containers:
+        - name: staticpage-container
+          image: cod4it/wepromolink.staticpage:$MICROSERVICE_STATICPAGE
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: my-configmap
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: backoffice-deployment
 spec:
   replicas: 1
@@ -249,6 +272,24 @@ spec:
       name: https
   type: ClusterIP  # Cambia esto según el tipo de servicio que desees
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: staticpage-service
+spec:
+  selector:
+    app: staticpage-app
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+      name: http
+    - port: 443
+      protocol: TCP
+      targetPort: 443
+      name: https
+  type: ClusterIP  # Cambia esto según el tipo de servicio que desees
+---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -311,6 +352,9 @@ spec:
   - hosts:
     - dev.wepromolink.io
     secretName: wepromolink-io-tls
+  - hosts:
+    - '*.wepromolink.com'
+    secretName: wildcard-com-tls
   rules:
     - host: dev.api.wepromolink.com
       http:
@@ -340,5 +384,15 @@ spec:
             backend:
               service:
                 name: webapi-service
+                port:
+                  number: 80
+    - host: '*.wepromolink.com'
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: staticpage-service
                 port:
                   number: 80

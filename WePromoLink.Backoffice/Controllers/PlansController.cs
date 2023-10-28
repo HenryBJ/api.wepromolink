@@ -87,12 +87,12 @@ public class PlansController : ControllerBase
     }
 
     [Authorize]
-    [HttpDelete("delete")]
-    public async Task<IActionResult> Delete(SubscriptionPlanDelete subPlan)
+    [HttpDelete("delete/{id}")]
+    public async Task<IActionResult> Delete(Guid id)
     {
         try
         {
-            await _service.Delete(subPlan);
+            await _service.Delete(new SubscriptionPlanDelete { Id = id });
             return new OkResult();
         }
         catch (System.Exception ex)
@@ -135,12 +135,12 @@ public class PlansController : ControllerBase
     }
 
     [Authorize]
-    [HttpDelete("feature/delete")]
-    public async Task<IActionResult> DeleteFeature(SubscriptionPlanFeatureDelete feature)
+    [HttpDelete("feature/delete/{id}")]
+    public async Task<IActionResult> DeleteFeature(Guid id)
     {
         try
         {
-            await _service.Delete(feature);
+            await _service.Delete(new SubscriptionPlanFeatureDelete { Id = id });
             return new OkResult();
         }
         catch (System.Exception ex)

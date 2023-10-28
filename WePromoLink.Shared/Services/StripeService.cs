@@ -361,6 +361,11 @@ public class StripeService
 
     // Backoffice methods
 
+    public async Task<bool> ApproveWithdraw(Guid id)
+    {
+        return true;
+    }
+
     public async Task<PaginationList<WithdrawRequest>> GetAllWitdrawRequests(int? page, int? cant)
     {
         PaginationList<WithdrawRequest> list = new();

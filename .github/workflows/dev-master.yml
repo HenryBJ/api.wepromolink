@@ -98,6 +98,14 @@ jobs:
           tags: cod4it/wepromolink.backoffice:${{ env.MICROSERVICE_BACKOFFICE }}
           file: WePromoLink.Backoffice.Dockerfile
 
+      - name: Build and Push Docker Image WePromolink.StaticPage
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: cod4it/wepromolink.staticpage:${{ env.MICROSERVICE_STATICPAGE }}
+          file: WePromoLink.StaticPage.Dockerfile
+
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@v1.0.0
         with:
