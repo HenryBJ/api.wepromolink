@@ -137,8 +137,8 @@ namespace WePromoLink.Services
             BlobClient blobClient = containerClient.GetBlobClient(fileName);
             using (var outputStream = new MemoryStream())
             {
-                ApplyWaterMark(image); // Apply watermark
-                AddWaterMarkURL(image); 
+               // ApplyWaterMark(image); // Apply watermark
+               // AddWaterMarkURL(image); 
                 image.SaveAsJpeg(outputStream, new JpegEncoder { Quality = 50 });
                 outputStream.Position = 0;
                 await blobClient.UploadAsync(outputStream, true);

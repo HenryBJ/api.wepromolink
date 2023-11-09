@@ -14,6 +14,8 @@ using WePromoLink.Shared.RabbitMQ;
 using WePromoLink.DTO.SignalR;
 using WePromoLink.Backoffice.Worker;
 using WePromoLink.Services.SubscriptionPlan;
+using WePromoLink.Services.StaticPages;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,10 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Default");
 
 builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration["SignalR:ConnectionString"]);
+builder.Services.AddTransient<BlobServiceClient>(_ =>
+{
+    return new BlobServiceClient(builder.Configuration["Azure:blob:connectionstring"]);
+});
 builder.Services.AddControllers();
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
 builder.Services.AddSingleton<IShareCache>(x =>
@@ -34,6 +40,7 @@ builder.Services.AddSingleton<IShareCache>(x =>
 builder.Services.AddSingleton<AdminDashboardService>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<ISubPlanService, SubPlanService>();
+builder.Services.AddTransient<IStaticPageService, StaticPageService>();
 
 builder.Services.AddTransient<IPushService, PushService>();
 builder.Services.AddTransient<IUserService, UserService>();

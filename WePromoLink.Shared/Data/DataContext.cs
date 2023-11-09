@@ -7,6 +7,14 @@ namespace WePromoLink.Data;
 
 public class DataContext : DbContext
 {
+    public virtual DbSet<StaticPageDataTemplateModel> StaticPageDataTemplates { get; set; }
+    public virtual DbSet<StaticPageProductByResourceModel> StaticPageProductByResources { get; set; }
+    public virtual DbSet<StaticPageModel> StaticPages { get; set; }
+    public virtual DbSet<StaticPageProductByPageModel> StaticPageProductByPages { get; set; }
+    public virtual DbSet<StaticPageProductModel> StaticPageProducts { get; set; }
+    public virtual DbSet<StaticPageResourceModel> StaticPageResources { get; set; }
+    public virtual DbSet<StaticPageWebsiteTemplateModel> StaticPageWebsiteTemplates { get; set; }
+
     public virtual DbSet<JoinWaitingListModel> JoinWaitingLists { get; set; }
     public virtual DbSet<SurveyQuestionModel> SurveyQuestions { get; set; }
     public virtual DbSet<SurveyAnswerModel> SurveyAnswers { get; set; }
@@ -164,6 +172,41 @@ public class DataContext : DbContext
         });
 
         builder.Entity<JoinWaitingListModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<StaticPageDataTemplateModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<StaticPageModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<StaticPageProductByPageModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<StaticPageProductByResourceModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<StaticPageProductModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<StaticPageResourceModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+        });
+
+        builder.Entity<StaticPageWebsiteTemplateModel>(entity =>
         {
             entity.HasKey(e => e.Id);
         });
