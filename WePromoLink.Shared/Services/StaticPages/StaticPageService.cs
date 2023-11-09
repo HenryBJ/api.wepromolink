@@ -18,16 +18,12 @@ public class StaticPageService : IStaticPageService
     private readonly NameCheapApi _api;
     private readonly IConfiguration _config;
     private readonly BlobServiceClient _blobService;
-    public StaticPageService(DataContext db, IConfiguration config, BlobServiceClient blobService)
+    public StaticPageService(DataContext db, IConfiguration config, BlobServiceClient blobService, NameCheapApi api)
     {
         _config = config;
         _db = db;
-        _api = new NameCheapApi(
-            _config["NameCheap:ApiUser"],
-            _config["NameCheap:ApiUser"],
-            _config["NameCheap:ApiKey"],
-            _config["NameCheap:ClientIP"]);
         _blobService = blobService;
+        _api = api;
     }
 
     private async Task<string> UploadResourceAzure(IFormFile file, string? contentType = "")

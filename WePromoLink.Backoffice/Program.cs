@@ -16,6 +16,7 @@ using WePromoLink.Backoffice.Worker;
 using WePromoLink.Services.SubscriptionPlan;
 using WePromoLink.Services.StaticPages;
 using Azure.Storage.Blobs;
+using NameCheap;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,15 @@ builder.Services.AddSingleton<IShareCache>(x =>
         builder.Configuration["Redis:Host"],
         builder.Configuration["Redis:Port"],
         builder.Configuration["Redis:Password"]);
+});
+
+builder.Services.AddSingleton<NameCheapApi>(x =>
+{
+    return new NameCheapApi(
+        builder.Configuration["NameCheap:ApiUser"],
+        builder.Configuration["NameCheap:ApiUser"],
+        builder.Configuration["NameCheap:ApiKey"],
+        builder.Configuration["NameCheap:ClientIP"]);
 });
 
 builder.Services.AddSingleton<AdminDashboardService>();
