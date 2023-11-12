@@ -1,4 +1,6 @@
+using System.Net;
 using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -6,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Scriban;
 using Scriban.Runtime;
 using WePromoLink.Data;
+using WePromoLink.Services.Cache;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,13 @@ builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString)
 builder.Services.AddTransient<BlobServiceClient>(_ =>
 {
     return new BlobServiceClient(builder.Configuration["Azure:blob:connectionstring"]);
+});
+builder.Services.AddSingleton<IShareCache>(x =>
+{
+    return new RedisCache(
+        builder.Configuration["Redis:Host"],
+        builder.Configuration["Redis:Port"],
+        builder.Configuration["Redis:Password"]);
 });
 
 builder.Services.AddControllers();
@@ -32,10 +42,12 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/favicon.ico", async (HttpContext httpContext) =>
 {
+
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<DataContext>();
-    httpContext.Response.ContentType = "image/x-icon";
+
     var subdomain = httpContext.Request.Host.Host;
+    // var subdomain = "demo.wepromolink.com";
 
     var pageId = await db.StaticPages
     .Where(e => e.Name.ToLower() == subdomain)
@@ -65,14 +77,50 @@ app.MapGet("/favicon.ico", async (HttpContext httpContext) =>
         await httpContext.Response.WriteAsync("Favicon not found");
         return;
     }
+
+    var cacheControl = new CacheControlHeaderValue
+    {
+        MaxAge = TimeSpan.FromHours(6), // Establece el tiempo de caché a 30 minutos
+        Public = true,
+    };
+
+    httpContext.Response.GetTypedHeaders().CacheControl = cacheControl;
     await httpContext.Response.Body.WriteAsync(faviconData);
 });
 
 
-app.MapGet("/", async (HttpContext httpContext, DataContext db) =>
+app.MapGet("/", async httpContext =>
 {
-    httpContext.Response.ContentType = "text/html";
     var subdomain = httpContext.Request.Host.Host;
+    // var subdomain = "demo.wepromolink.com";
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+    var cache = scope.ServiceProvider.GetRequiredService<IShareCache>();
+
+    if (httpContext.Request.Headers.ContainsKey("If-None-Match"))
+    {
+        var _etag = httpContext.Request.Headers["If-None-Match"];
+        if (cache.TryGetValue($"page_etag_{subdomain}", out string? cachePageEtag))
+        {
+            if (!string.IsNullOrEmpty(cachePageEtag) && _etag == cachePageEtag)
+            {
+                httpContext.Response.StatusCode = (int)HttpStatusCode.NotModified;
+                return;
+            }
+        }
+    }
+
+    if (cache.TryGetValue($"page_{subdomain}", out string? cachePage))
+    {
+        if (!string.IsNullOrEmpty(cachePage))
+        {
+            httpContext.Response.ContentType = "text/html";
+            httpContext.Response.Headers.ETag = cache.Get<string>($"page_etag_{subdomain}");
+            await httpContext.Response.WriteAsync(cachePage);
+            return;
+        }
+    }
+
     var defaultResponseHtml = $@"
         <!DOCTYPE html>
         <html>
@@ -90,21 +138,17 @@ app.MapGet("/", async (HttpContext httpContext, DataContext db) =>
         </html>
     ";
 
-
-    var cacheControl = new CacheControlHeaderValue
-    {
-        MaxAge = TimeSpan.FromMinutes(30), // Establece el tiempo de caché a 30 minutos
-        Public = true
-    };
-    httpContext.Response.GetTypedHeaders().CacheControl = cacheControl;
-
     var page = await db.StaticPages
     .Include(e => e.StaticPageDataTemplate)
     .Include(e => e.StaticPageWebsiteTemplate)
     .Where(e => e.Name.ToLower() == subdomain)
     .SingleOrDefaultAsync();
 
-    if (page == null) return httpContext.Response.WriteAsync(defaultResponseHtml);
+    if (page == null)
+    {
+        await httpContext.Response.WriteAsync(defaultResponseHtml);
+        return;
+    }
 
     var dic = await DownloadJsonAsync(page.StaticPageDataTemplate.Json);
     var webTemplate = await DownloadWebAsync(page.StaticPageWebsiteTemplate.Url);
@@ -115,7 +159,13 @@ app.MapGet("/", async (HttpContext httpContext, DataContext db) =>
     Template scribanTemplate = Template.Parse(webTemplate);
     string result = scribanTemplate.Render(templateContext);
 
-    return httpContext.Response.WriteAsync(result);
+    cache.Set<string>($"page_etag_{subdomain}", page.Etag!, TimeSpan.FromMinutes(30));
+    cache.Set<string>($"page_{subdomain}", result);
+
+    httpContext.Response.ContentType = "text/html";
+    httpContext.Response.Headers.ETag = page.Etag;
+    await httpContext.Response.WriteAsync(result);
+    return;
 });
 
 
