@@ -1,13 +1,13 @@
 {
-    "wepromolink": "0.0.122",
-    "hitworker": "0.0.122",
-    "stripeworker": "0.0.122",
-    "statworker": "0.0.122",
-    "controller": "0.0.122",
-    "notiworker": "0.0.122",
-    "geolocationworker": "0.0.122",
-    "btcpayworker": "0.0.122",
-    "backoffice": "0.0.122",
-    "staticpage": "0.0.3"
+    "wepromolink": "0.0.123",
+    "hitworker": "0.0.123",
+    "stripeworker": "0.0.123",
+    "statworker": "0.0.123",
+    "controller": "0.0.123",
+    "notiworker": "0.0.123",
+    "geolocationworker": "0.0.123",
+    "btcpayworker": "0.0.123",
+    "backoffice": "0.0.123",
+    "staticpage": "0.0.4"
   }
   

@@ -1,3 +1,4 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -289,32 +290,32 @@ spec:
       targetPort: 443
       name: https
   type: ClusterIP  # Cambia esto según el tipo de servicio que desees
----
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: ClusterIssuer
+# metadata:
+#   name: letsencrypt-staging
+# spec:
+#   acme:
+#     # The ACME server URL
+#     server: https://acme-staging-v02.api.letsencrypt.org/directory
+#     # Email address used for ACME registration
+#     email: henry.coolsoft@gmail.com
+#     # Name of a secret used to store the ACME account private key
+#     privateKeySecretRef:
+#       name: letsencrypt-staging
+#     # Enable the HTTP-01 challenge provider
+#     solvers:
+#       - http01:
+#           ingress:
+#             ingressClassName: nginx
+
+# ---
+
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-staging
-spec:
-  acme:
-    # The ACME server URL
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
-    # Email address used for ACME registration
-    email: henry.coolsoft@gmail.com
-    # Name of a secret used to store the ACME account private key
-    privateKeySecretRef:
-      name: letsencrypt-staging
-    # Enable the HTTP-01 challenge provider
-    solvers:
-      - http01:
-          ingress:
-            ingressClassName: nginx
-
----
-
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-prod
+  name: letsencrypt-prod-old
 spec:
   acme:
     # The ACME server URL
@@ -323,7 +324,7 @@ spec:
     email: henry.coolsoft@gmail.com
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
-      name: letsencrypt-prod
+      name: letsencrypt-prod-old
     # Enable the HTTP-01 challenge provider
     solvers:
       - http01:
@@ -331,30 +332,62 @@ spec:
             ingressClassName: nginx
 
 ---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: namecheap-credentials
+  namespace: cert-manager
+type: Opaque
+stringData:
+  apiKey: ea62ae4f7fc44fcf88ec79c5754cff30
+  apiUser: jebenitez
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-cert-com-prod
+  namespace: default
+spec:
+  secretName: wildcard-cert-com-prod
+  commonName: "*.wepromolink.com"
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  dnsNames:
+  - "*.wepromolink.com"
+---
+
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: wildcard-cert-io-stage
+#   namespace: default
+# spec:
+#   secretName: wildcard-cert-io-stage
+#   commonName: "*.wepromolink.com"
+#   issuerRef:
+#     kind: ClusterIssuer
+#     name: letsencrypt-stage
+#   dnsNames:
+#   - "*.wepromolink.io"
+# ---
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: my-ingress
+  name: my-ingress-2
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     # nginx.ingress.kubernetes.io/rewrite-target: /
     # nginx.ingress.kubernetes.io/whitelist-source-range: "170.75.168.146/32"
     nginx.ingress.kubernetes.io/proxy-body-size: "8m"
 spec:
-  ingressClassName: nginx  # Especifica el nombre del controlador de Ingress que debe manejar las reglas definidas en este Ingress
+  ingressClassName: nginx
   tls:
   - hosts:
-    - dev.api.wepromolink.com
-    secretName: api-wepromolink-tls
-  - hosts:
-    - admin.api.wepromolink.com
-    secretName: admin-wepromolink-tls
-  - hosts:
-    - dev.wepromolink.io
-    secretName: wepromolink-io-tls
-  - hosts:
-    - '*.wepromolink.com'
-    secretName: wildcard-com-tls
+    - "*.wepromolink.com"
+    secretName: wildcard-cert-com-prod
   rules:
     - host: dev.api.wepromolink.com
       http:
@@ -376,16 +409,6 @@ spec:
                 name: backoffice-service
                 port:
                   number: 80
-    - host: dev.wepromolink.io
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: webapi-service
-                port:
-                  number: 80
     - host: '*.wepromolink.com'
       http:
         paths:
@@ -396,3 +419,29 @@ spec:
                 name: staticpage-service
                 port:
                   number: 80
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress-io
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod-old"
+    nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - dev.wepromolink.io
+    secretName: wildcard-cert-io-prod
+  rules:
+    - host: dev.wepromolink.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webapi-service
+                port:
+                  number: 80  
