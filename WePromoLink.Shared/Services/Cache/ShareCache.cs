@@ -16,6 +16,12 @@ public class ShareCache : IShareCache
         return _memoryCache.Get(key) as T;
     }
 
+    public bool Remove(string key)
+    {
+        _memoryCache.Remove(key);
+        return true;
+    }
+
     public void Set<T>(string key, T value) where T:class
     {
         _memoryCache.Set(key, value, new MemoryCacheEntryOptions { Size = 1 });

@@ -74,4 +74,9 @@ public class RedisCache : IShareCache, IDisposable
     {
         conn?.Close();
     }
+
+    public bool Remove(string key)
+    {
+        return _db.KeyDelete(key);
+    }
 }

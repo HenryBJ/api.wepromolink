@@ -9,6 +9,9 @@ public interface IStaticPageService
     Task<PaginationList<StaticPageRead>> GetAllStaticPage(int page, int cant, string filter);
     Task<StaticPageRead> GetStaticPage(Guid id);
     Task<bool> DeleteStaticPage(Guid id);
+    Task AddProduct(Guid pageId, Guid productId);
+    Task RemoveProduct(Guid pageId, Guid productId);
+    Task ClearCache(Guid pageId);
 
     Task<Guid> CreateStaticPageResource(StaticPageResourceCreate data);
     Task<Guid> EditStaticPageResource(StaticPageResourceEdit data);
@@ -33,6 +36,8 @@ public interface IStaticPageService
     Task<PaginationList<StaticPageProductRead>> GetAllStaticPageProduct(int page, int cant, string filter);
     Task<StaticPageProductRead> GetStaticPageProduct(Guid id);
     Task<bool> DeleteStaticPageProduct(Guid id);
+    Task AddResource(Guid productId, Guid resourceId);
+    Task RemoveResource(Guid productId, Guid resourceId);
 
     Task<Guid> CreateStaticPageProductByPage(StaticPageProductByPageCreate data);
     Task<bool> ExitsStaticPageProductByPage(StaticPageProductByPageCreate data);

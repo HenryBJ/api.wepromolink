@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Scriban;
 using Scriban.Runtime;
 using WePromoLink.Data;
+using WePromoLink.DTO.StaticPage;
 using WePromoLink.Services.Cache;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -144,6 +145,39 @@ app.MapGet("/", async httpContext =>
     .Where(e => e.Name.ToLower() == subdomain)
     .SingleOrDefaultAsync();
 
+    var products = await db.StaticPageProductByPages
+    .Include(e => e.Product)
+    .Where(e => e.StaticPageModelId == page.Id)
+    .Select(e=> new StaticPageProductRead
+    {
+        Id = e.Product.Id,
+        AffiliateLink = e.Product.AffiliateLink,
+        AffiliateProgram = e.Product.AffiliateProgram,
+        BuyLink = e.Product.BuyLink,
+        Category = e.Product.Category,
+        Commission = e.Product.Commission,
+        CostPrice = e.Product.CostPrice,
+        Description = e.Product.Description,
+        Discount = e.Product.Discount,
+        Height = e.Product.Height,
+        Inventory = e.Product.Inventory,
+        Length = e.Product.Length,
+        Price = e.Product.Price,
+        Provider = e.Product.Provider,
+        SKU = e.Product.SKU,
+        Tags = e.Product.Tags,
+        Title = e.Product.Title,
+        Weight = e.Product.Weight,
+        Width = e.Product.Width
+
+    })
+    .ToListAsync();
+
+    foreach (var product in products)
+    {
+        product.ImagesUrl = await db.StaticPageProductByResources.Where(e=>e.StaticPageProductModelId == product.Id).Select(e=>e.Resource.Url).ToListAsync();
+    }
+
     if (page == null)
     {
         await httpContext.Response.WriteAsync(defaultResponseHtml);
@@ -154,7 +188,7 @@ app.MapGet("/", async httpContext =>
     var webTemplate = await DownloadWebAsync(page.StaticPageWebsiteTemplate.Url);
 
     var templateContext = new TemplateContext();
-    var scriptObject = new ScriptObject { { "data", dic } };
+    var scriptObject = new ScriptObject { { "data", dic },{ "products", products } };
     templateContext.PushGlobal(scriptObject);
     Template scribanTemplate = Template.Parse(webTemplate);
     string result = scribanTemplate.Render(templateContext);

@@ -8,6 +8,7 @@ using Org.BouncyCastle.Asn1.Misc;
 using WePromoLink.Data;
 using WePromoLink.DTO.StaticPage;
 using WePromoLink.Models;
+using WePromoLink.Services.Cache;
 
 namespace WePromoLink.Services.StaticPages;
 
@@ -18,12 +19,14 @@ public class StaticPageService : IStaticPageService
     private readonly NameCheapApi _api;
     private readonly IConfiguration _config;
     private readonly BlobServiceClient _blobService;
-    public StaticPageService(DataContext db, IConfiguration config, BlobServiceClient blobService, NameCheapApi api)
+    private readonly IShareCache _cache;
+    public StaticPageService(DataContext db, IConfiguration config, BlobServiceClient blobService, NameCheapApi api, IShareCache cache)
     {
         _config = config;
         _db = db;
         _blobService = blobService;
         _api = api;
+        _cache = cache;
     }
 
     private async Task<string> UploadResourceAzure(IFormFile file, string? contentType = "")
@@ -207,7 +210,7 @@ public class StaticPageService : IStaticPageService
             Id = id,
             Name = data.Name,
             SizeMB = data.SizeMB,
-            Width = data.Height,
+            Width = data.Width,
             Url = await UploadResourceAzure(data.File)
         });
         _db.SaveChanges();
@@ -251,6 +254,11 @@ public class StaticPageService : IStaticPageService
         _api.Dns.SetHosts(sld, tld, list.ToArray());
         _db.StaticPages.Remove(page);
         _db.SaveChanges();
+
+        //Remove cache
+        _cache.Remove($"page_etag_{page.Name}");
+        _cache.Remove($"page_{page.Name}");
+
         return true;
     }
 
@@ -258,9 +266,21 @@ public class StaticPageService : IStaticPageService
     {
         var item = await _db.StaticPageDataTemplates.Where(e => e.Id == id).SingleOrDefaultAsync();
         if (item == null) throw new Exception("Element not found");
+
+        // Remove from cache all pages that use this data template
+        var pagesNames = _db.StaticPages.Where(e => e.StaticPageDataTemplateModelId == id).Select(e => e.Name);
+        foreach (var pageName in pagesNames)
+        {
+            //Remove cache
+            _cache.Remove($"page_etag_{pageName}");
+            _cache.Remove($"page_{pageName}");
+        }
+
         await DeleteResourceAzure(item.Json);
         _db.StaticPageDataTemplates.Remove(item);
         _db.SaveChanges();
+
+
         return true;
     }
 
@@ -268,6 +288,16 @@ public class StaticPageService : IStaticPageService
     {
         var item = await _db.StaticPageProducts.Where(e => e.Id == id).SingleOrDefaultAsync();
         if (item == null) throw new Exception("Element not found");
+
+        // Remove from cache all pages that use this product
+        var pagesNames = _db.StaticPageProductByPages.Where(e => e.StaticPageProductModelId == id).Select(e => e.Page.Name);
+        foreach (var pageName in pagesNames)
+        {
+            //Remove cache
+            _cache.Remove($"page_etag_{pageName}");
+            _cache.Remove($"page_{pageName}");
+        }
+
         _db.StaticPageProducts.Remove(item);
         _db.SaveChanges();
         return true;
@@ -277,6 +307,16 @@ public class StaticPageService : IStaticPageService
     {
         var item = await _db.StaticPageProductByPages.Where(e => e.Id == id).SingleOrDefaultAsync();
         if (item == null) throw new Exception("Element not found");
+
+        // Remove from cache all pages that use this product
+        var pagesNames = _db.StaticPageProductByPages.Where(e => e.Id == id).Select(e => e.Page.Name);
+        foreach (var pageName in pagesNames)
+        {
+            //Remove cache
+            _cache.Remove($"page_etag_{pageName}");
+            _cache.Remove($"page_{pageName}");
+        }
+
         _db.StaticPageProductByPages.Remove(item);
         _db.SaveChanges();
         return true;
@@ -286,6 +326,16 @@ public class StaticPageService : IStaticPageService
     {
         var item = await _db.StaticPageProductByResources.Where(e => e.Id == id).SingleOrDefaultAsync();
         if (item == null) throw new Exception("Element not found");
+
+        // Remove from cache all pages that use this product
+        var pagesNames = _db.StaticPageProductByPages.Where(e => e.StaticPageProductModelId == item.StaticPageProductModelId).Select(e => e.Page.Name);
+        foreach (var pageName in pagesNames)
+        {
+            //Remove cache
+            _cache.Remove($"page_etag_{pageName}");
+            _cache.Remove($"page_{pageName}");
+        }
+
         _db.StaticPageProductByResources.Remove(item);
         _db.SaveChanges();
         return true;
@@ -295,6 +345,8 @@ public class StaticPageService : IStaticPageService
     {
         var item = await _db.StaticPageResources.Where(e => e.Id == id).SingleOrDefaultAsync();
         if (item == null) throw new Exception("Element not found");
+
+
         await DeleteResourceAzure(item.Url);
         _db.StaticPageResources.Remove(item);
         _db.SaveChanges();
@@ -305,6 +357,16 @@ public class StaticPageService : IStaticPageService
     {
         var item = await _db.StaticPageWebsiteTemplates.Where(e => e.Id == id).SingleOrDefaultAsync();
         if (item == null) throw new Exception("Element not found");
+
+        // Remove from cache all pages that use this web template
+        var pagesNames = _db.StaticPages.Where(e => e.StaticPageWebsiteTemplateModelId == id).Select(e => e.Name);
+        foreach (var pageName in pagesNames)
+        {
+            //Remove cache
+            _cache.Remove($"page_etag_{pageName}");
+            _cache.Remove($"page_{pageName}");
+        }
+
         await DeleteResourceAzure(item.Url);
         _db.StaticPageWebsiteTemplates.Remove(item);
         _db.SaveChanges();
@@ -324,6 +386,11 @@ public class StaticPageService : IStaticPageService
 
         _db.StaticPages.Update(item);
         _db.SaveChanges();
+
+        //Remove cache
+        _cache.Remove($"page_etag_{item.Name}");
+        _cache.Remove($"page_{item.Name}");
+
         return item.Id;
     }
 
@@ -331,6 +398,15 @@ public class StaticPageService : IStaticPageService
     {
         var item = await _db.StaticPageDataTemplates.Where(e => e.Id == data.Id).SingleOrDefaultAsync();
         if (item == null) throw new Exception("Element not found");
+
+        // Remove from cache all pages that use this data template
+        var pagesNames = _db.StaticPages.Where(e => e.StaticPageDataTemplateModelId == item.Id).Select(e => e.Name);
+        foreach (var pageName in pagesNames)
+        {
+            //Remove cache
+            _cache.Remove($"page_etag_{pageName}");
+            _cache.Remove($"page_{pageName}");
+        }
 
         item.Etag = Nanoid.Nanoid.Generate(size: 12);
         item.ExpiredAt = DateTime.UtcNow.AddDays(30);
@@ -349,6 +425,15 @@ public class StaticPageService : IStaticPageService
     {
         var item = await _db.StaticPageProducts.Where(e => e.Id == data.Id).SingleOrDefaultAsync();
         if (item == null) throw new Exception("Element not found");
+
+        // Remove from cache all pages that use this product
+        var pagesNames = _db.StaticPageProductByPages.Where(e => e.StaticPageProductModelId == data.Id).Select(e => e.Page.Name);
+        foreach (var pageName in pagesNames)
+        {
+            //Remove cache
+            _cache.Remove($"page_etag_{pageName}");
+            _cache.Remove($"page_{pageName}");
+        }
 
         item.AffiliateLink = data.AffiliateLink;
         item.AffiliateProgram = data.AffiliateProgram;
@@ -397,6 +482,15 @@ public class StaticPageService : IStaticPageService
     {
         var item = await _db.StaticPageWebsiteTemplates.Where(e => e.Id == data.Id).SingleOrDefaultAsync();
         if (item == null) throw new Exception("Element not found");
+
+        // Remove from cache all pages that use this web template
+        var pagesNames = _db.StaticPages.Where(e => e.StaticPageWebsiteTemplateModelId == data.Id).Select(e => e.Name);
+        foreach (var pageName in pagesNames)
+        {
+            //Remove cache
+            _cache.Remove($"page_etag_{pageName}");
+            _cache.Remove($"page_{pageName}");
+        }
 
         item.Name = data.Name;
         item.Etag = Nanoid.Nanoid.Generate(size: 12);
@@ -654,5 +748,72 @@ public class StaticPageService : IStaticPageService
             WebsiteTemplateUrl = e.Url
         })
         .SingleAsync();
+    }
+
+    public async Task AddProduct(Guid pageId, Guid productId)
+    {
+        var item = await _db.StaticPageProductByPages
+        .Where(e => e.StaticPageModelId == pageId && e.StaticPageProductModelId == productId)
+        .SingleOrDefaultAsync();
+
+        if (item != null) return;
+
+        _db.StaticPageProductByPages.Add(new StaticPageProductByPageModel
+        {
+            StaticPageModelId = pageId,
+            StaticPageProductModelId = productId
+        });
+
+        _db.SaveChanges();
+    }
+
+    public async Task RemoveProduct(Guid pageId, Guid productId)
+    {
+        var item = await _db.StaticPageProductByPages
+        .Where(e => e.StaticPageModelId == pageId && e.StaticPageProductModelId == productId)
+        .SingleOrDefaultAsync();
+
+        if (item == null) return;
+        _db.StaticPageProductByPages.Remove(item);
+        _db.SaveChanges();
+    }
+
+    public async Task AddResource(Guid productId, Guid resourceId)
+    {
+        var item = await _db.StaticPageProductByResources
+        .Where(e => e.StaticPageResourceModelId == resourceId && e.StaticPageProductModelId == productId)
+        .SingleOrDefaultAsync();
+
+        if (item != null) return;
+
+        _db.StaticPageProductByResources.Add(new StaticPageProductByResourceModel
+        {
+            StaticPageResourceModelId = resourceId,
+            StaticPageProductModelId = productId
+        });
+
+        _db.SaveChanges();
+    }
+
+    public async Task RemoveResource(Guid productId, Guid resourceId)
+    {
+        var item = await _db.StaticPageProductByResources
+        .Where(e => e.StaticPageResourceModelId == resourceId && e.StaticPageProductModelId == productId)
+        .SingleOrDefaultAsync();
+
+        if (item == null) return;
+        _db.StaticPageProductByResources.Remove(item);
+        _db.SaveChanges();
+    }
+
+    public async Task ClearCache(Guid pageId)
+    {
+        var pageName = await _db.StaticPages.Where(e => e.Id == pageId).Select(e => e.Name).SingleOrDefaultAsync();
+        if (!string.IsNullOrEmpty(pageName))
+        {
+            //Remove cache
+            _cache.Remove($"page_etag_{pageName}");
+            _cache.Remove($"page_{pageName}");
+        }
     }
 }

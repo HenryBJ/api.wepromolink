@@ -73,6 +73,54 @@ public class PagesController : ControllerBase
     }
 
     [Authorize]
+    [HttpPost("add/product/{pageId}/{productId}")]
+    public async Task<IActionResult> AddProduct(Guid? pageId, Guid? productId)
+    {
+        try
+        {
+            await _service.AddProduct(pageId.Value, productId.Value);
+            return new OkResult();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpPost("clearcache/{pageId}")]
+    public async Task<IActionResult> ClearCache(Guid? pageId)
+    {
+        try
+        {
+            await _service.ClearCache(pageId!.Value);
+            return new OkResult();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("remove/product/{pageId}/{productId}")]
+    public async Task<IActionResult> RemoveProduct(Guid? pageId, Guid? productId)
+    {
+        try
+        {
+            await _service.RemoveProduct(pageId.Value, productId.Value);
+            return new OkResult();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
     [HttpPut("edit")]
     public async Task<IActionResult> Edit(StaticPageEdit data)
     {
@@ -417,7 +465,7 @@ public class PagesController : ControllerBase
             return new StatusCodeResult(500);
         }
     }
-
+    
     [Authorize]
     [HttpPut("products/edit")]
     public async Task<IActionResult> EditProduct(StaticPageProductEdit data)
@@ -441,6 +489,38 @@ public class PagesController : ControllerBase
         try
         {
             await _service.DeleteStaticPageProduct(id);
+            return new OkResult();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpPost("products/add/resource/{productId}/{resourceId}")]
+    public async Task<IActionResult> AddResource(Guid? productId, Guid? resourceId)
+    {
+        try
+        {
+            await _service.AddResource(productId.Value, resourceId.Value);
+            return new OkResult();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("products/remove/resource/{productId}/{resourceId}")]
+    public async Task<IActionResult> RemoveResource(Guid? productId, Guid? resourceId)
+    {
+        try
+        {
+            await _service.RemoveResource(productId.Value, resourceId.Value);
             return new OkResult();
         }
         catch (System.Exception ex)
@@ -485,12 +565,17 @@ public class PagesController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("productsbypage/exits")]
-    public async Task<IActionResult> ExitsProductByPage(StaticPageProductByPageCreate data)
+    [HttpGet("productsbypage/exits/{pageId}/{productId}")]
+    public async Task<IActionResult> ExitsProductByPage(Guid? pageId, Guid? productId)
     {
         try
         {
-            var result = await _service.ExitsStaticPageProductByPage(data);
+            var result = await _service.ExitsStaticPageProductByPage(new StaticPageProductByPageCreate
+            {
+                StaticPagePageModelId = pageId,
+                StaticPageProductModelId = productId
+            });
+
             return new OkObjectResult(result);
         }
         catch (System.Exception ex)
@@ -535,12 +620,16 @@ public class PagesController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("productsbyresource/exits")]
-    public async Task<IActionResult> ExitsProductByResource(StaticPageProductByResourceCreate data)
+    [HttpGet("productsbyresource/exits/{productId}/{resourceId}")]
+    public async Task<IActionResult> ExitsProductByResource(Guid? productId, Guid? resourceId)
     {
         try
         {
-            var result = await _service.ExitsStaticPageProductByResource(data);
+            var result = await _service.ExitsStaticPageProductByResource(new StaticPageProductByResourceCreate
+            {
+                StaticPageProductModelId = productId,
+                StaticPageResourceModelId = resourceId
+            });
             return new OkObjectResult(result);
         }
         catch (System.Exception ex)
