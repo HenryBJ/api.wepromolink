@@ -127,7 +127,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(builder =>
    {
-       builder.WithOrigins("https://admin.wepromolink.com", "http://localhost:3000")
+       builder.WithOrigins("https://dashboard.wepromolink.com", "http://localhost:3000")
            .AllowAnyHeader()
            .WithMethods("GET", "POST", "PUT", "DELETE")
            .AllowCredentials();
