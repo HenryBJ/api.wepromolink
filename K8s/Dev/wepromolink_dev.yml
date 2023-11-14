@@ -389,7 +389,7 @@ spec:
     - "*.wepromolink.com"
     secretName: wildcard-cert-com-prod
   rules:
-    - host: dev.api.wepromolink.com
+    - host: apidev.wepromolink.com
       http:
         paths:
           - path: /
@@ -399,7 +399,7 @@ spec:
                 name: webapi-service
                 port:
                   number: 80
-    - host: admin.api.wepromolink.com
+    - host: apiadmin.wepromolink.com
       http:
         paths:
           - path: /
