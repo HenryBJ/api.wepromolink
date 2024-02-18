@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Stripe;
+using Stripe.Checkout;
 using WePromoLink.Data;
 using WePromoLink.DTO;
 using WePromoLink.DTO.Events;
@@ -40,8 +41,8 @@ public class StripeService
         {
             if (subscription != null)
             {
-                var productId = subscription.Items.Data[0].Price.ProductId;
-                var subPlan = await _db.SubscriptionPlans.Where(e => e.AnnualyProductId == productId || e.MonthlyProductId == productId).SingleOrDefaultAsync();
+                var priceId = subscription.Items.Data[0].Price.Id;
+                var subPlan = await _db.SubscriptionPlans.Where(e => e.AnnualyPriceId == priceId || e.MonthlyPriceId == priceId).SingleOrDefaultAsync();
                 var service = new CustomerService();
                 Customer customer = await service.GetAsync(subscription.CustomerId);
 
@@ -55,6 +56,7 @@ public class StripeService
                 {
                     SubscriptionInfo = new SubscriptionInfo
                     {
+                        SubscriptionId = fullSub.Id,
                         Status = subscription.Status,
                         LastPaymentDate = lastInvoiceDate,
                         NextPaymentDate = upcommigInvoiceDate
@@ -62,9 +64,9 @@ public class StripeService
                     Fullname = customer.Name,
                     Email = customer.Email,
                     CustomerId = customer.Id,
-                    ProductId = productId,
+                    ProductId = subscription.Items.Data[0].Price.ProductId,
                     SubscriptionPlanModelId = subPlan?.Id
-                });
+                }, subPlan!.Commission > 0); // If have commission must be subscribed at this moment
             }
 
         }
@@ -89,6 +91,41 @@ public class StripeService
         billing.IsVerified = true;
         _db.StripeBillings.Update(billing);
         await _db.SaveChangesAsync();
+    }
+
+    public async Task<string> Checkout(string priceId, string firebaseId)
+    {
+        // Get Email from firebaseId
+        var email = await FirebaseUtil.GetEmailById(firebaseId);
+
+        // If there is a cost, must set quantity to charge at the moment
+        var cost = await _db.SubscriptionPlans
+                            .Where(e => e.MonthlyPriceId == priceId || e.AnnualyPriceId == priceId)
+                            .Select(e => e.Annually + e.Monthly)
+                            .SingleAsync();
+
+        SessionCreateOptions options = new SessionCreateOptions
+        {
+            PaymentMethodTypes = new List<string>
+            {
+                "card",
+            },
+            LineItems = new List<SessionLineItemOptions>
+            {
+                  new SessionLineItemOptions
+                {
+                    Price = priceId,
+                    Quantity = cost > 0 ? 1:null
+                },
+            },
+            Mode = "subscription",
+            SuccessUrl = "https://wepromolink.com/thanks",
+            CancelUrl = "https://wepromolink.com/pricing",
+            CustomerEmail = email
+        };
+        SessionService? service = new Stripe.Checkout.SessionService();
+        var session = service.Create(options);
+        return session.Url;
     }
 
     public async Task<string> CreateAccountLink()

@@ -91,19 +91,100 @@ namespace WePromoLink.Shared.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StaticPageDataTemplates",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Json = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MaxAge = table.Column<TimeSpan>(type: "time", nullable: true),
+                    Etag = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaticPageDataTemplates", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StaticPageProducts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CostPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Inventory = table.Column<int>(type: "int", nullable: false),
+                    SKU = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Tags = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Weight = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Length = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Width = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Height = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    AffiliateProgram = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Commission = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    AffiliateLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BuyLink = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaticPageProducts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StaticPageResources",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SizeMB = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Height = table.Column<int>(type: "int", nullable: true),
+                    Width = table.Column<int>(type: "int", nullable: true),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaticPageResources", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StaticPageWebsiteTemplates",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MaxAge = table.Column<TimeSpan>(type: "time", nullable: true),
+                    Etag = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaticPageWebsiteTemplates", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SubscriptionPlans",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExternalId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Level = table.Column<int>(type: "int", nullable: false),
-                    MonthlyProductId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AnnualyProductId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MonthlyPaymantLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AnnualyPaymantLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MonthlyPriceId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AnnualyPriceId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Order = table.Column<int>(type: "int", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Monthly = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
+                    Commission = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Annually = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     Discount = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -126,6 +207,61 @@ namespace WePromoLink.Shared.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SurveyQuestions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StaticPageProductByResources",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StaticPageProductModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StaticPageResourceModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaticPageProductByResources", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StaticPageProductByResources_StaticPageProducts_StaticPageProductModelId",
+                        column: x => x.StaticPageProductModelId,
+                        principalTable: "StaticPageProducts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_StaticPageProductByResources_StaticPageResources_StaticPageResourceModelId",
+                        column: x => x.StaticPageResourceModelId,
+                        principalTable: "StaticPageResources",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StaticPages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IP = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StaticPageDataTemplateModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StaticPageWebsiteTemplateModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MaxAge = table.Column<TimeSpan>(type: "time", nullable: true),
+                    Etag = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaticPages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StaticPages_StaticPageDataTemplates_StaticPageDataTemplateModelId",
+                        column: x => x.StaticPageDataTemplateModelId,
+                        principalTable: "StaticPageDataTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StaticPages_StaticPageWebsiteTemplates_StaticPageWebsiteTemplateModelId",
+                        column: x => x.StaticPageWebsiteTemplateModelId,
+                        principalTable: "StaticPageWebsiteTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -193,6 +329,32 @@ namespace WePromoLink.Shared.Migrations
                         principalTable: "SurveyQuestions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StaticPageProductByPages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StaticPageProductModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StaticPageModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AffiliateClicks = table.Column<int>(type: "int", nullable: false),
+                    BuyClicks = table.Column<int>(type: "int", nullable: false),
+                    Profit = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaticPageProductByPages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StaticPageProductByPages_StaticPageProducts_StaticPageProductModelId",
+                        column: x => x.StaticPageProductModelId,
+                        principalTable: "StaticPageProducts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_StaticPageProductByPages_StaticPages_StaticPageModelId",
+                        column: x => x.StaticPageModelId,
+                        principalTable: "StaticPages",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1881,23 +2043,19 @@ namespace WePromoLink.Shared.Migrations
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
-                columns: new[] { "Id", "Annually", "AnnualyPaymantLink", "AnnualyProductId", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPaymantLink", "MonthlyProductId", "Order", "PaymentMethod", "Tag", "Title" },
-                values: new object[,]
-                {
-                    { new Guid("36bd6851-325b-47f1-8fb2-f7bebccdfff2"), 244m, "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF", "prod_NpuAflpfqloJa9", 15m, "RdZhF_GhMK75", 2, null, 24m, "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss", "prod_NpnKrvEvvWJtqG", 2, "stripe", "Popular", "Professional" },
-                    { new Guid("ac7de61d-55d9-4ffb-8016-81789a26c2ee"), 0m, "", "", 0m, "AiZKq-4dL-6n", 1, null, 0m, "", "", 1, "bitcoin", "", "Community" }
-                });
+                columns: new[] { "Id", "Annually", "AnnualyPriceId", "Commission", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPriceId", "Order", "PaymentMethod", "Tag", "Title" },
+                values: new object[] { new Guid("4c440ccb-4797-481c-a428-5893c5493aad"), 0m, "", 0.09m, 0m, "il7Tbn3V4iFw", 1, null, 0m, "price_1OktQYC26XBdqsojcQwEpZTu", 2, "stripe", "Popular", "Basic" });
 
             migrationBuilder.InsertData(
                 table: "SurveyQuestions",
                 columns: new[] { "Id", "Group", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), 4, "How useful do you find the WePromoLink platform for your advertising needs?" },
-                    { new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), 2, "Which payment methods do you prefer for platform subscriptions and earnings withdrawals?" },
-                    { new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"), 3, "Do you prefer a monthly subscription fee or paying a commission on earnings?" },
-                    { new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), 5, "What additional features or improvements would you like to see on the WePromoLink platform?" },
-                    { new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), 1, "What motivates you to use a platform like WePromoLink?" }
+                    { new Guid("191c668b-e3e4-4169-bb51-f3e6e740d86b"), 2, "Which payment methods do you prefer for platform subscriptions and earnings withdrawals?" },
+                    { new Guid("5aca019b-e281-4027-ae46-52dbe8db55bf"), 5, "What additional features or improvements would you like to see on the WePromoLink platform?" },
+                    { new Guid("943590a1-6d2f-4d2e-be37-7a3d06f42b83"), 3, "Do you prefer a monthly subscription fee or paying a commission on earnings?" },
+                    { new Guid("c761951d-ef8a-4ad3-90b3-64f7e90441df"), 4, "How useful do you find the WePromoLink platform for your advertising needs?" },
+                    { new Guid("eae5653d-be97-4674-81eb-5dde7d2fc7ef"), 1, "What motivates you to use a platform like WePromoLink?" }
                 });
 
             migrationBuilder.InsertData(
@@ -1905,8 +2063,10 @@ namespace WePromoLink.Shared.Migrations
                 columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("04c14326-f7b4-4cac-af4f-29a8bfa81376"), false, "Contain ads", new Guid("36bd6851-325b-47f1-8fb2-f7bebccdfff2"), null },
-                    { new Guid("4d250b37-5bc6-4a9c-9c13-6a95d9b4aa75"), true, "Contain ads", new Guid("ac7de61d-55d9-4ffb-8016-81789a26c2ee"), null }
+                    { new Guid("5c255353-0fcc-4c21-9945-490e3a40a385"), false, "Links", new Guid("4c440ccb-4797-481c-a428-5893c5493aad"), "Unlimited" },
+                    { new Guid("a4f20b2f-de54-421d-ae16-63dc276b3223"), true, "Contain ads", new Guid("4c440ccb-4797-481c-a428-5893c5493aad"), "" },
+                    { new Guid("e702dab7-560f-46ea-a51c-522b401a4e39"), false, "Commission per click", new Guid("4c440ccb-4797-481c-a428-5893c5493aad"), "U$0.09" },
+                    { new Guid("e73e19b1-98a7-4d0b-bb00-d6e5273d4232"), false, "Campaigns", new Guid("4c440ccb-4797-481c-a428-5893c5493aad"), "Unlimited" }
                 });
 
             migrationBuilder.InsertData(
@@ -1914,27 +2074,27 @@ namespace WePromoLink.Shared.Migrations
                 columns: new[] { "Id", "SurveyQuestionModelId", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("0a8b12ce-7666-4714-9905-c09f2875cf89"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Somewhat useful" },
-                    { new Guid("1e047dd9-b39b-466e-963b-a5816ef2f9f8"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Extremely useful" },
-                    { new Guid("3547ea36-c291-4bfa-8c57-e7549a846ab4"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "I'm not sure" },
-                    { new Guid("3ba37a3d-62ee-4024-b86c-6767fdeeec3b"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Not useful at all" },
-                    { new Guid("3dfbc43e-395d-422f-895b-d309ef0d5361"), new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"), "I'm not sure" },
-                    { new Guid("51aeedae-1573-4559-9f74-a0a4b13f0ded"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "Advanced analytics and reporting" },
-                    { new Guid("5fb9c1ba-65eb-499e-a1ea-a85685b73ddc"), new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), "PayPal" },
-                    { new Guid("636011ee-5ca0-4a04-ba44-d3955fa72aad"), new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), "Stripe" },
-                    { new Guid("6b776504-8994-4d71-ade3-aaf982a3c53c"), new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"), "Commission on earnings" },
-                    { new Guid("8567d9ac-52ba-4cf4-ba34-d5983de804b4"), new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), "Connecting with other users and businesses" },
-                    { new Guid("94fb9766-7eb7-4540-bb0a-050d327759e6"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Not very useful" },
-                    { new Guid("a4d39b2b-aadd-4e90-915c-b289c1341b28"), new Guid("3a1fa3e4-05d4-45ce-92ce-a54bcaccb903"), "Very useful" },
-                    { new Guid("ab2b77fa-3867-472b-b77f-1a15721f6723"), new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), "Credit/Debit card" },
-                    { new Guid("c78a5ece-f26a-4128-b4a5-99dcf5887de8"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "Improved user interface and navigation" },
-                    { new Guid("d00ab3bc-d7e4-40e8-befc-4b74650a31c5"), new Guid("b635c45d-eb2d-4e13-8f9b-ad4b430555f2"), "Monthly subscription fee" },
-                    { new Guid("d1ce3276-f208-49eb-a9de-edb7a45c8da4"), new Guid("985ecaed-76a9-4dbe-8206-37249f932c0b"), "Bank transfer" },
-                    { new Guid("d5364342-05e2-43e7-b816-588047bd9899"), new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), "Promoting my products or services" },
-                    { new Guid("e16346ef-b4cd-4e6b-9743-c53fb7e7e022"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "Integration with other advertising platforms" },
-                    { new Guid("e865a2bc-d576-45bc-b23a-56de71073748"), new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), "Earning money through affiliate marketing" },
-                    { new Guid("ece25c47-265b-4dcc-a8c0-cfb3578850e7"), new Guid("c184d547-6478-415f-a2aa-c77ec6e90bd2"), "More campaign customization options" },
-                    { new Guid("fcdab328-8201-43c8-a52d-17805c49372b"), new Guid("c5586c12-e2d2-4831-bdb9-259c0ef83298"), "Exploring new advertising opportunities" }
+                    { new Guid("009a2738-b1f0-4a05-9900-5a1925cbf42b"), new Guid("c761951d-ef8a-4ad3-90b3-64f7e90441df"), "Extremely useful" },
+                    { new Guid("11cf7250-05fe-466e-883f-29959823808a"), new Guid("191c668b-e3e4-4169-bb51-f3e6e740d86b"), "Bank transfer" },
+                    { new Guid("1bef408c-1c69-416b-9e87-86aaa175ee60"), new Guid("c761951d-ef8a-4ad3-90b3-64f7e90441df"), "Not useful at all" },
+                    { new Guid("2f413356-2958-4594-a084-c18fa01bc80a"), new Guid("eae5653d-be97-4674-81eb-5dde7d2fc7ef"), "Connecting with other users and businesses" },
+                    { new Guid("2f46f69a-b0db-45c1-afe7-0cec7e772dc8"), new Guid("943590a1-6d2f-4d2e-be37-7a3d06f42b83"), "Monthly subscription fee" },
+                    { new Guid("33aefef1-1601-42cb-a18a-3059fdcc782d"), new Guid("eae5653d-be97-4674-81eb-5dde7d2fc7ef"), "Promoting my products or services" },
+                    { new Guid("3a162e33-11e0-401d-8bff-5f37dd5c10f5"), new Guid("c761951d-ef8a-4ad3-90b3-64f7e90441df"), "Not very useful" },
+                    { new Guid("65593b8c-3d84-47af-81fa-2591b5ae9f2f"), new Guid("eae5653d-be97-4674-81eb-5dde7d2fc7ef"), "Earning money through affiliate marketing" },
+                    { new Guid("83f7e6e0-daf5-4c19-93da-b8fb50e4935c"), new Guid("c761951d-ef8a-4ad3-90b3-64f7e90441df"), "Somewhat useful" },
+                    { new Guid("8418c289-686a-46a9-bb27-84ca5249637e"), new Guid("5aca019b-e281-4027-ae46-52dbe8db55bf"), "I'm not sure" },
+                    { new Guid("86dab0a0-2212-4cee-8913-39a8b7bdbba2"), new Guid("c761951d-ef8a-4ad3-90b3-64f7e90441df"), "Very useful" },
+                    { new Guid("8aee4bc3-db2d-4ecd-b474-0d26a6d21d6d"), new Guid("5aca019b-e281-4027-ae46-52dbe8db55bf"), "More campaign customization options" },
+                    { new Guid("92d229d7-2b00-4eeb-b287-920efc5babe0"), new Guid("5aca019b-e281-4027-ae46-52dbe8db55bf"), "Integration with other advertising platforms" },
+                    { new Guid("a87ae105-22d1-40bf-8059-ea39b73009bc"), new Guid("943590a1-6d2f-4d2e-be37-7a3d06f42b83"), "Commission on earnings" },
+                    { new Guid("ba66e195-63a1-47cc-8f68-276f9414146a"), new Guid("943590a1-6d2f-4d2e-be37-7a3d06f42b83"), "I'm not sure" },
+                    { new Guid("ccc5973b-1ce3-43fa-bd37-ec35bc64c312"), new Guid("191c668b-e3e4-4169-bb51-f3e6e740d86b"), "Stripe" },
+                    { new Guid("d969b536-753c-4ae4-9389-68c6879f55b5"), new Guid("191c668b-e3e4-4169-bb51-f3e6e740d86b"), "PayPal" },
+                    { new Guid("de2b7e59-276d-47e3-a6ab-6d39592ded8c"), new Guid("5aca019b-e281-4027-ae46-52dbe8db55bf"), "Advanced analytics and reporting" },
+                    { new Guid("e15eb85f-6ec1-4816-9c5e-e60dfd6524fe"), new Guid("eae5653d-be97-4674-81eb-5dde7d2fc7ef"), "Exploring new advertising opportunities" },
+                    { new Guid("e47c1e8d-d4bb-4f44-9f72-d0a4c1fbaaf4"), new Guid("5aca019b-e281-4027-ae46-52dbe8db55bf"), "Improved user interface and navigation" },
+                    { new Guid("e7f21638-23c4-4ad0-8a1d-da61670e5948"), new Guid("191c668b-e3e4-4169-bb51-f3e6e740d86b"), "Credit/Debit card" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -2286,6 +2446,36 @@ namespace WePromoLink.Shared.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_StaticPageProductByPages_StaticPageModelId",
+                table: "StaticPageProductByPages",
+                column: "StaticPageModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StaticPageProductByPages_StaticPageProductModelId",
+                table: "StaticPageProductByPages",
+                column: "StaticPageProductModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StaticPageProductByResources_StaticPageProductModelId",
+                table: "StaticPageProductByResources",
+                column: "StaticPageProductModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StaticPageProductByResources_StaticPageResourceModelId",
+                table: "StaticPageProductByResources",
+                column: "StaticPageResourceModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StaticPages_StaticPageDataTemplateModelId",
+                table: "StaticPages",
+                column: "StaticPageDataTemplateModelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StaticPages_StaticPageWebsiteTemplateModelId",
+                table: "StaticPages",
+                column: "StaticPageWebsiteTemplateModelId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StripeBillings_UserModelId",
                 table: "StripeBillings",
                 column: "UserModelId",
@@ -2491,6 +2681,12 @@ namespace WePromoLink.Shared.Migrations
                 name: "SharedTodayUsers");
 
             migrationBuilder.DropTable(
+                name: "StaticPageProductByPages");
+
+            migrationBuilder.DropTable(
+                name: "StaticPageProductByResources");
+
+            migrationBuilder.DropTable(
                 name: "StripeBillings");
 
             migrationBuilder.DropTable(
@@ -2506,10 +2702,25 @@ namespace WePromoLink.Shared.Migrations
                 name: "Links");
 
             migrationBuilder.DropTable(
+                name: "StaticPages");
+
+            migrationBuilder.DropTable(
+                name: "StaticPageProducts");
+
+            migrationBuilder.DropTable(
+                name: "StaticPageResources");
+
+            migrationBuilder.DropTable(
                 name: "SurveyAnswers");
 
             migrationBuilder.DropTable(
                 name: "Campaigns");
+
+            migrationBuilder.DropTable(
+                name: "StaticPageDataTemplates");
+
+            migrationBuilder.DropTable(
+                name: "StaticPageWebsiteTemplates");
 
             migrationBuilder.DropTable(
                 name: "SurveyQuestions");

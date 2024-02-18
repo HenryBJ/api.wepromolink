@@ -27,13 +27,9 @@ public class SubscriptionPlanServiceTest : BaseTest
         SubscriptionPlanCreate item = new SubscriptionPlanCreate
         {
             Annually = 200,
-            AnnualyPaymantLink = "https://test.stripe",
-            AnnualyProductId = "123456",
             Discount = 20,
             Level = 1,
             Monthly = 20,
-            MonthlyPaymantLink = "https://test.stripe",
-            MonthlyProductId = "654321",
             Order = 1,
             PaymentMethod = "stripe",
             Tag = "testing",
@@ -53,13 +49,9 @@ public class SubscriptionPlanServiceTest : BaseTest
             Assert.NotEqual(result, Guid.Empty);
             plan = await _db.SubscriptionPlans.Include(e => e.Features).Where(e => e.Id == result).SingleOrDefaultAsync();
             Assert.NotNull(plan);
-            Assert.Equal("https://test.stripe", plan.AnnualyPaymantLink);
-            Assert.Equal("123456", plan.AnnualyProductId);
             Assert.Equal(20, plan.Discount);
             Assert.Equal(1, plan.Level);
             Assert.Equal(20, plan.Monthly);
-            Assert.Equal("https://test.stripe", plan.MonthlyPaymantLink);
-            Assert.Equal("654321", plan.MonthlyProductId);
             Assert.Equal(1, plan.Order);
             Assert.Equal("stripe", plan.PaymentMethod);
             Assert.Equal("testing", plan.Tag);
@@ -86,13 +78,9 @@ public class SubscriptionPlanServiceTest : BaseTest
         SubscriptionPlanCreate item = new SubscriptionPlanCreate
         {
             Annually = 200,
-            AnnualyPaymantLink = "https://test.stripe",
-            AnnualyProductId = "123456",
             Discount = 20,
             Level = 1,
             Monthly = 20,
-            MonthlyPaymantLink = "https://test.stripe",
-            MonthlyProductId = "654321",
             Order = 1,
             PaymentMethod = "stripe",
             Tag = "testing",
@@ -114,12 +102,8 @@ public class SubscriptionPlanServiceTest : BaseTest
             {
                 Id = result,
                 Annually = 201,
-                AnnualyPaymantLink = "https://test.stripe1",
-                AnnualyProductId = "1234561",
                 Discount = 21,
                 Monthly = 22,
-                MonthlyPaymantLink = "https://test.stripe1",
-                MonthlyProductId = "6543211",
                 Order = 2,
                 PaymentMethod = "stripe1",
                 Tag = "testing1",
@@ -131,13 +115,9 @@ public class SubscriptionPlanServiceTest : BaseTest
             Assert.NotEqual(result, Guid.Empty);
             plan = await _db.SubscriptionPlans.Where(e => e.Id == result).SingleOrDefaultAsync();
             Assert.NotNull(plan);
-            Assert.Equal("https://test.stripe1", plan.AnnualyPaymantLink);
-            Assert.Equal("1234561", plan.AnnualyProductId);
             Assert.Equal(21, plan.Discount);
             Assert.Equal(1, plan.Level);
             Assert.Equal(22, plan.Monthly);
-            Assert.Equal("https://test.stripe1", plan.MonthlyPaymantLink);
-            Assert.Equal("6543211", plan.MonthlyProductId);
             Assert.Equal(2, plan.Order);
             Assert.Equal("stripe1", plan.PaymentMethod);
             Assert.Equal("testing1", plan.Tag);
@@ -162,13 +142,9 @@ public class SubscriptionPlanServiceTest : BaseTest
         SubscriptionPlanCreate item = new SubscriptionPlanCreate
         {
             Annually = 200,
-            AnnualyPaymantLink = "https://test.stripe",
-            AnnualyProductId = "123456",
             Discount = 20,
             Level = 1,
             Monthly = 20,
-            MonthlyPaymantLink = "https://test.stripe",
-            MonthlyProductId = "654321",
             Order = 1,
             PaymentMethod = "stripe",
             Tag = "testing",
@@ -208,13 +184,9 @@ public class SubscriptionPlanServiceTest : BaseTest
         SubscriptionPlanCreate item = new SubscriptionPlanCreate
         {
             Annually = 200,
-            AnnualyPaymantLink = "https://test.stripe",
-            AnnualyProductId = "123456",
             Discount = 20,
             Level = 1,
             Monthly = 20,
-            MonthlyPaymantLink = "https://test.stripe",
-            MonthlyProductId = "654321",
             Order = 1,
             PaymentMethod = "stripe",
             Tag = "testing",
@@ -234,12 +206,8 @@ public class SubscriptionPlanServiceTest : BaseTest
             plan = await _service.Get(result);
 
             Assert.NotNull(plan);
-            Assert.Equal("https://test.stripe", plan.AnnualyPaymantLink);
-            Assert.Equal("123456", plan.AnnualyProductId);
             Assert.Equal(20, plan.Discount);
             Assert.Equal(20, plan.Monthly);
-            Assert.Equal("https://test.stripe", plan.MonthlyPaymantLink);
-            Assert.Equal("654321", plan.MonthlyProductId);
             Assert.Equal(1, plan.Order);
             Assert.Equal("stripe", plan.PaymentMethod);
             Assert.Equal("testing", plan.Tag);
@@ -263,13 +231,9 @@ public class SubscriptionPlanServiceTest : BaseTest
         SubscriptionPlanCreate item1 = new SubscriptionPlanCreate
         {
             Annually = 200,
-            AnnualyPaymantLink = "https://test.stripe",
-            AnnualyProductId = "123456",
             Discount = 20,
             Level = 1,
             Monthly = 20,
-            MonthlyPaymantLink = "https://test.stripe",
-            MonthlyProductId = "654321",
             Order = 1,
             PaymentMethod = "stripe",
             Tag = "testing",
@@ -285,13 +249,9 @@ public class SubscriptionPlanServiceTest : BaseTest
         SubscriptionPlanCreate item2 = new SubscriptionPlanCreate
         {
             Annually = 400,
-            AnnualyPaymantLink = "https://test.stripe",
-            AnnualyProductId = "123456",
             Discount = 40,
             Level = 2,
             Monthly = 40,
-            MonthlyPaymantLink = "https://test.stripe",
-            MonthlyProductId = "654321",
             Order = 2,
             PaymentMethod = "stripe",
             Tag = "testing",
@@ -340,13 +300,9 @@ public class SubscriptionPlanServiceTest : BaseTest
         SubscriptionPlanCreate item = new SubscriptionPlanCreate
         {
             Annually = 200,
-            AnnualyPaymantLink = "https://test.stripe",
-            AnnualyProductId = "123456",
             Discount = 20,
             Level = 1,
             Monthly = 20,
-            MonthlyPaymantLink = "https://test.stripe",
-            MonthlyProductId = "654321",
             Order = 1,
             PaymentMethod = "stripe",
             Tag = "testing",
@@ -392,13 +348,9 @@ public class SubscriptionPlanServiceTest : BaseTest
         SubscriptionPlanCreate item = new SubscriptionPlanCreate
         {
             Annually = 200,
-            AnnualyPaymantLink = "https://test.stripe",
-            AnnualyProductId = "123456",
             Discount = 20,
             Level = 1,
             Monthly = 20,
-            MonthlyPaymantLink = "https://test.stripe",
-            MonthlyProductId = "654321",
             Order = 1,
             PaymentMethod = "stripe",
             Tag = "testing",
@@ -447,13 +399,9 @@ public class SubscriptionPlanServiceTest : BaseTest
         SubscriptionPlanCreate item = new SubscriptionPlanCreate
         {
             Annually = 200,
-            AnnualyPaymantLink = "https://test.stripe",
-            AnnualyProductId = "123456",
             Discount = 20,
             Level = 1,
             Monthly = 20,
-            MonthlyPaymantLink = "https://test.stripe",
-            MonthlyProductId = "654321",
             Order = 1,
             PaymentMethod = "stripe",
             Tag = "testing",

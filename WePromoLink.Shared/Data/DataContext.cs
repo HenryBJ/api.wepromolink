@@ -94,8 +94,8 @@ public class DataContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        Guid subPlanCommunity = Guid.NewGuid();
         Guid subPlanProfesional = Guid.NewGuid();
+        Guid subPlanBasic = Guid.NewGuid();
         base.OnModelCreating(builder);
 
         builder.Entity<SubscriptionFeatureModel>(entity =>
@@ -103,9 +103,15 @@ public class DataContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasData(new[]
             {
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = true,SubscriptionPlanModelId = subPlanCommunity},
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional}
-        });
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Campaigns",BoolValue = false,SubscriptionPlanModelId = subPlanBasic, Value="Unlimited"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Links",BoolValue = false,SubscriptionPlanModelId = subPlanBasic, Value="Unlimited"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Commission per click",BoolValue = false,SubscriptionPlanModelId = subPlanBasic, Value="U$0.01"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = true,SubscriptionPlanModelId = subPlanBasic, Value=""},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Campaigns",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="Unlimited"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Links",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="Unlimited"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Commission per click",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="U$0.00"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value=""}
+            });
         });
 
         var key1 = Guid.NewGuid();
@@ -314,37 +320,35 @@ public class DataContext : DbContext
 
             entity.HasData(new[]{
                 new SubscriptionPlanModel {
-                    Id = subPlanProfesional,
-                    AnnualyProductId = "prod_NpuAflpfqloJa9",
-                    MonthlyProductId = "prod_NpnKrvEvvWJtqG",
-                    Annually = 244,
-                    Monthly = 24,
-                    Discount = 15,
-                    Level = 2,
-                    PaymentMethod = "stripe",
-                    Tag = "Popular",
-                    Title = "Professional",
-                    MonthlyPaymantLink = "https://buy.stripe.com/test_eVa9Es8qI0KJaOs7ss",
-                    AnnualyPaymantLink = "https://buy.stripe.com/test_8wM8Ao6iAfFD3m0aEF",
-                    ExternalId = Nanoid.Nanoid.Generate(size:12),
-                    Order = 2
-                },
-                new SubscriptionPlanModel {
-                    Id = subPlanCommunity,
-                    AnnualyProductId = "",
-                    MonthlyProductId = "",
+                    Id = subPlanBasic,
+                    MonthlyPriceId = "price_1Ol0LGC26XBdqsojWuT9BKvb",
+                    AnnualyPriceId = "",
+                    Commission = 0.01m,
                     Annually = 0,
                     Monthly = 0,
                     Discount = 0,
                     Level = 1,
                     PaymentMethod = "stripe",
                     Tag = "",
-                    Title = "Community",
-                    MonthlyPaymantLink = "",
-                    AnnualyPaymantLink = "",
+                    Title = "Basic",
                     ExternalId = Nanoid.Nanoid.Generate(size:12),
-                    Order = 1
-                }
+                    Order = 2
+                },
+                new SubscriptionPlanModel {
+                    Id = subPlanProfesional,
+                    MonthlyPriceId = "price_1OkwiHC26XBdqsojpgor0QaV",
+                    AnnualyPriceId = "",
+                    Commission = 0,
+                    Annually = 0,
+                    Monthly = 4.99m,
+                    Discount = 0,
+                    Level = 2,
+                    PaymentMethod = "stripe",
+                    Tag = "Popular",
+                    Title = "Professional",
+                    ExternalId = Nanoid.Nanoid.Generate(size:12),
+                    Order = 3
+                },
             });
         });
 

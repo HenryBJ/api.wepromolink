@@ -25,6 +25,23 @@ public class StripeController : ControllerBase
 
     [HttpPost]
     [Authorize]
+    [Route("account/checkout/{priceId}/{firebaseId}")]
+    public async Task<IActionResult> Checkout(string priceId, string firebaseId)
+    {
+        try
+        {
+            var url = await _service.Checkout(priceId, firebaseId);
+            return new OkObjectResult(url);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
     [Route("account/create")]
     public async Task<IActionResult> CreateAccountLink()
     {

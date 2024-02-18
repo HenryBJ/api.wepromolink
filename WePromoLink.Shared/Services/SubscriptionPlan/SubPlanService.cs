@@ -20,15 +20,14 @@ public class SubPlanService : ISubPlanService
         SubscriptionPlanModel model = new SubscriptionPlanModel
         {
             Annually = subPlan.Annually,
-            AnnualyPaymantLink = subPlan.AnnualyPaymantLink,
-            AnnualyProductId = subPlan.AnnualyProductId,
+            AnnualyPriceId = subPlan.AnnualyPriceId,
+            MonthlyPriceId = subPlan.MonthlyPriceId,
+            Commission = subPlan.Commission,            
             Discount = subPlan.Discount,
             ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
             Id = Guid.NewGuid(),
             Level = subPlan.Level,
             Monthly = subPlan.Monthly,
-            MonthlyPaymantLink = subPlan.MonthlyPaymantLink,
-            MonthlyProductId = subPlan.MonthlyProductId,
             Order = subPlan.Order,
             PaymentMethod = subPlan.PaymentMethod,
             Tag = subPlan.Tag,
@@ -88,13 +87,12 @@ public class SubPlanService : ISubPlanService
         if (item == null) throw new Exception("Subscription plan not found");
 
         item.Annually = subPlan.Annually;
-        item.AnnualyPaymantLink = subPlan.AnnualyPaymantLink;
-        item.AnnualyProductId = subPlan.AnnualyProductId;
         item.Discount = subPlan.Discount;
         item.Monthly = subPlan.Monthly;
-        item.MonthlyPaymantLink = subPlan.MonthlyPaymantLink;
-        item.MonthlyProductId = subPlan.MonthlyProductId;
         item.Order = subPlan.Order;
+        item.AnnualyPriceId = subPlan.AnnualyPriceId;
+        item.MonthlyPriceId = subPlan.MonthlyPriceId;
+        item.Commission = subPlan.Commission;
         item.Level = subPlan.Level;
         item.PaymentMethod = subPlan.PaymentMethod;
         item.Tag = subPlan.Tag;
@@ -125,13 +123,12 @@ public class SubPlanService : ISubPlanService
         SubscriptionPlanRead result = new()
         {
             Annually = item.Annually,
-            AnnualyPaymantLink = item.AnnualyPaymantLink,
-            AnnualyProductId = item.AnnualyProductId,
             Discount = item.Discount,
             Id = item.Id,
             Monthly = item.Monthly,
-            MonthlyPaymantLink = item.MonthlyPaymantLink,
-            MonthlyProductId = item.MonthlyProductId,
+            AnnualyPriceId = item.AnnualyPriceId,
+            MonthlyPriceId = item.MonthlyPriceId,
+            Commission = item.Commission,
             Order = item.Order,
             PaymentMethod = item.PaymentMethod,
             Tag = item.Tag,
@@ -167,13 +164,12 @@ public class SubPlanService : ISubPlanService
         .Select(item => new SubscriptionPlanRead
         {
             Annually = item.Annually,
-            AnnualyPaymantLink = item.AnnualyPaymantLink,
-            AnnualyProductId = item.AnnualyProductId,
             Discount = item.Discount,
             Id = item.Id,
+            AnnualyPriceId = item.AnnualyPriceId,
+            MonthlyPriceId = item.MonthlyPriceId,
+            Commission = item.Commission,
             Monthly = item.Monthly,
-            MonthlyPaymantLink = item.MonthlyPaymantLink,
-            MonthlyProductId = item.MonthlyProductId,
             Order = item.Order,
             PaymentMethod = item.PaymentMethod,
             Tag = item.Tag,

@@ -4,10 +4,9 @@ public class SubscriptionPlanRead
 {
     public Guid Id { get; set; }
     public decimal Monthly { get; set; }
-    public string? MonthlyProductId { get; set; }
-    public string? AnnualyProductId { get; set; }
-    public string MonthlyPaymantLink { get; set; }
-    public string AnnualyPaymantLink { get; set; }
+    public string? MonthlyPriceId { get; set; }
+    public string? AnnualyPriceId { get; set; }
+    public decimal Commission { get; set; }
     public int Order { get; set; }
     public int Level { get; set; }
     public string Title { get; set; }

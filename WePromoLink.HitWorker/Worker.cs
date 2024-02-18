@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events;
 using WePromoLink.DTO.Events.Commands;
@@ -84,6 +85,8 @@ public class Worker : BackgroundService
                 .ThenInclude(e => e.Profit)
                 .Include(e => e.Campaign)
                 .ThenInclude(e => e.User)
+                .ThenInclude(e => e.Subscription)
+                .ThenInclude(e => e.SubscriptionPlan)
                 .Where(e => e.ExternalId == item.LinkId)
                 .SingleOrDefaultAsync();
                 if (link == null) return false;
@@ -168,7 +171,10 @@ public class Worker : BackgroundService
                     IsGeolocated = false,
                     LastHitAt = DateTime.UtcNow,
                     FirstHitAt = DateTime.UtcNow,
-                    Origin = origin
+                    Origin = origin,
+                    Payed = false,
+                    Commission = userFromCampaign.Subscription.SubscriptionPlan.Commission,
+                    SubscriptionId = userFromCampaign.Subscription.StripeId
                 };
 
 

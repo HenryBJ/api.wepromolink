@@ -4,6 +4,7 @@ public class SubscriptionModel
 {
     public Guid Id { get; set; }
     public string ExternalId { get; set; }
+    public string StripeId { get; set; }
     public string Status { get; set; }
     public virtual UserModel User { get; set; }
     public Guid SubscriptionPlanModelId { get; set; }

@@ -14,6 +14,12 @@ public static class FirebaseUtil
         return await FirebaseAuth.DefaultInstance.GetUserAsync(uId);
     }
 
+    public static async Task<string> GetEmailById(string firebaseId)
+    {
+        var user = await FirebaseAuth.DefaultInstance.GetUserAsync(firebaseId);
+        return user.Email;
+    }
+
     public static string GetFirebaseId(IHttpContextAccessor ca)
     {
         ca.HttpContext?.Request.Headers.TryGetValue("X-Wepromolink-UserId", out StringValues userId);

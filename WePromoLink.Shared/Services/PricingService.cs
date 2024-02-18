@@ -29,8 +29,9 @@ public class PricingService : IPricingService
             PaymentMethod = e.PaymentMethod,
             Title = e.Title,
             Tag = e.Tag,
-            MonthlyPaymantLink = e.MonthlyPaymantLink,
-            AnnualyPaymantLink = e.AnnualyPaymantLink,
+            AnnualyPriceId = e.AnnualyPriceId,
+            Commission = e.Commission,
+            MonthlyPriceId = e.MonthlyPriceId,
             Order = e.Order,
             Features = e.Features.Select(k => new PricingFeature { BoolValue = k.BoolValue, Name = k.Name, Value = k.Value }).ToList()
 

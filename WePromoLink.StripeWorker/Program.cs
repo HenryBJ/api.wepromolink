@@ -18,6 +18,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         IConfiguration configuration = hostContext.Configuration;
         StripeConfiguration.ApiKey = configuration["Stripe:ApiKey"];
         services.AddHostedService<Worker>();
+        services.AddHostedService<CommissionWorker>();
         services.AddHttpContextAccessor();
         services.AddTransient<StripeService>();
         services.AddTransient<IUserService, UserService>();

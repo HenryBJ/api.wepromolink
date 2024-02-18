@@ -90,6 +90,7 @@ public class UserService : IUserService
 
             Subscription = new SubscriptionModel
             {
+                StripeId = user.SubscriptionInfo.SubscriptionId,
                 CreatedAt = DateTime.UtcNow,
                 ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
                 Id = Guid.NewGuid(),
