@@ -17,7 +17,7 @@ public class UserRegisteredHandler : IRequestHandler<UserRegisteredEvent, bool>
     }
     public Task<bool> Handle(UserRegisteredEvent request, CancellationToken cancellationToken)
     {
-        _senderEmail.Send(request.Name, request.Email, "Welcome to WePromoLink", Templates.Welcome(new { user = request.Name })).GetAwaiter().GetResult();
+        _senderEmail.Send(request.Name, request.Email, "Welcome to WePromoLink", Templates.Welcome(new { user = request.Name, year = DateTime.Now.Year.ToString() })).GetAwaiter().GetResult();
         _senderDashboard.Send(new DashboardStatus
         {
             Clicks = 0,

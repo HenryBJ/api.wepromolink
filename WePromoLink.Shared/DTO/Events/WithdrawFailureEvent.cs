@@ -5,7 +5,6 @@ namespace WePromoLink.DTO.Events;
 public class WithdrawFailureEvent : BaseEvent, IRequest<bool>
 {
     public Guid UserId { get; set; }
-    public Guid PaymentTransactionId { get; set; }
     public string? Name { get; set; }
     public string? PaymentMethod { get; set; }
     public string? FailureReason { get; set; }

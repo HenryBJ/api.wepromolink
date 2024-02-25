@@ -8,7 +8,7 @@ namespace WePromoLink.StripeWorker;
 
 public class CommissionWorker : BackgroundService
 {
-    const int WAIT_TIME_MIN = 5;
+    const int WAIT_TIME_MIN = 1;
     const int HIT_BULK = 300;
     private readonly ILogger<CommissionWorker> _logger;
     private readonly DataContext _db;
@@ -22,9 +22,9 @@ public class CommissionWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await ProcessHitCommission();
         while (true)
         {
+            await ProcessHitCommission();
             stoppingToken.ThrowIfCancellationRequested();
             await Task.Delay(TimeSpan.FromMinutes(WAIT_TIME_MIN), stoppingToken);
         }

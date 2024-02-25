@@ -24,6 +24,7 @@ using WePromoLink.DTO.Events;
 using WePromoLink.DTO.SignalR;
 using WePromoLink.Services.Profile;
 using WePromoLink.Services.Marketing;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
@@ -74,6 +75,7 @@ builder.Services.AddScoped<BTCPayServerClient>(x =>
 builder.Services.AddTransient<IMarketingService, MarketingService>();
 builder.Services.AddTransient<ILinkService, LinkService>();
 builder.Services.AddTransient<IPushService, PushService>();
+builder.Services.AddSingleton<IMongoClient>(new MongoClient(builder.Configuration["Mongodb:ConnectionString"]));
 builder.Services.AddTransient<IProfileService, ProfileService>();
 
 

@@ -36,6 +36,7 @@ public class CampaignCreatedHandler : IRequestHandler<CampaignCreatedEvent, bool
             ExternalId = Nanoid.Nanoid.GenerateAsync(size: 12).GetAwaiter().GetResult(),
             Status = NotificationStatusEnum.Unread,
             UserModelId = request.UserId,
+            Etag = Nanoid.Nanoid.Generate(size:12),
             Title = "Campaign created",
             Message = $"Your campaign called '{request.CampaignName}' has been successfully created. It has been assigned a budget of {request.InitialAmount.ToString("0.00")} USD.",
         };

@@ -16,11 +16,12 @@ public class Worker : BackgroundService
     private readonly MessageBroker<GeoLocalizeHitCommand> _commandBroker;
     private readonly MessageBroker<BaseEvent> _eventBroker;
 
-    public Worker(ILogger<Worker> logger, DataContext db, IPStackService service, MessageBroker<GeoLocalizeHitCommand> commandBroker, MessageBroker<BaseEvent> eventBroker)
+    public Worker(ILogger<Worker> logger, IServiceScopeFactory fac, MessageBroker<GeoLocalizeHitCommand> commandBroker, MessageBroker<BaseEvent> eventBroker)
     {
+        var scope = fac.CreateScope();
         _logger = logger;
-        _db = db;
-        _service = service;
+        _db = scope.ServiceProvider.GetRequiredService<DataContext>();
+        _service = scope.ServiceProvider.GetRequiredService<IPStackService>();;
         _commandBroker = commandBroker;
         _eventBroker = eventBroker;
     }
@@ -43,7 +44,11 @@ public class Worker : BackgroundService
         .ThenInclude(e => e.Campaign)
         .ThenInclude(e => e.User)
         .Where(e => e.Id == command.HitId).SingleOrDefault();
-        if (hit == null) throw new Exception("Hit does no exists");
+        if (hit == null)
+        {
+            _logger.LogError("Hit does no exists");
+            return true;
+        } 
 
         if (hit.IsGeolocated)
         {

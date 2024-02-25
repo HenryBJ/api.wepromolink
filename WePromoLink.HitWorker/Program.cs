@@ -3,6 +3,7 @@ using WePromoLink;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events;
 using WePromoLink.DTO.Events.Commands;
+using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.HitWorker;
 using WePromoLink.Services;
 using WePromoLink.Services.Cache;
@@ -27,8 +28,19 @@ IHost host = Host.CreateDefaultBuilder(args)
                 configuration["Redis:Port"],
                 configuration["Redis:Password"]);
         });
+        services.AddHttpContextAccessor();
 
         services.AddTransient<IPushService, PushService>();
+        
+        services.AddSingleton<MessageBroker<AddClickCommand>>(_ =>
+        {
+            return new MessageBroker<AddClickCommand>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
+        });
 
         services.AddSingleton<MessageBroker<Hit>>(_ =>
         {

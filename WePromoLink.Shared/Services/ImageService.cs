@@ -53,7 +53,8 @@ namespace WePromoLink.Services
                         ThumbnailAspectRatio = result.ThumbnailAspectRatio,
                         ThumbnailHeight = result.ThumbnailHeight,
                         ThumbnailWidth = result.ThumbnailWidth,
-                        Bound = false
+                        Bound = false,
+                        CreatedAt = result.CreatedAt
                     });
 
                     await _db.SaveChangesAsync();
@@ -112,7 +113,8 @@ namespace WePromoLink.Services
                     Thumbnail = thumbnailUrl,
                     ThumbnailWidth = Convert.ToInt32(80 * originalAspectRatio),
                     ThumbnailHeight = 80,
-                    ThumbnailAspectRatio = originalAspectRatio
+                    ThumbnailAspectRatio = originalAspectRatio,
+                    CreatedAt = DateTime.UtcNow
                 };
             }
         }
@@ -187,7 +189,8 @@ namespace WePromoLink.Services
                 Thumbnail = e.Thumbnail,
                 ThumbnailAspectRatio = e.ThumbnailAspectRatio,
                 ThumbnailHeight = e.ThumbnailHeight,
-                ThumbnailWidth = e.ThumbnailWidth
+                ThumbnailWidth = e.ThumbnailWidth,
+                CreatedAt = e.CreatedAt
             }).Single();
         }
 

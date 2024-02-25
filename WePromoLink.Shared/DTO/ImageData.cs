@@ -19,4 +19,6 @@ public class ImageData
     public int ThumbnailWidth { get; set; }
     public int ThumbnailHeight { get; set; }
     public double ThumbnailAspectRatio { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
 }

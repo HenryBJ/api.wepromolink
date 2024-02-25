@@ -21,6 +21,8 @@ public class WithdrawCompletedHandler : IRequestHandler<WithdrawCompletedEvent, 
     public Task<bool> Handle(WithdrawCompletedEvent request, CancellationToken cancellationToken)
     {
         _pushService.SetPushNotification(request.UserId, e => e.Transaction++);
+        // Enviamos un correo
+        _senderEmail.Send(request.Name!, request.Email!, "Withdraw completed", Templates.Withdraw(new { user = request.Name, amount = request.Amount.ToString("C"), year = DateTime.Now.Year.ToString() })).GetAwaiter().GetResult();
         _senderDashboard.Send(new DashboardStatus
         {
             Clicks = 0,

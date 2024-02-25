@@ -21,4 +21,5 @@ public class ImageDataModel
     public int ThumbnailHeight { get; set; }
     public double ThumbnailAspectRatio { get; set; }
     public bool Bound { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

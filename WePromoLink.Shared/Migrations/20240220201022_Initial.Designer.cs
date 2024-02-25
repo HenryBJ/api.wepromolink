@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WePromoLink.Data;
 
@@ -11,9 +12,10 @@ using WePromoLink.Data;
 namespace WePromoLink.Shared.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240220201022_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -587,9 +589,6 @@ namespace WePromoLink.Shared.Migrations
                         .HasPrecision(10, 4)
                         .HasColumnType("decimal(10,4)");
 
-                    b.Property<decimal?>("AmountNet")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<Guid?>("CampaignModelId")
                         .HasColumnType("uniqueidentifier");
 
@@ -612,14 +611,8 @@ namespace WePromoLink.Shared.Migrations
                     b.Property<string>("Metadata")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("PaymentProcessorFee")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StripeTranferId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -1185,66 +1178,66 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("da970b81-ed0d-4050-8f31-c3f62b57f042"),
+                            Id = new Guid("4724a846-12ab-4423-bbbe-65e8d825ea43"),
                             BoolValue = false,
                             Name = "Campaigns",
-                            SubscriptionPlanModelId = new Guid("7ac5c559-5a90-41a8-b40f-756638391f21"),
+                            SubscriptionPlanModelId = new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"),
                             Value = "Unlimited"
                         },
                         new
                         {
-                            Id = new Guid("877544c7-c012-405a-935e-29d516290c5d"),
+                            Id = new Guid("97bcec47-6d0f-4a9e-8acb-741cc3cee8bf"),
                             BoolValue = false,
                             Name = "Links",
-                            SubscriptionPlanModelId = new Guid("7ac5c559-5a90-41a8-b40f-756638391f21"),
+                            SubscriptionPlanModelId = new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"),
                             Value = "Unlimited"
                         },
                         new
                         {
-                            Id = new Guid("1d8f7c03-ad4b-4d69-9329-c726c743db42"),
+                            Id = new Guid("a92469d4-81d7-4c1d-bcb3-265f064443f3"),
                             BoolValue = false,
                             Name = "Commission per click",
-                            SubscriptionPlanModelId = new Guid("7ac5c559-5a90-41a8-b40f-756638391f21"),
+                            SubscriptionPlanModelId = new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"),
                             Value = "U$0.01"
                         },
                         new
                         {
-                            Id = new Guid("e6ad18a7-ce8f-40b6-8435-79aedf976e1c"),
+                            Id = new Guid("33d6956c-c000-411c-aa41-0f91d893cac9"),
                             BoolValue = true,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("7ac5c559-5a90-41a8-b40f-756638391f21"),
+                            SubscriptionPlanModelId = new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"),
                             Value = ""
                         },
                         new
                         {
-                            Id = new Guid("3d2a3486-1f9a-433b-90b6-497028bafdd7"),
+                            Id = new Guid("a2c3dc40-977e-4e2b-bde1-0d828bb72b38"),
                             BoolValue = false,
                             Name = "Campaigns",
-                            SubscriptionPlanModelId = new Guid("c2530b8d-baf6-4199-bb65-1ad732feeacf"),
+                            SubscriptionPlanModelId = new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"),
                             Value = "Unlimited"
                         },
                         new
                         {
-                            Id = new Guid("aa17f4e5-f5d4-4f86-a375-3b73e27d1961"),
+                            Id = new Guid("4301b911-3f20-4ba7-9ed1-b8ad568eeaa0"),
                             BoolValue = false,
                             Name = "Links",
-                            SubscriptionPlanModelId = new Guid("c2530b8d-baf6-4199-bb65-1ad732feeacf"),
+                            SubscriptionPlanModelId = new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"),
                             Value = "Unlimited"
                         },
                         new
                         {
-                            Id = new Guid("ca219652-9954-48c0-9c33-dfd7eae22a27"),
+                            Id = new Guid("25a029e4-2bc5-4d8a-953b-61504ea7b879"),
                             BoolValue = false,
                             Name = "Commission per click",
-                            SubscriptionPlanModelId = new Guid("c2530b8d-baf6-4199-bb65-1ad732feeacf"),
+                            SubscriptionPlanModelId = new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"),
                             Value = "U$0.00"
                         },
                         new
                         {
-                            Id = new Guid("a6697425-7613-4cd6-aaca-92334a653ed2"),
+                            Id = new Guid("998a1683-e4cb-4f49-8f75-5b8d26c7cf3e"),
                             BoolValue = false,
                             Name = "Contain ads",
-                            SubscriptionPlanModelId = new Guid("c2530b8d-baf6-4199-bb65-1ad732feeacf"),
+                            SubscriptionPlanModelId = new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"),
                             Value = ""
                         });
                 });
@@ -1361,12 +1354,12 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7ac5c559-5a90-41a8-b40f-756638391f21"),
+                            Id = new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"),
                             Annually = 0m,
                             AnnualyPriceId = "",
                             Commission = 0.01m,
                             Discount = 0m,
-                            ExternalId = "jdqSEYBr5T_U",
+                            ExternalId = "swr4YVUhcnjJ",
                             Level = 1,
                             Monthly = 0m,
                             MonthlyPriceId = "price_1Ol0LGC26XBdqsojWuT9BKvb",
@@ -1377,12 +1370,12 @@ namespace WePromoLink.Shared.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c2530b8d-baf6-4199-bb65-1ad732feeacf"),
+                            Id = new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"),
                             Annually = 0m,
                             AnnualyPriceId = "",
                             Commission = 0m,
                             Discount = 0m,
-                            ExternalId = "oLbDB1_kVyV6",
+                            ExternalId = "SoIk3H2vnIpb",
                             Level = 2,
                             Monthly = 4.99m,
                             MonthlyPriceId = "price_1OkwiHC26XBdqsojpgor0QaV",
@@ -1415,128 +1408,128 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("74f28dfe-9ae3-4890-9e6c-6fb1c3ccf226"),
-                            SurveyQuestionModelId = new Guid("56fda914-0d2c-4360-bcfb-a726c381ce5a"),
+                            Id = new Guid("e004f790-e7a8-4e70-93b8-98c5b990d031"),
+                            SurveyQuestionModelId = new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"),
                             Value = "Earning money through affiliate marketing"
                         },
                         new
                         {
-                            Id = new Guid("2a68a734-c2e8-45ca-9e39-dec918c5dea8"),
-                            SurveyQuestionModelId = new Guid("56fda914-0d2c-4360-bcfb-a726c381ce5a"),
+                            Id = new Guid("19c9c571-ac8f-4f7d-8053-54f9d1f1c4d1"),
+                            SurveyQuestionModelId = new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"),
                             Value = "Promoting my products or services"
                         },
                         new
                         {
-                            Id = new Guid("d3dc505a-4346-41f1-bcc3-e015de4c3835"),
-                            SurveyQuestionModelId = new Guid("56fda914-0d2c-4360-bcfb-a726c381ce5a"),
+                            Id = new Guid("4f352dee-5b0b-4e3f-a4f1-c93aabdbe96d"),
+                            SurveyQuestionModelId = new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"),
                             Value = "Exploring new advertising opportunities"
                         },
                         new
                         {
-                            Id = new Guid("ba72d0e0-731f-4a27-8603-2a9c7ab37b3e"),
-                            SurveyQuestionModelId = new Guid("56fda914-0d2c-4360-bcfb-a726c381ce5a"),
+                            Id = new Guid("9421c406-3291-45fd-a92e-c49dd7fc053a"),
+                            SurveyQuestionModelId = new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"),
                             Value = "Connecting with other users and businesses"
                         },
                         new
                         {
-                            Id = new Guid("43f8c439-c412-443e-a553-ee77bd655a56"),
-                            SurveyQuestionModelId = new Guid("acf2f98b-7091-40ea-9c7f-3a6ffab5b06d"),
+                            Id = new Guid("102db161-8515-4cc7-9aab-2e0aa9d91125"),
+                            SurveyQuestionModelId = new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"),
                             Value = "Credit/Debit card"
                         },
                         new
                         {
-                            Id = new Guid("8bd1b616-bcf6-4c9e-9c6d-ddf1ca479911"),
-                            SurveyQuestionModelId = new Guid("acf2f98b-7091-40ea-9c7f-3a6ffab5b06d"),
+                            Id = new Guid("d4e0fd46-a356-4d75-bf03-a3e945188ef3"),
+                            SurveyQuestionModelId = new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"),
                             Value = "PayPal"
                         },
                         new
                         {
-                            Id = new Guid("464cd230-7cbc-4383-bd7b-873c9ecf708e"),
-                            SurveyQuestionModelId = new Guid("acf2f98b-7091-40ea-9c7f-3a6ffab5b06d"),
+                            Id = new Guid("df9638f3-3f01-4eeb-926f-191452db1a47"),
+                            SurveyQuestionModelId = new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"),
                             Value = "Stripe"
                         },
                         new
                         {
-                            Id = new Guid("cd6968fe-b907-4dc8-8d5a-58858861eb00"),
-                            SurveyQuestionModelId = new Guid("acf2f98b-7091-40ea-9c7f-3a6ffab5b06d"),
+                            Id = new Guid("cbe9f9e2-6505-4704-b7fa-f08ba222ced5"),
+                            SurveyQuestionModelId = new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"),
                             Value = "Bank transfer"
                         },
                         new
                         {
-                            Id = new Guid("39977189-359e-4306-889c-4631481245f6"),
-                            SurveyQuestionModelId = new Guid("b1fcc131-ec3c-42ad-9827-e3af177028ff"),
+                            Id = new Guid("432db7cd-aacd-403c-99ab-8c243ffec0fe"),
+                            SurveyQuestionModelId = new Guid("bcda607a-be83-48fa-8710-a464cd5d81c5"),
                             Value = "Monthly subscription fee"
                         },
                         new
                         {
-                            Id = new Guid("d453c2cc-b0d9-4858-844b-51eb49f6b44e"),
-                            SurveyQuestionModelId = new Guid("b1fcc131-ec3c-42ad-9827-e3af177028ff"),
+                            Id = new Guid("18493212-3ae0-4b49-889c-b1d441c05559"),
+                            SurveyQuestionModelId = new Guid("bcda607a-be83-48fa-8710-a464cd5d81c5"),
                             Value = "Commission on earnings"
                         },
                         new
                         {
-                            Id = new Guid("2034449e-2eda-4bce-a8e5-2792ca68ed0c"),
-                            SurveyQuestionModelId = new Guid("b1fcc131-ec3c-42ad-9827-e3af177028ff"),
+                            Id = new Guid("d28a1e23-e0b5-4d5d-b13d-4c96ac8c5b58"),
+                            SurveyQuestionModelId = new Guid("bcda607a-be83-48fa-8710-a464cd5d81c5"),
                             Value = "I'm not sure"
                         },
                         new
                         {
-                            Id = new Guid("c10f7e27-682b-411f-afc2-b8a796d22f12"),
-                            SurveyQuestionModelId = new Guid("2c3180db-5c66-4544-8961-9882d186743b"),
+                            Id = new Guid("736b026b-b79a-4721-b41c-8426d898cd0d"),
+                            SurveyQuestionModelId = new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"),
                             Value = "Extremely useful"
                         },
                         new
                         {
-                            Id = new Guid("36f22ca9-c635-468b-b442-9e5990d73e77"),
-                            SurveyQuestionModelId = new Guid("2c3180db-5c66-4544-8961-9882d186743b"),
+                            Id = new Guid("3443683c-d757-4011-bb30-64e41f970786"),
+                            SurveyQuestionModelId = new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"),
                             Value = "Very useful"
                         },
                         new
                         {
-                            Id = new Guid("8de39547-f9e7-4186-b118-f9a47993f4aa"),
-                            SurveyQuestionModelId = new Guid("2c3180db-5c66-4544-8961-9882d186743b"),
+                            Id = new Guid("ce11e04a-23ff-4733-a2d3-b5cd1b102a70"),
+                            SurveyQuestionModelId = new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"),
                             Value = "Somewhat useful"
                         },
                         new
                         {
-                            Id = new Guid("6bc5055a-178e-49f8-a2d4-8174dac1c21f"),
-                            SurveyQuestionModelId = new Guid("2c3180db-5c66-4544-8961-9882d186743b"),
+                            Id = new Guid("f247c8c7-b061-4ff5-93e2-8d0af201a7e4"),
+                            SurveyQuestionModelId = new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"),
                             Value = "Not very useful"
                         },
                         new
                         {
-                            Id = new Guid("f09133f6-31e4-45ad-ba9c-16758a7f9027"),
-                            SurveyQuestionModelId = new Guid("2c3180db-5c66-4544-8961-9882d186743b"),
+                            Id = new Guid("76ccbdf1-4fb2-40aa-8c5a-e10a9b5aaeb1"),
+                            SurveyQuestionModelId = new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"),
                             Value = "Not useful at all"
                         },
                         new
                         {
-                            Id = new Guid("3bf58a43-8b2d-4cc3-8a5c-9c00dc29cfa4"),
-                            SurveyQuestionModelId = new Guid("3f934969-0fb6-4711-86cc-86e16c98315c"),
+                            Id = new Guid("d73e2668-7f0f-4351-8ce1-d1c536a35bb7"),
+                            SurveyQuestionModelId = new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"),
                             Value = "More campaign customization options"
                         },
                         new
                         {
-                            Id = new Guid("e619692e-1110-4d41-a550-29f7c358e66d"),
-                            SurveyQuestionModelId = new Guid("3f934969-0fb6-4711-86cc-86e16c98315c"),
+                            Id = new Guid("3e7e4fe7-2848-4ebf-882d-bb3906524250"),
+                            SurveyQuestionModelId = new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"),
                             Value = "Advanced analytics and reporting"
                         },
                         new
                         {
-                            Id = new Guid("4d40fe2f-8d7a-49fb-9167-838b5193a40a"),
-                            SurveyQuestionModelId = new Guid("3f934969-0fb6-4711-86cc-86e16c98315c"),
+                            Id = new Guid("dd1720fa-d533-41e7-b7ce-0b8fa943b7a6"),
+                            SurveyQuestionModelId = new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"),
                             Value = "Integration with other advertising platforms"
                         },
                         new
                         {
-                            Id = new Guid("39d7a0f3-06ae-4f7a-97ef-a42e09027339"),
-                            SurveyQuestionModelId = new Guid("3f934969-0fb6-4711-86cc-86e16c98315c"),
+                            Id = new Guid("cbf13998-292c-43eb-a7d5-0465db1a2ea5"),
+                            SurveyQuestionModelId = new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"),
                             Value = "Improved user interface and navigation"
                         },
                         new
                         {
-                            Id = new Guid("ac7c077b-7c96-4527-91c5-69f4286792cf"),
-                            SurveyQuestionModelId = new Guid("3f934969-0fb6-4711-86cc-86e16c98315c"),
+                            Id = new Guid("35a6dcb9-c6ac-40bd-96da-297eafd07f7f"),
+                            SurveyQuestionModelId = new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"),
                             Value = "I'm not sure"
                         });
                 });
@@ -1585,31 +1578,31 @@ namespace WePromoLink.Shared.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("56fda914-0d2c-4360-bcfb-a726c381ce5a"),
+                            Id = new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"),
                             Group = 1,
                             Value = "What motivates you to use a platform like WePromoLink?"
                         },
                         new
                         {
-                            Id = new Guid("acf2f98b-7091-40ea-9c7f-3a6ffab5b06d"),
+                            Id = new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"),
                             Group = 2,
                             Value = "Which payment methods do you prefer for platform subscriptions and earnings withdrawals?"
                         },
                         new
                         {
-                            Id = new Guid("b1fcc131-ec3c-42ad-9827-e3af177028ff"),
+                            Id = new Guid("bcda607a-be83-48fa-8710-a464cd5d81c5"),
                             Group = 3,
                             Value = "Do you prefer a monthly subscription fee or paying a commission on earnings?"
                         },
                         new
                         {
-                            Id = new Guid("2c3180db-5c66-4544-8961-9882d186743b"),
+                            Id = new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"),
                             Group = 4,
                             Value = "How useful do you find the WePromoLink platform for your advertising needs?"
                         },
                         new
                         {
-                            Id = new Guid("3f934969-0fb6-4711-86cc-86e16c98315c"),
+                            Id = new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"),
                             Group = 5,
                             Value = "What additional features or improvements would you like to see on the WePromoLink platform?"
                         });

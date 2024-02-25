@@ -1,7 +1,13 @@
+using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
+using MongoDB.Driver;
 using WePromoLink.DTO;
+using WePromoLink.DTO.Statistics;
+using WePromoLink.Enums;
 using WePromoLink.Services;
 using WePromoLink.Validators;
 
@@ -11,17 +17,44 @@ namespace WePromoLink.Controllers;
 [Route("[controller]")]
 public class DataController : ControllerBase
 {
+    private const string DATABASE = "wepromolink";
     private readonly IDataService _service;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<DataController> _logger;
+    private readonly IMongoClient _client;
 
-    public DataController(IHttpContextAccessor httpContextAccessor, IDataService service, ILogger<DataController> logger)
+    public DataController(IHttpContextAccessor httpContextAccessor, IDataService service, ILogger<DataController> logger, IMongoClient client)
     {
         _httpContextAccessor = httpContextAccessor;
         _service = service;
         _logger = logger;
+        _client = client;
     }
 
+    [HttpGet("{collectionName}/{externalId}")]
+    [Authorize]
+    public IActionResult Get(string collectionName, string externalId)
+    {
+        var database = _client.GetDatabase(DATABASE);
+        var collection = database.GetCollection<BsonDocument>(collectionName);
+
+        var filter = Builders<BsonDocument>.Filter.Eq("_id", externalId);
+        var document = collection.Find(filter).FirstOrDefault();
+
+        if (document == null)
+        {
+            return NotFound();
+        }
+        var json = document.ToJson();
+        _logger.LogInformation(json);
+        switch (collectionName)
+        {
+            case StatisticsEnum.CampaignXClick:
+                return new OkObjectResult(Newtonsoft.Json.JsonConvert.DeserializeObject<ChartData<string, int>>(json));
+            default:
+                return Ok();
+        }
+    }
 
     [HttpGet]
     [Authorize]
@@ -57,38 +90,6 @@ public class DataController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    [Route("locked")]
-    public async Task<IActionResult> GetLocked()
-    {
-        try
-        {
-            return await _service.GetLocked();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("payout")]
-    public async Task<IActionResult> GetPayout()
-    {
-        try
-        {
-            return await _service.GetPayoutStats();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
     [Route("profit")]
     public async Task<IActionResult> GetProfit()
     {
@@ -102,528 +103,5 @@ public class DataController : ControllerBase
             return new StatusCodeResult(500);
         }
     }
-
-    [HttpGet]
-    [Authorize]
-    [Route("earntoday")]
-    public async Task<IActionResult> GetEarnToday()
-    {
-        try
-        {
-            return await _service.GetEarnToday();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-
-    [HttpGet]
-    [Authorize]
-    [Route("earnlastweek")]
-    public async Task<IActionResult> GetEarnLastWeek()
-    {
-        try
-        {
-            return await _service.GetEarnLastWeek();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("clickstodayonlinks")]
-    public async Task<IActionResult> GetClickTodayOnLinks()
-    {
-        try
-        {
-            return await _service.GetClickTodayOnLinks();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("clickslastweekonlinks")]
-    public async Task<IActionResult> GetClickLastWeekOnLinks()
-    {
-        try
-        {
-            return await _service.GetClickLastWeekOnLinks();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("clickstodayoncampaigns")]
-    public async Task<IActionResult> GetClickTodayOnCampaigns()
-    {
-        try
-        {
-            return await _service.GetClickTodayOnCampaigns();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-
-    [HttpGet]
-    [Authorize]
-    [Route("clickslastweekoncampaigns")]
-    public async Task<IActionResult> GetClickLastWeekOnCampaigns()
-    {
-        try
-        {
-            return await _service.GetClickLastWeekOnCampaigns();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-    // From here below
-
-    [HttpGet]
-    [Authorize]
-    [Route("sharedtoday")]
-    public async Task<IActionResult> GetSharedToday()
-    {
-        try
-        {
-            return await _service.GetSharedToday();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-
-    [HttpGet]
-    [Authorize]
-    [Route("sharedlastweek")]
-    public async Task<IActionResult> GetSharedLastWeek()
-    {
-        try
-        {
-            return await _service.GetSharedLastWeek();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-
-    [HttpGet]
-    [Authorize]
-    [Route("historicalclicksonlink")]
-    public async Task<IActionResult> GetHistoricalClickOnLinks()
-    {
-        try
-        {
-            return await _service.GetHistoricalClickOnLinks();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historicalearnonlink")]
-    public async Task<IActionResult> GetHistoricalEarnOnLinks()
-    {
-        try
-        {
-            return await _service.GetHistoricalEarnOnLinks();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historicalclickoncampaigns")]
-    public async Task<IActionResult> GetHistoricalClickOnCampaigns()
-    {
-        try
-        {
-            return await _service.GetHistoricalClickOnCampaigns();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historicalclickonshares")]
-    public async Task<IActionResult> GetHistoricalClickOnShares()
-    {
-        try
-        {
-            return await _service.GetHistoricalClickOnShares();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historicalclickbycountriesonlinks")]
-    public async Task<IActionResult> GetHistoricalClickByCountriesOnLinks()
-    {
-        try
-        {
-            return await _service.GetHistoricalClickByCountriesOnLinks();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historicalearnbycountries")]
-    public async Task<IActionResult> GetHistoricalEarnByCountries()
-    {
-        try
-        {
-            return await _service.GetHistoricalEarnByCountries();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-
-    [HttpGet]
-    [Authorize]
-    [Route("historicalclickbycountriesoncampaigns")]
-    public async Task<IActionResult> GetHistoricalClickByCountriesOnCampaigns()
-    {
-        try
-        {
-            return await _service.GetHistoricalClickByCountriesOnCampaigns();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historicalsharedbyusers")]
-    public async Task<IActionResult> GetHistoricalSharedByUser()
-    {
-        try
-        {
-            return await _service.GetHistoricalSharedByUsers();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    // Campaigns
-
-    [HttpGet]
-    [Authorize]
-    [Route("clickslastweekoncampaign/{id}")]
-    public async Task<IActionResult> GetClicksLastWeekOnCampaign(string id)
-    {
-        try
-        {
-            return await _service.GetClicksLastWeekOnCampaign(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("clickstodayoncampaign/{id}")]
-    public async Task<IActionResult> GetClicksTodayOnCampaign(string id)
-    {
-        try
-        {
-            return await _service.GetClicksTodayOnCampaign(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historyclicksbycountriesoncampaign/{id}")]
-    public async Task<IActionResult> GetHistoryClicksByCountriesOnCampaign(string id)
-    {
-        try
-        {
-            return await _service.GetHistoryClicksByCountriesOnCampaign(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historyclicksoncampaign/{id}")]
-    public async Task<IActionResult> GetHistoryClicksOnCampaign(string id)
-    {
-        try
-        {
-            return await _service.GetHistoryClicksOnCampaign(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historysharedbyusersoncampaign/{id}")]
-    public async Task<IActionResult> GetHistorySharedByUsersOnCampaign(string id)
-    {
-        try
-        {
-            return await _service.GetHistorySharedByUsersOnCampaign(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historysharedoncampaign/{id}")]
-    public async Task<IActionResult> GetHistorySharedOnCampaign(string id)
-    {
-        try
-        {
-            return await _service.GetHistorySharedOnCampaign(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("sharedlastweekoncampaign/{id}")]
-    public async Task<IActionResult> GetSharedLastWeekOnCampaign(string id)
-    {
-        try
-        {
-            return await _service.GetSharedLastWeekOnCampaign(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("sharedtodayoncampaignmodel/{id}")]
-    public async Task<IActionResult> GetSharedTodayOnCampaignModel(string id)
-    {
-        try
-        {
-            return await _service.GetSharedTodayOnCampaignModel(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    // Links
-
-    [HttpGet]
-    [Authorize]
-    [Route("clickslastweekonlink/{id}")]
-    public async Task<IActionResult> GetClicksLastWeekOnLink(string id)
-    {
-        try
-        {
-            return await _service.GetClicksLastWeekOnLink(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("clickstodayonlink/{id}")]
-    public async Task<IActionResult> GetClicksTodayOnLink(string id)
-    {
-        try
-        {
-            return await _service.GetClicksTodayOnLink(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("earnlastweekonlink/{id}")]
-    public async Task<IActionResult> GetEarnLastWeekOnLink(string id)
-    {
-        try
-        {
-            return await _service.GetEarnLastWeekOnLink(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("earntodayonlink/{id}")]
-    public async Task<IActionResult> GetEarnTodayOnLink(string id)
-    {
-        try
-        {
-            return await _service.GetEarnTodayOnLink(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historyclicksbycountriesonlink/{id}")]
-    public async Task<IActionResult> GetHistoryClicksByCountriesOnLink(string id)
-    {
-        try
-        {
-            return await _service.GetHistoryClicksByCountriesOnLink(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historyearnbycountriesonlink/{id}")]
-    public async Task<IActionResult> GetHistoryEarnByCountriesOnLink(string id)
-    {
-        try
-        {
-            return await _service.GetHistoryEarnByCountriesOnLink(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historyearnonlink/{id}")]
-    public async Task<IActionResult> GetHistoryEarnOnLink(string id)
-    {
-        try
-        {
-            return await _service.GetHistoryEarnOnLink(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
-    [HttpGet]
-    [Authorize]
-    [Route("historyclicksonlink/{id}")]
-    public async Task<IActionResult> GetHistoryClicksOnLink(string id)
-    {
-        try
-        {
-            return await _service.GetHistoryClicksOnLink(id);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return new StatusCodeResult(500);
-        }
-    }
-
 
 }

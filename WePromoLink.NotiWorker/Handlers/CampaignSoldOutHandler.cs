@@ -33,6 +33,7 @@ public class CampaignSoldOutHandler : IRequestHandler<CampaignSoldOutEvent, bool
             ExternalId = Nanoid.Nanoid.GenerateAsync(size: 12).GetAwaiter().GetResult(),
             Status = NotificationStatusEnum.Unread,
             UserModelId = request.UserId,
+            Etag = Nanoid.Nanoid.Generate(size:12),
             Title = "Campaign deactivated",
             Message = $"Your campaign called '{request.CampaignName}' has been deactivated due insufficient budget (${request.Amount.ToString("0.00")} USD)",
         };

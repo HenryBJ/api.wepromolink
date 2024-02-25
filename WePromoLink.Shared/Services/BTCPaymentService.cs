@@ -132,16 +132,14 @@ public class BTCPaymentService
                 // Get User
                 var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
                 var user = await _db.Users
-                .Include(e => e.Profit)
                 .Where(e => e.FirebaseId == firebaseId)
                 .SingleAsync();
 
                 // Discount from Profit
-                user.Profit.Value -= amount;
-                user.Profit.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
-                _db.Profits.Update(user.Profit);
+                user.Profit -= amount;
+                _db.Users.Update(user);
 
-                if (user.Profit.Value < 0) throw new Exception("Profit negative");
+                if (user.Profit < 0) throw new Exception("Profit negative");
 
                 // Create Payment Transaction
                 var paymentTrans = new PaymentTransaction

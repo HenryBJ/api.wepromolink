@@ -24,6 +24,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.8" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
     <PackageReference Include="NameCheapDotNet" Version="1.0.0" />
     <PackageReference Include="NanoId" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -44,6 +45,13 @@
     <None Update="Services\Email\Templates\JoinWaitingList.scriban-html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Services\Email\Templates\WithdrawCompleted.scriban-html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Services\Email\Templates\DepositCompleted.scriban-html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    
   </ItemGroup>
 
   <ItemGroup>

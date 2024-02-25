@@ -40,52 +40,6 @@ public class DataContext : DbContext
     public virtual DbSet<PaymentTransaction> PaymentTransactions { get; set; }
     public virtual DbSet<CampaignModel> Campaigns { get; set; }
     public virtual DbSet<AbuseReportModel> AbuseReports { get; set; }
-    public virtual DbSet<AvailableModel> Availables { get; set; }
-    public virtual DbSet<BudgetModel> Budgets { get; set; }
-    public virtual DbSet<LockedModel> Lockeds { get; set; }
-    public virtual DbSet<PayoutStatModel> PayoutStats { get; set; }
-    public virtual DbSet<ProfitModel> Profits { get; set; }
-
-    // Statistics for User
-    public virtual DbSet<ClickLastWeekOnLinksUserModel> ClickLastWeekOnLinksUsers { get; set; }
-    public virtual DbSet<ClicksTodayOnCampaignUserModel> ClicksTodayOnCampaignUsers { get; set; }
-    public virtual DbSet<ClicksLastWeekOnCampaignUserModel> ClicksLastWeekOnCampaignUsers { get; set; }
-    public virtual DbSet<ClicksTodayOnLinksUserModel> ClicksTodayOnLinksUsers { get; set; }
-    public virtual DbSet<EarnLastWeekUserModel> EarnLastWeekUsers { get; set; }
-    public virtual DbSet<EarnTodayUserModel> EarnTodayUsers { get; set; }
-    public virtual DbSet<HistoryClicksByCountriesOnCampaignUserModel> HistoryClicksByCountriesOnCampaignUsers { get; set; }
-    public virtual DbSet<HistoryClicksByCountriesOnLinkUserModel> HistoryClicksByCountriesOnLinkUsers { get; set; }
-    public virtual DbSet<HistoryClicksOnCampaignUserModel> HistoryClicksOnCampaignUsers { get; set; }
-    // public virtual DbSet<HistoryClicksOnLinkUserModel> HistoryClicksOnLinkUsers { get; set; }
-    public virtual DbSet<HistoryClicksOnSharesUserModel> HistoryClicksOnSharesUsers { get; set; }
-    public virtual DbSet<HistoryEarnByCountriesUserModel> HistoryEarnByCountriesUsers { get; set; }
-    public virtual DbSet<HistoryEarnOnLinksUserModel> HistoryEarnOnLinksUsers { get; set; }
-    public virtual DbSet<HistorySharedByUsersUserModel> HistorySharedByUsersUsers { get; set; }
-    public virtual DbSet<HistoryClicksOnLinksUserModel> HistoryClicksOnLinksUsers { get; set; }
-    public virtual DbSet<SharedLastWeekUserModel> SharedLastWeekUsers { get; set; }
-    public virtual DbSet<SharedTodayUserModel> SharedTodayUsers { get; set; }
-
-    // Statistics for Campaign
-    public virtual DbSet<ClicksLastWeekOnCampaignModel> ClicksLastWeekOnCampaigns { get; set; }
-    public virtual DbSet<ClicksTodayOnCampaignModel> ClicksTodayOnCampaigns { get; set; }
-    public virtual DbSet<HistoryClicksByCountriesOnCampaignModel> HistoryClicksByCountriesOnCampaigns { get; set; }
-    public virtual DbSet<HistoryClicksOnCampaignModel> HistoryClicksOnCampaigns { get; set; }
-    public virtual DbSet<HistorySharedByUsersOnCampaignModel> HistorySharedByUsersOnCampaigns { get; set; }
-    public virtual DbSet<HistorySharedOnCampaignModel> HistorySharedOnCampaigns { get; set; }
-    public virtual DbSet<SharedLastWeekOnCampaignModel> SharedLastWeekOnCampaigns { get; set; }
-    public virtual DbSet<SharedTodayOnCampaignModel> SharedTodayOnCampaigns { get; set; }
-
-    // Statistics for Links
-    public virtual DbSet<ClicksLastWeekOnLinkModel> ClicksLastWeekOnLinks { get; set; }
-    public virtual DbSet<ClicksTodayOnLinkModel> ClicksTodayOnLinks { get; set; }
-    public virtual DbSet<EarnLastWeekOnLinkModel> EarnLastWeekOnLinks { get; set; }
-    public virtual DbSet<EarnTodayOnLinkModel> EarnTodayOnLinks { get; set; }
-    public virtual DbSet<HistoryClicksByCountriesOnLinkModel> HistoryClicksByCountriesOnLinks { get; set; }
-    public virtual DbSet<HistoryEarnByCountriesOnLinkModel> HistoryEarnByCountriesOnLinks { get; set; }
-    public virtual DbSet<HistoryEarnOnLinkModel> HistoryEarnOnLinks { get; set; }
-    public virtual DbSet<HistoryClicksOnLinkModel> HistoryClicksOnLinkModels { get; set; }
-
-
 
 
     public DataContext(DbContextOptions<DataContext> options) : base(options)
@@ -288,18 +242,6 @@ public class DataContext : DbContext
             entity.HasKey(e => e.Id);
         });
 
-        builder.Entity<AvailableModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-
-        builder.Entity<BudgetModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-
         builder.Entity<LinkModel>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -404,123 +346,7 @@ public class DataContext : DbContext
         });
 
         builder.Entity<GenericEventModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<ClicksLastWeekOnCampaignModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<ClicksLastWeekOnCampaignUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<ClicksLastWeekOnLinkModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<ClicksTodayOnCampaignModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<ClicksTodayOnCampaignUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<ClicksTodayOnLinkModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<ClicksTodayOnLinksUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<EarnLastWeekOnLinkModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-        builder.Entity<EarnLastWeekUserModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-        builder.Entity<EarnTodayOnLinkModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-        builder.Entity<EarnTodayUserModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-        builder.Entity<HistoryClicksByCountriesOnCampaignUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryClicksByCountriesOnCampaignModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryClicksByCountriesOnLinkModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryClicksByCountriesOnLinkUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryClicksOnCampaignModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryClicksOnCampaignUserModel>(entity => entity.HasKey(e => e.Id));
-        // builder.Entity<HistoryClicksOnLinkUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryClicksOnSharesUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryEarnByCountriesOnLinkModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.X0).HasPrecision(10, 4);
-            entity.Property(e => e.X1).HasPrecision(10, 4);
-            entity.Property(e => e.X2).HasPrecision(10, 4);
-            entity.Property(e => e.X3).HasPrecision(10, 4);
-            entity.Property(e => e.X4).HasPrecision(10, 4);
-            entity.Property(e => e.X5).HasPrecision(10, 4);
-            entity.Property(e => e.X6).HasPrecision(10, 4);
-            entity.Property(e => e.X7).HasPrecision(10, 4);
-            entity.Property(e => e.X8).HasPrecision(10, 4);
-            entity.Property(e => e.X9).HasPrecision(10, 4);
-        });
-        builder.Entity<HistoryEarnByCountriesUserModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.X0).HasPrecision(10, 4);
-            entity.Property(e => e.X1).HasPrecision(10, 4);
-            entity.Property(e => e.X2).HasPrecision(10, 4);
-            entity.Property(e => e.X3).HasPrecision(10, 4);
-            entity.Property(e => e.X4).HasPrecision(10, 4);
-            entity.Property(e => e.X5).HasPrecision(10, 4);
-            entity.Property(e => e.X6).HasPrecision(10, 4);
-            entity.Property(e => e.X7).HasPrecision(10, 4);
-            entity.Property(e => e.X8).HasPrecision(10, 4);
-            entity.Property(e => e.X9).HasPrecision(10, 4);
-        });
-        builder.Entity<HistoryEarnOnLinkModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.X0).HasPrecision(10, 4);
-            entity.Property(e => e.X1).HasPrecision(10, 4);
-            entity.Property(e => e.X2).HasPrecision(10, 4);
-            entity.Property(e => e.X3).HasPrecision(10, 4);
-            entity.Property(e => e.X4).HasPrecision(10, 4);
-            entity.Property(e => e.X5).HasPrecision(10, 4);
-            entity.Property(e => e.X6).HasPrecision(10, 4);
-            entity.Property(e => e.X7).HasPrecision(10, 4);
-            entity.Property(e => e.X8).HasPrecision(10, 4);
-            entity.Property(e => e.X9).HasPrecision(10, 4);
-        });
-
-        builder.Entity<HistoryEarnOnLinksUserModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.X0).HasPrecision(10, 4);
-            entity.Property(e => e.X1).HasPrecision(10, 4);
-            entity.Property(e => e.X2).HasPrecision(10, 4);
-            entity.Property(e => e.X3).HasPrecision(10, 4);
-            entity.Property(e => e.X4).HasPrecision(10, 4);
-            entity.Property(e => e.X5).HasPrecision(10, 4);
-            entity.Property(e => e.X6).HasPrecision(10, 4);
-            entity.Property(e => e.X7).HasPrecision(10, 4);
-            entity.Property(e => e.X8).HasPrecision(10, 4);
-            entity.Property(e => e.X9).HasPrecision(10, 4);
-        });
-
-        builder.Entity<HistorySharedByUsersOnCampaignModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistorySharedByUsersUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistorySharedOnCampaignModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<HistoryClicksOnLinksUserModel>(entity => entity.HasKey(e => e.Id));
-        // builder.Entity<HistoryClicksOnLinkUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<LockedModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-        builder.Entity<PayoutStatModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-        builder.Entity<ProfitModel>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Value).HasPrecision(10, 4);
-        });
-        builder.Entity<SharedLastWeekOnCampaignModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<SharedLastWeekUserModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<SharedTodayOnCampaignModel>(entity => entity.HasKey(e => e.Id));
-        builder.Entity<SharedTodayUserModel>(entity => entity.HasKey(e => e.Id));
+        
     }
 
     public void MigrateDB()

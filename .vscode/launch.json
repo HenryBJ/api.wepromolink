@@ -3,6 +3,17 @@
     "configurations": [
 
         {
+            "name": "GeoLocationWorker (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/WePromoLink.GeoLocationWorker/bin/Debug/net6.0/WePromoLink.GeoLocationWorker.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },    
+        {
             "name": "ControllerWorker (console)",
             "type": "coreclr",
             "request": "launch",

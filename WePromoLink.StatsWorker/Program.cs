@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events;
+using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Services;
 using WePromoLink.Services.Cache;
 using WePromoLink.Shared.DTO.Messages;
@@ -25,49 +27,19 @@ IHost host = Host.CreateDefaultBuilder(args)
                 configuration["Redis:Port"],
                 configuration["Redis:Password"]);
         });
-
+        services.AddHttpContextAccessor();
         services.AddTransient<IPushService, PushService>();
+        services.AddSingleton<IMongoClient>(new MongoClient(configuration["Mongodb:ConnectionString"]));
 
-        services.AddSingleton<MessageBroker<UpdateCampaignMessage>>(_ =>
+        services.AddSingleton<MessageBroker<AddClickCommand>>(_ =>
         {
-            return new MessageBroker<UpdateCampaignMessage>(new MessageBrokerOptions
+            return new MessageBroker<AddClickCommand>(new MessageBrokerOptions
             {
                 HostName = configuration["RabbitMQ:hostname"],
                 UserName = configuration["RabbitMQ:username"],
                 Password = configuration["RabbitMQ:password"]
             });
         });
-
-        services.AddSingleton<MessageBroker<UpdateUserMessage>>(_ =>
-        {
-            return new MessageBroker<UpdateUserMessage>(new MessageBrokerOptions
-            {
-                HostName = configuration["RabbitMQ:hostname"],
-                UserName = configuration["RabbitMQ:username"],
-                Password = configuration["RabbitMQ:password"]
-            });
-        });
-
-        services.AddSingleton<MessageBroker<UpdateLinkMessage>>(_ =>
-        {
-            return new MessageBroker<UpdateLinkMessage>(new MessageBrokerOptions
-            {
-                HostName = configuration["RabbitMQ:hostname"],
-                UserName = configuration["RabbitMQ:username"],
-                Password = configuration["RabbitMQ:password"]
-            });
-        });
-
-        services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
-        {
-            return new MessageBroker<BaseEvent>(new MessageBrokerOptions
-            {
-                HostName = configuration["RabbitMQ:hostname"],
-                UserName = configuration["RabbitMQ:username"],
-                Password = configuration["RabbitMQ:password"]
-            });
-        });
-
         services.AddHostedService<Worker>();
     })
     .Build();

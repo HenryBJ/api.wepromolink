@@ -20,7 +20,7 @@ public class EmailSenderTest:BaseTest
         if (_emailSender == null) throw new Exception("EmailSender null");
 
         string email = "jose.devops@gmail.com";
-        _emailSender.Send("Enrique", email, "Welcome to WePromoLink", Templates.Welcome(new { user = "Enrique" })).GetAwaiter().GetResult();
+        _emailSender.Send("Enrique", email, "Welcome to WePromoLink", Templates.Welcome(new { user = "Enrique", year = DateTime.Now.Year.ToString() })).GetAwaiter().GetResult();
         Assert.True(true);
     }
 }

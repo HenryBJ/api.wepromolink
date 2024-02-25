@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Welcome to WePromoLink</title>
+    <title>Withdraw</title>
     <style>
         body {
             background-color: #ffab48;
@@ -66,12 +66,12 @@
         <div class="logo">
             <img src="https://wepromolinkstorage.blob.core.windows.net/asset/logo1.png" alt="WePromoLink Logo">
         </div>
-        <h1>Welcome !!! &#127881;</h1>
+        <h1>Withdrawal completed !!! &#127881;</h1>
         <p class="message">Dear {{user}},</p>
-        <p class="message">Thank you for joining us. We are excited to have you as part of our community.</p>
-        <p class="message">Now you can promote your campaigns and monetize by sharing the campaigns of others, easier than ever.</p>
-        <p class="message">We also invite you to join us on our social networks to stay in touch.</p>
-      
+        <p class="message">We are writing to inform you that your withdrawal request has been successfully processed. We are pleased to confirm that an amount of {{amount}} USD has been debited from your account and transferred to your Stripe Connect account.</p>
+        <p class="message">Please note that the funds will be available in your external account according to the withdrawal frequency settings defined in your Stripe Connect account. We understand the importance of timely and accurate transactions, and we are committed to providing you with exceptional service.</p>
+        <p class="message">If you have any questions or require further assistance, please do not hesitate to contact our customer support team. We are here to assist you.</p>
+
         <table class="social-icons">
         <tr>
         <td>

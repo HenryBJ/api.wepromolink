@@ -55,31 +55,13 @@ public class UserService : IUserService
             IsSubscribed = isSubscribed,
             ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
             CreatedAt = DateTime.UtcNow,
+            Profit = 0,
+            Available = 0,
+            Budget = 0,
             ThumbnailImageUrl = user.PhotoUrl ?? "",
             CustomerId = user.CustomerId,
-            Available = new AvailableModel(),
-            Budget = new BudgetModel(),
-            SharedToday = new SharedTodayUserModel(),
-            SharedLastWeek = new SharedLastWeekUserModel(),
-            ClickLastWeekOnLinksUser = new ClickLastWeekOnLinksUserModel(),
-            ClicksLastWeekOnCampaignUser = new ClicksLastWeekOnCampaignUserModel(),
-            ClicksTodayOnCampaignUser = new ClicksTodayOnCampaignUserModel(),
-            ClicksTodayOnLinksUser = new ClicksTodayOnLinksUserModel(),
-            EarnLastWeekUser = new EarnLastWeekUserModel(),
-            EarnTodayUser = new EarnTodayUserModel(),
-            HistoryClicksByCountriesOnCampaignUser = new HistoryClicksByCountriesOnCampaignUserModel(),
-            HistoryClicksByCountriesOnLinkUser = new HistoryClicksByCountriesOnLinkUserModel(),
-            HistoryClicksOnCampaignUser = new HistoryClicksOnCampaignUserModel(), //done
-            HistoryClicksOnLinksUser = new HistoryClicksOnLinksUserModel(), // done
-            HistoryClicksOnSharesUser = new HistoryClicksOnSharesUserModel(), //done
-            HistoryEarnByCountriesUser = new HistoryEarnByCountriesUserModel(),
-            HistoryEarnOnLinksUser = new HistoryEarnOnLinksUserModel(), //done
-            HistorySharedByUsersUser = new HistorySharedByUsersUserModel(),
             BitcoinBillingMethod = new BitcoinBillingMethod(),
             StripeBillingMethod = new StripeBillingMethod(),
-            Locked = new LockedModel(),
-            PayoutStat = new PayoutStatModel(),
-            Profit = new ProfitModel(),
             FirebaseId = firebaseId,
             AffiliateProgram = new AffiliateModel(),
             Privacy = new PrivacyModel(),
@@ -119,18 +101,16 @@ public class UserService : IUserService
                 _db.PaymentTransactions.Update(payment);
                 await _db.SaveChangesAsync();
 
-                // Asignamos la cantidad al Available
-                var available = await _db.Availables
-                .Where(e => e.UserModelId == payment.UserModelId)
+                var user = await _db.Users
+                .Where(e => e.Id == payment.UserModelId)
                 .SingleOrDefaultAsync();
-                if (available == null) throw new Exception("No Availabe account found");
+                if (user == null) throw new Exception("User not found");
+                user.Available += payment.Amount;
 
-                available.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
-                available.Value += payment.Amount;
-                _db.Availables.Update(available);
                 await _db.SaveChangesAsync();
-
                 transaction.Commit();
+
+                //TODO: Add AddAvailableEvent
 
                 _eventSender.Send(new DepositCompletedEvent
                 {

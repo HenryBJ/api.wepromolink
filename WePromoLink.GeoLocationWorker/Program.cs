@@ -25,7 +25,8 @@ IHost host = Host.CreateDefaultBuilder(args)
                 configuration["Redis:Port"],
                 configuration["Redis:Password"]);
         });
-
+        
+        services.AddHttpContextAccessor();
         services.AddTransient<IPushService, PushService>();
 
         services.AddSingleton<MessageBroker<BaseEvent>>(sp =>

@@ -269,31 +269,45 @@ public class StripeService
     {
         using (var transaction = _db.Database.BeginTransaction())
         {
+            int amountCents = amount * 100;
+            // Get User
+            var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+            var user = await _db.Users
+            .Include(e => e.StripeBillingMethod)
+            .Where(e => e.FirebaseId == firebaseId)
+            .SingleAsync();
+
             try
             {
-                int amountCents = amount * 100;
-                // Get User
-                var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-                var user = await _db.Users
-                .Include(e => e.Profit)
-                .Where(e => e.FirebaseId == firebaseId)
-                .SingleAsync();
+                if (!user.StripeBillingMethod.IsVerified || String.IsNullOrEmpty(user.StripeBillingMethod.AccountId))
+                    throw new Exception("User account no verified");
 
                 // Discount from Profit
-                user.Profit.Value -= amount;
-                user.Profit.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
-                _db.Profits.Update(user.Profit);
+                user.Profit -= amount;
+                _db.Users.Update(user);
 
-                if (user.Profit.Value < 0) throw new Exception("Profit negative");
+                if (user.Profit < 0) throw new Exception("Profit negative");
+
+                // Create Stripe transaction
+                var options = new TransferCreateOptions
+                {
+                    Amount = amountCents,
+                    Currency = "usd",
+                    Destination = user.StripeBillingMethod.AccountId,
+                    Description = "WePromoLink Withdraw",
+                };
+                var service = new TransferService();
+                var transfer = service.Create(options);
 
                 // Create Payment Transaction
                 var paymentTrans = new PaymentTransaction
                 {
                     Id = Guid.NewGuid(),
+                    StripeTranferId = transfer.Id,
                     Amount = amount,
                     CreatedAt = DateTime.UtcNow,
                     ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
-                    Status = TransactionStatusEnum.Requesting,
+                    Status = TransactionStatusEnum.Completed,
                     Title = $"Withdraw ${amount}",
                     TransactionType = TransactionTypeEnum.Withdraw,
                     UserModelId = user.Id,
@@ -304,11 +318,29 @@ public class StripeService
                 await _db.SaveChangesAsync();
 
                 await transaction.CommitAsync();
+
+                _messageBroker.Send(new WithdrawCompletedEvent
+                {
+                    PaymentTransactionId = paymentTrans.Id,
+                    PaymentMethod = "Stripe",
+                    Amount = paymentTrans.Amount,
+                    UserId = user.Id,
+                    Name = user.Fullname,
+                    Email = user.Email,
+                });
             }
             catch (System.Exception ex)
             {
                 _logger.LogError(ex.Message);
                 transaction.Rollback();
+                _messageBroker.Send(new WithdrawFailureEvent
+                {
+                    PaymentMethod = "Stripe",
+                    Amount = amount,
+                    UserId = user.Id,
+                    Name = user.Fullname,
+                    FailureReason = ex.Message
+                });
                 throw new Exception("Creating payment transaction fail");
             }
         }
@@ -428,7 +460,7 @@ public class StripeService
            CreatedAt = e.CreatedAt,
            Status = e.Status,
            Title = e.Title,
-           Available = e.User != null ? e.User.Available.Value : 0,
+           Available = e.User != null ? e.User.Available : 0,
            UserImageUrl = e.User != null ? e.User.ThumbnailImageUrl : "",
            UserName = e.User!.Fullname!
        })

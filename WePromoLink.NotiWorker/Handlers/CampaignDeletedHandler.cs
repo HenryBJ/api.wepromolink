@@ -34,6 +34,7 @@ public class CampaignDeletedHandler : IRequestHandler<CampaignDeletedEvent, bool
             Id = Guid.NewGuid(),
             ExternalId = Nanoid.Nanoid.GenerateAsync(size: 12).GetAwaiter().GetResult(),
             Status = NotificationStatusEnum.Unread,
+            Etag = Nanoid.Nanoid.Generate(size:12),
             UserModelId = request.UserId,
             Title = "Campaign deleted",
             Message = $"Your campaign called '{request.CampaignName}' has been deleted, remaining campaign budget has been added to the available balance",

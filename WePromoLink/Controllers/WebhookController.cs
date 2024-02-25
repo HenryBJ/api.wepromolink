@@ -69,6 +69,12 @@ public class WebhookController : ControllerBase
     [Route("stripe/connect")]
     public async Task<IResult> StripeConnect()
     {
+        //  For testing:
+        //  stripe login or stripe login --api-key sk_test_51Mvp......GM3RL
+        //  ./stripe listen --forward-to localhost:5208/webhook/stripe/connect
+        //  stripe trigger payment_intent.succeeded
+        //  stripe trigger --help
+
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         try
         {

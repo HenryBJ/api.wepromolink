@@ -36,6 +36,7 @@ public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bo
             ExternalId = Nanoid.Nanoid.GenerateAsync(size: 12).GetAwaiter().GetResult(),
             Status = NotificationStatusEnum.Unread,
             UserModelId = request.UserId,
+            Etag = Nanoid.Nanoid.Generate(size:12),
             Title = "Deposit completed",
             Message = $"We are pleased to inform you that your deposit has been successfully processed. An amount of ${request.Amount} USD has been credited to your account.",
         };
@@ -43,7 +44,7 @@ public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bo
         _db.SaveChanges();
 
         // Enviamos un correo
-        _senderEmail.Send(request.Name!, request.Email!, "Deposit completed", Templates.Deposit(new { user = request.Name, amount = request.Amount.ToString("C") })).GetAwaiter().GetResult();
+        _senderEmail.Send(request.Name!, request.Email!, "Deposit completed", Templates.Deposit(new { user = request.Name, amount = request.Amount.ToString("C"), year = DateTime.Now.Year.ToString() })).GetAwaiter().GetResult();
 
         _senderDashboard.Send(new DashboardStatus
         {

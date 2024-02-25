@@ -76,7 +76,6 @@ IHost host = Host.CreateDefaultBuilder(args)
             });
         });
 
-        services.AddSingleton<UpdateStatsTask>();
         services.AddSingleton<CleanImagesTask>();
 
         services.AddHostedService<Worker>();

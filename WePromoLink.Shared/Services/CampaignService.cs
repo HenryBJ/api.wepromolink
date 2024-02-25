@@ -40,15 +40,14 @@ public class CampaignService : ICampaignService
     public async Task<string> CreateCampaign(Campaign campaign)
     {
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).SingleOrDefaultAsync();
 
         if (user == null) throw new Exception("User does not exits");
-        if (user.Available.Value < campaign.Budget) throw new Exception("Insufficient balance");
+        if (user.Available < campaign.Budget) throw new Exception("Insufficient balance");
         if (!user.IsSubscribed) throw new Exception("Subscription is not active");
         if (user.IsBlocked) throw new Exception("User is blocked");
 
         var externalId = await Nanoid.Nanoid.GenerateAsync(size: 12);
-        var available = user.Available;
 
         using (var transaction = _db.Database.BeginTransaction())
         {
@@ -76,24 +75,15 @@ public class CampaignService : ICampaignService
                     Url = campaign.Url,
                     IsArchived = false,
                     IsBlocked = false,
-                    SharedLastWeekOnCampaign = new SharedLastWeekOnCampaignModel(),
                     Status = campaign.Budget >= 10,
-                    SharedTodayOnCampaignModel = new SharedTodayOnCampaignModel(),
                     UserModelId = user.Id,
-                    ClicksLastWeekOnCampaign = new ClicksLastWeekOnCampaignModel(),
-                    ClicksTodayOnCampaign = new ClicksTodayOnCampaignModel(),
-                    HistoryClicksByCountriesOnCampaign = new HistoryClicksByCountriesOnCampaignModel(),
-                    HistoryClicksOnCampaign = new HistoryClicksOnCampaignModel(),
-                    HistorySharedByUsersOnCampaign = new HistorySharedByUsersOnCampaignModel(),
-                    HistorySharedOnCampaign = new HistorySharedOnCampaignModel()
                 };
 
                 // Validate Available balance    
-                available.Value = available.Value - campaign.Budget;
-                available.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
-                _db.Availables.Update(available);
+                user.Available = user.Available - campaign.Budget;
+                _db.Users.Update(user);
                 await _db.SaveChangesAsync();
-                if (available.Value < 0) throw new Exception("Negative balance");
+                if (user.Available < 0) throw new Exception("Negative balance");
 
                 // Add Campaign
                 await _db.Campaigns.AddAsync(item);
@@ -156,7 +146,7 @@ public class CampaignService : ICampaignService
     {
         if (string.IsNullOrEmpty(id)) throw new Exception("Invalid Campaign ID");
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).SingleOrDefaultAsync();
         if (user == null) throw new Exception("User no found");
         if (user.IsBlocked) throw new Exception("User is blocked");
         if (!user.IsSubscribed) throw new Exception("User is not subscribed");
@@ -164,7 +154,6 @@ public class CampaignService : ICampaignService
         var campaignModel = await _db.Campaigns.Where(e => e.ExternalId == id).SingleOrDefaultAsync();
         if (campaignModel == null) throw new Exception("Campaign does not exits");
         if (campaignModel.IsArchived) throw new Exception("Campaign deleted");
-        var available = user.Available;
 
         using (var transaction = _db.Database.BeginTransaction())
         {
@@ -172,9 +161,8 @@ public class CampaignService : ICampaignService
             {
                 if (campaignModel.Budget > 0)
                 {
-                    available.Value += campaignModel.Budget;
-                    available.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
-                    _db.Availables.Update(available);
+                    user.Available += campaignModel.Budget;
+                    _db.Users.Update(user);
                     await _db.SaveChangesAsync();
 
                     // Create Payment Transaction
@@ -225,7 +213,7 @@ public class CampaignService : ICampaignService
     {
         if (string.IsNullOrEmpty(id)) throw new Exception("Invalid Campaign ID");
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).SingleOrDefaultAsync();
         if (user == null) throw new Exception("User no found");
         if (user.IsBlocked) throw new Exception("User is blocked");
         if (!user.IsSubscribed) throw new Exception("User is not subscribed");
@@ -238,18 +226,16 @@ public class CampaignService : ICampaignService
         var oldbudget = campaignModel.Budget;
         var oldEPM = campaignModel.EPM;
         var oldTitle = campaignModel.Title;
-        var available = user.Available;
 
         using (var transaction = _db.Database.BeginTransaction())
         {
             try
             {
                 // Validate Available balance    
-                available.Value = available.Value + campaignModel.Budget - campaign.Budget;
-                available.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
-                _db.Availables.Update(available);
+                user.Available = user.Available + campaignModel.Budget - campaign.Budget;
+                _db.Users.Update(user);
                 await _db.SaveChangesAsync();
-                if (available.Value < 0) throw new Exception("Negative balance");
+                if (user.Available < 0) throw new Exception("Negative balance");
 
                 // Verificar si hay que cambiar la imagen
                 if (campaignModel.ImageData?.ExternalId != campaign.ImageBundleId)

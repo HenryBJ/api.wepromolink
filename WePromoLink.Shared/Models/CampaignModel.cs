@@ -22,14 +22,5 @@ public class CampaignModel
     public DateTime? LastShared { get; set; }
     public DateTime? LastUpdated { get; set; }
     public DateTime CreatedAt { get; set; }
-    public ClicksLastWeekOnCampaignModel ClicksLastWeekOnCampaign { get; set; }
-    public ClicksTodayOnCampaignModel ClicksTodayOnCampaign { get; set; }
-    public HistoryClicksByCountriesOnCampaignModel HistoryClicksByCountriesOnCampaign { get; set; }
-    public HistoryClicksOnCampaignModel HistoryClicksOnCampaign { get; set; }
-    public HistorySharedByUsersOnCampaignModel HistorySharedByUsersOnCampaign { get; set; }
-    public HistorySharedOnCampaignModel HistorySharedOnCampaign { get; set; }
-    public SharedLastWeekOnCampaignModel SharedLastWeekOnCampaign { get; set; }
-    public SharedTodayOnCampaignModel SharedTodayOnCampaignModel { get; set; }
-
 
 }

@@ -8,7 +8,6 @@ using WePromoLink.DTO;
 using WePromoLink.DTO.Events;
 using WePromoLink.Enums;
 using WePromoLink.Models;
-using WePromoLink.Repositories;
 using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 
@@ -56,18 +55,11 @@ public class LinkService : ILinkService
         if (userA == null) throw new Exception("User no found");
 
         var campaign = await _db.Campaigns
-        .Include(e => e.HistorySharedByUsersOnCampaign)
-        .Include(e => e.HistorySharedOnCampaign)
-        .Include(e => e.SharedLastWeekOnCampaign)
-        .Include(e => e.SharedTodayOnCampaignModel)
         .Where(e => e.ExternalId == ExternalCampaignId)
         .SingleOrDefaultAsync();
         if (campaign == null) throw new Exception("Campaign no found");
 
         var userB = await _db.Users
-        .Include(e => e.HistorySharedByUsersUser)
-        .Include(e => e.SharedLastWeek)
-        .Include(e => e.SharedToday)
         .Where(e => e.Id == campaign.UserModelId)
         .SingleOrDefaultAsync();
         if (userB == null) throw new Exception("User no found");
@@ -85,14 +77,6 @@ public class LinkService : ILinkService
                     Url = $"https://{_config["Link:Domain"]}/{externalLinkId}",
                     CampaignModelId = campaign.Id,
                     ExternalId = externalLinkId,
-                    ClicksLastWeekOnLink = new ClicksLastWeekOnLinkModel(),
-                    ClicksTodayOnLink = new ClicksTodayOnLinkModel(),
-                    EarnLastWeekOnLink = new EarnLastWeekOnLinkModel(),
-                    EarnTodayOnLink = new EarnTodayOnLinkModel(),
-                    HistoryClicksByCountriesOnLink = new HistoryClicksByCountriesOnLinkModel(),
-                    HistoryClicksOnLink = new HistoryClicksOnLinkModel(),
-                    HistoryEarnByCountriesOnLink = new HistoryEarnByCountriesOnLinkModel(),
-                    HistoryEarnOnLink = new HistoryEarnOnLinkModel(),
                     CreatedAt = DateTime.UtcNow,
                     LastUpdated = DateTime.UtcNow,
                     UserModelId = userA.Id

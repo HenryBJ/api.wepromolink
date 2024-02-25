@@ -4,9 +4,9 @@ using Stripe;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events;
 using WePromoLink.DTO.Events.Commands;
+using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Enums;
 using WePromoLink.Models;
-using WePromoLink.Repositories;
 using WePromoLink.Services;
 using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
@@ -24,6 +24,7 @@ public class Worker : BackgroundService
     private MessageBroker<UpdateUserMessage> _userMessageBroker;
     private MessageBroker<UpdateLinkMessage> _linkMessageBroker;
     private readonly MessageBroker<BaseEvent> _eventSender;
+    private readonly MessageBroker<AddClickCommand> _addClick;
     private readonly MessageBroker<GeoLocalizeHitCommand> _commandSender;
 
 
@@ -34,7 +35,8 @@ public class Worker : BackgroundService
         MessageBroker<UpdateUserMessage> userMessageBroker,
         MessageBroker<UpdateLinkMessage> linkMessageBroker,
         MessageBroker<BaseEvent> eventSender,
-        MessageBroker<GeoLocalizeHitCommand> commandSender)
+        MessageBroker<GeoLocalizeHitCommand> commandSender,
+        MessageBroker<AddClickCommand> addClick)
     {
         var scope = fac.CreateScope();
         _db = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -46,6 +48,7 @@ public class Worker : BackgroundService
         _linkMessageBroker = linkMessageBroker;
         _eventSender = eventSender;
         _commandSender = commandSender;
+        _addClick = addClick;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -82,7 +85,6 @@ public class Worker : BackgroundService
 
                 var link = await _db.Links
                 .Include(e => e.User)
-                .ThenInclude(e => e.Profit)
                 .Include(e => e.Campaign)
                 .ThenInclude(e => e.User)
                 .ThenInclude(e => e.Subscription)
@@ -188,11 +190,9 @@ public class Worker : BackgroundService
                 await _db.SaveChangesAsync();
 
                 // Actualizamos el profit del usuario del link
-                CheckProfitReachThreshold(userFromLink.Id, profitFromLink.Value, profitFromLink.Value + amount);
-                profitFromLink.Value += amount;
-                profitFromLink.LastModified = DateTime.UtcNow;
-                profitFromLink.Etag = await Nanoid.Nanoid.GenerateAsync(size: 12);
-                _db.Profits.Update(profitFromLink);
+                CheckProfitReachThreshold(userFromLink.Id, profitFromLink, profitFromLink + amount);
+                link.User.Profit += amount;
+                _db.Users.Update(link.User);
                 await _db.SaveChangesAsync();
 
                 // Creamos el PaymentTransaction para el usuario del link
@@ -234,6 +234,7 @@ public class Worker : BackgroundService
                 _userMessageBroker.Send(new UpdateUserMessage { Id = userFromLink.Id });
                 _userMessageBroker.Send(new UpdateUserMessage { Id = userFromCampaign.Id });
                 _linkMessageBroker.Send(new UpdateLinkMessage { Id = link.Id });
+                _addClick.Send(new AddClickCommand {  ExternalId = campaign.ExternalId });
 
                 dbtrans.Commit();
 

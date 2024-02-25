@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using Microsoft.EntityFrameworkCore;
 using WePromoLink.Data;
 
 namespace WePromoLink.Controller.Tasks;
@@ -27,7 +28,10 @@ public class CleanImagesTask
             "thumbnail"
         };
 
-        var images = _db.ImageDatas.Where(e => !e.Bound).ToList();
+        var images = _db.ImageDatas
+        .Where(e => !e.Bound && EF.Functions.DateDiffDay(DateTime.UtcNow, e.CreatedAt) > 2)
+        .ToList();
+
         foreach (var imageModel in images)
         {
             try

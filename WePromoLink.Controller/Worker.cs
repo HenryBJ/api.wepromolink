@@ -8,13 +8,11 @@ public class Worker : BackgroundService
 {
     const int WAIT_TIME_MIN = 30;
     private readonly ILogger<Worker> _logger;
-    private readonly UpdateStatsTask _updateStatsTask;
     private readonly CleanImagesTask _cleanImagesTask;
 
-    public Worker(ILogger<Worker> logger, UpdateStatsTask updateStatsTask, CleanImagesTask cleanImagesTask)
+    public Worker(ILogger<Worker> logger, CleanImagesTask cleanImagesTask)
     {
         _logger = logger;
-        _updateStatsTask = updateStatsTask;
         _cleanImagesTask = cleanImagesTask;
     }
 
@@ -22,7 +20,6 @@ public class Worker : BackgroundService
     {
         while (true)
         {
-            await _updateStatsTask.Update();
             await _cleanImagesTask.Update();
             stoppingToken.ThrowIfCancellationRequested();
             await Task.Delay(TimeSpan.FromMinutes(WAIT_TIME_MIN), stoppingToken);
