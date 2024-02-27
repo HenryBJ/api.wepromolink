@@ -5,14 +5,14 @@ using WePromoLink.Enums;
 
 namespace WePromoLink.StatsWorker.Services.Campaign;
 
-public class AddClick : ChartDataRepository<string, int>, IProcessEvent<AddClickCommand>
+public class AddClickCampaignCommandHandler : ChartDataRepository<string, int>, IProcessEvent<AddClickCampaignCommand>
 {
 
-    public AddClick(IMongoClient client) : base(StatisticsEnum.CampaignXClick, client)
+    public AddClickCampaignCommandHandler(IMongoClient client) : base(StatisticsEnum.CampaignXClick, client)
     {
     }
 
-    public async Task<bool> Process(AddClickCommand item)
+    public async Task<bool> Process(AddClickCampaignCommand item)
     {
         try
         {

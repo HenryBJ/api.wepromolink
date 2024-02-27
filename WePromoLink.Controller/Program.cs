@@ -6,7 +6,6 @@ using WePromoLink.Data;
 using WePromoLink.DTO.Events;
 using WePromoLink.Services;
 using WePromoLink.Services.Cache;
-using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 
 IHost host = Host.CreateDefaultBuilder(args)
@@ -34,36 +33,6 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddTransient<BlobServiceClient>(_ =>
         {
             return new BlobServiceClient(configuration["Azure:blob:connectionstring"]);
-        });
-        
-        services.AddSingleton<MessageBroker<UpdateCampaignMessage>>(_ =>
-        {
-            return new MessageBroker<UpdateCampaignMessage>(new MessageBrokerOptions
-            {
-                HostName = configuration["RabbitMQ:hostname"],
-                UserName = configuration["RabbitMQ:username"],
-                Password = configuration["RabbitMQ:password"]
-            });
-        });
-
-        services.AddSingleton<MessageBroker<UpdateUserMessage>>(_ =>
-        {
-            return new MessageBroker<UpdateUserMessage>(new MessageBrokerOptions
-            {
-                HostName = configuration["RabbitMQ:hostname"],
-                UserName = configuration["RabbitMQ:username"],
-                Password = configuration["RabbitMQ:password"]
-            });
-        });
-
-        services.AddSingleton<MessageBroker<UpdateLinkMessage>>(_ =>
-        {
-            return new MessageBroker<UpdateLinkMessage>(new MessageBrokerOptions
-            {
-                HostName = configuration["RabbitMQ:hostname"],
-                UserName = configuration["RabbitMQ:username"],
-                Password = configuration["RabbitMQ:password"]
-            });
         });
 
         services.AddSingleton<MessageBroker<BaseEvent>>(sp =>

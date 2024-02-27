@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Http;
 using WePromoLink.Services.Cache;
 using WePromoLink.Shared.RabbitMQ;
 using WePromoLink.DTO.Events;
+using WePromoLink.DTO.Events.Commands.Statistics;
+using Microsoft.EntityFrameworkCore.Migrations.Internal;
 
 namespace WePromoLink.Services;
 
@@ -108,6 +110,7 @@ public class CampaignService : ICampaignService
 
                 transaction.Commit();
 
+                _eventSender.Send(new AddBudgetCampaignCommand { ExternalId = item.ExternalId, Budget = item.Budget });
                 _eventSender.Send(new CampaignCreatedEvent
                 {
                     CampaignId = item.Id,
@@ -154,6 +157,7 @@ public class CampaignService : ICampaignService
         var campaignModel = await _db.Campaigns.Where(e => e.ExternalId == id).SingleOrDefaultAsync();
         if (campaignModel == null) throw new Exception("Campaign does not exits");
         if (campaignModel.IsArchived) throw new Exception("Campaign deleted");
+        decimal removeAmount = campaignModel.Budget;
 
         using (var transaction = _db.Database.BeginTransaction())
         {
@@ -191,6 +195,7 @@ public class CampaignService : ICampaignService
 
                 transaction.Commit();
 
+                _eventSender.Send(new ReduceBudgetCampaignCommand { ExternalId = campaignModel.ExternalId, Amount = removeAmount });
                 _eventSender.Send(new CampaignDeletedEvent
                 {
                     CampaignId = campaignModel.Id,
@@ -288,6 +293,20 @@ public class CampaignService : ICampaignService
                     await _db.SaveChangesAsync();
                 }
                 transaction.Commit();
+
+                var diff = campaignModel.Budget - oldbudget;
+                if (diff > 0)
+                {
+                    _eventSender.Send(new AddBudgetCampaignCommand { ExternalId = campaignModel.ExternalId, Budget = diff });
+                    _eventSender.Send(new ReduceAvailableCommand{ ExternalId = user.ExternalId, Amount = diff});
+                }
+                else
+                if(diff < 0)
+                {
+                    _eventSender.Send(new ReduceBudgetCampaignCommand{ExternalId = campaignModel.ExternalId, Amount = diff});
+                    _eventSender.Send(new AddAvailableCommand{ExternalId = user.ExternalId, Available = diff});
+                }
+
                 _eventSender.Send(new CampaignEditedEvent
                 {
                     CampaignId = campaignModel.Id,

@@ -1,5 +1,4 @@
 using WePromoLink.Controller.Tasks;
-using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.Controller;

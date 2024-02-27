@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using WePromoLink.Data;
 using WePromoLink.DTO;
 using WePromoLink.DTO.Events;
+using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Services.Email;
@@ -110,7 +111,7 @@ public class UserService : IUserService
                 await _db.SaveChangesAsync();
                 transaction.Commit();
 
-                //TODO: Add AddAvailableEvent
+                _eventSender.Send(new AddAvailableCommand{ExternalId = user.ExternalId, Available = payment.Amount});
 
                 _eventSender.Send(new DepositCompletedEvent
                 {

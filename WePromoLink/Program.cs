@@ -17,7 +17,6 @@ using Google.Apis.Auth.OAuth2;
 using WePromoLink.Services.Email;
 using Azure.Storage.Blobs;
 using WePromoLink.Shared.RabbitMQ;
-using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Services.Cache;
 using WePromoLink.Services.SignalR;
 using WePromoLink.DTO.Events;
@@ -94,36 +93,6 @@ builder.Services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
 builder.Services.AddSingleton<MessageBroker<Hit>>(sp =>
 {
     return new MessageBroker<Hit>(new MessageBrokerOptions
-    {
-        HostName = builder.Configuration["RabbitMQ:hostname"],
-        UserName = builder.Configuration["RabbitMQ:username"],
-        Password = builder.Configuration["RabbitMQ:password"]
-    });
-});
-
-builder.Services.AddSingleton<MessageBroker<UpdateCampaignMessage>>(sp =>
-{
-    return new MessageBroker<UpdateCampaignMessage>(new MessageBrokerOptions
-    {
-        HostName = builder.Configuration["RabbitMQ:hostname"],
-        UserName = builder.Configuration["RabbitMQ:username"],
-        Password = builder.Configuration["RabbitMQ:password"]
-    });
-});
-
-builder.Services.AddSingleton<MessageBroker<UpdateUserMessage>>(sp =>
-{
-    return new MessageBroker<UpdateUserMessage>(new MessageBrokerOptions
-    {
-        HostName = builder.Configuration["RabbitMQ:hostname"],
-        UserName = builder.Configuration["RabbitMQ:username"],
-        Password = builder.Configuration["RabbitMQ:password"]
-    });
-});
-
-builder.Services.AddSingleton<MessageBroker<UpdateLinkMessage>>(sp =>
-{
-    return new MessageBroker<UpdateLinkMessage>(new MessageBrokerOptions
     {
         HostName = builder.Configuration["RabbitMQ:hostname"],
         UserName = builder.Configuration["RabbitMQ:username"],

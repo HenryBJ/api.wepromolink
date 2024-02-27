@@ -5,7 +5,6 @@ using WePromoLink.DTO.Events;
 using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Services;
 using WePromoLink.Services.Cache;
-using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 using WePromoLink.StatsWorker;
 
@@ -31,9 +30,9 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddTransient<IPushService, PushService>();
         services.AddSingleton<IMongoClient>(new MongoClient(configuration["Mongodb:ConnectionString"]));
 
-        services.AddSingleton<MessageBroker<AddClickCommand>>(_ =>
+        services.AddSingleton<MessageBroker<AddClickCampaignCommand>>(_ =>
         {
-            return new MessageBroker<AddClickCommand>(new MessageBrokerOptions
+            return new MessageBroker<AddClickCampaignCommand>(new MessageBrokerOptions
             {
                 HostName = configuration["RabbitMQ:hostname"],
                 UserName = configuration["RabbitMQ:username"],

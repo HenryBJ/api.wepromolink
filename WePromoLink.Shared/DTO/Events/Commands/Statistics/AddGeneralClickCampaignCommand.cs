@@ -1,9 +1,9 @@
 namespace WePromoLink.DTO.Events.Commands.Statistics;
 
-public class AddClickCommand: BaseEvent
+public class AddGeneralClickCampaignCommand: BaseEvent
 {
     public string ExternalId { get; set; }
-    public AddClickCommand()
+    public AddGeneralClickCampaignCommand()
     {
         EventType = GetType().FullName!;
     }

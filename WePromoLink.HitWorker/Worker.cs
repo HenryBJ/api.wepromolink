@@ -8,7 +8,6 @@ using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Services;
-using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.HitWorker;
@@ -20,32 +19,23 @@ public class Worker : BackgroundService
     private readonly IPStackService _service;
     private readonly ILogger<Worker> _logger;
     private MessageBroker<Hit> _messageBroker;
-    private MessageBroker<UpdateCampaignMessage> _campaignMessageBroker;
-    private MessageBroker<UpdateUserMessage> _userMessageBroker;
-    private MessageBroker<UpdateLinkMessage> _linkMessageBroker;
     private readonly MessageBroker<BaseEvent> _eventSender;
-    private readonly MessageBroker<AddClickCommand> _addClick;
+    private readonly MessageBroker<AddClickCampaignCommand> _addClick;
     private readonly MessageBroker<GeoLocalizeHitCommand> _commandSender;
 
 
     public Worker(
         IServiceScopeFactory fac,
         ILogger<Worker> logger,
-        MessageBroker<UpdateCampaignMessage> campaignMessageBroker,
-        MessageBroker<UpdateUserMessage> userMessageBroker,
-        MessageBroker<UpdateLinkMessage> linkMessageBroker,
         MessageBroker<BaseEvent> eventSender,
         MessageBroker<GeoLocalizeHitCommand> commandSender,
-        MessageBroker<AddClickCommand> addClick)
+        MessageBroker<AddClickCampaignCommand> addClick)
     {
         var scope = fac.CreateScope();
         _db = scope.ServiceProvider.GetRequiredService<DataContext>();
         _messageBroker = scope.ServiceProvider.GetRequiredService<MessageBroker<Hit>>();
         _logger = logger;
         _service = scope.ServiceProvider.GetRequiredService<IPStackService>();
-        _campaignMessageBroker = campaignMessageBroker;
-        _userMessageBroker = userMessageBroker;
-        _linkMessageBroker = linkMessageBroker;
         _eventSender = eventSender;
         _commandSender = commandSender;
         _addClick = addClick;
@@ -228,18 +218,11 @@ public class Worker : BackgroundService
                 await _db.PaymentTransactions.AddAsync(paymentA);
                 await _db.PaymentTransactions.AddAsync(paymentB);
                 await _db.SaveChangesAsync();
-
-                // Actualizamos las estadisticas
-                _campaignMessageBroker.Send(new UpdateCampaignMessage { Id = campaign.Id });
-                _userMessageBroker.Send(new UpdateUserMessage { Id = userFromLink.Id });
-                _userMessageBroker.Send(new UpdateUserMessage { Id = userFromCampaign.Id });
-                _linkMessageBroker.Send(new UpdateLinkMessage { Id = link.Id });
-                _addClick.Send(new AddClickCommand {  ExternalId = campaign.ExternalId });
-
                 dbtrans.Commit();
 
+                // Actualizamos las estadisticas
+                _addClick.Send(new AddClickCampaignCommand {  ExternalId = campaign.ExternalId });
                 _commandSender.Send(new GeoLocalizeHitCommand { HitId = model.Id });
-
                 _eventSender.Send(new LinkClickedEvent
                 {
                     LinkId = link.Id,

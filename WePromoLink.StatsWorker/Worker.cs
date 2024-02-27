@@ -1,7 +1,6 @@
 using MongoDB.Driver;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events.Commands.Statistics;
-using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 using WePromoLink.StatsWorker.Services.Campaign;
 
@@ -11,17 +10,14 @@ public class Worker : BackgroundService
 {
     const int WAIT_TIME_SECONDS = 5;
     private readonly ILogger<Worker> _logger;
-    private MessageBroker<UpdateCampaignMessage> _campaignMessageBroker;
-    private MessageBroker<UpdateUserMessage> _userMessageBroker;
-    private MessageBroker<UpdateLinkMessage> _linkMessageBroker;
-    private MessageBroker<AddClickCommand> _addclick;
+    private MessageBroker<AddClickCampaignCommand> _addclick;
     private readonly IMongoClient _mongo;
 
     private readonly IServiceScopeFactory _fac;
 
     public Worker(IServiceScopeFactory fac,
     ILogger<Worker> logger,
-    MessageBroker<AddClickCommand> addclick,
+    MessageBroker<AddClickCampaignCommand> addclick,
     IMongoClient mongo)
     {
         _logger = logger;
@@ -32,7 +28,7 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _addclick.Receive((item) => new AddClick(_mongo).Process(item).Result);
+        await _addclick.Receive((item) => new AddClickCampaignCommandHandler(_mongo).Process(item).Result);
 
         while (true)
         {

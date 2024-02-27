@@ -8,7 +8,6 @@ using WePromoLink.DTO;
 using WePromoLink.DTO.Events;
 using WePromoLink.Enums;
 using WePromoLink.Models;
-using WePromoLink.Shared.DTO.Messages;
 using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.Services;
@@ -19,8 +18,6 @@ public class LinkService : ILinkService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<LinkService> _logger;
     private readonly MessageBroker<Hit> _messageBroker;
-    private readonly MessageBroker<UpdateUserMessage> _userMessageBroker;
-    private readonly MessageBroker<UpdateCampaignMessage> _campaignMessageBroker;
     private readonly MessageBroker<BaseEvent> _eventSender;
     private readonly IConfiguration _config;
 
@@ -28,8 +25,6 @@ public class LinkService : ILinkService
         DataContext ctx,
         IHttpContextAccessor httpContextAccessor,
         ILogger<LinkService> logger,
-        MessageBroker<UpdateUserMessage> userMessageBroker,
-        MessageBroker<UpdateCampaignMessage> campaignMessageBroker,
         MessageBroker<BaseEvent> eventSender,
         MessageBroker<Hit> messageBroker,
         IConfiguration config)
@@ -37,8 +32,6 @@ public class LinkService : ILinkService
         _db = ctx;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
-        _userMessageBroker = userMessageBroker;
-        _campaignMessageBroker = campaignMessageBroker;
         _eventSender = eventSender;
         _messageBroker = messageBroker;
         _config = config;
@@ -83,12 +76,6 @@ public class LinkService : ILinkService
                 };
                 await _db.Links.AddAsync(link);
                 await _db.SaveChangesAsync();
-
-                // Update Campaign Statistics
-                _campaignMessageBroker.Send(new UpdateCampaignMessage { Id = campaign.Id });
-
-                // Update User (campaign owner) Statistics
-                _userMessageBroker.Send(new UpdateUserMessage { Id = userB.Id });
 
                 transaction.Commit();
 
