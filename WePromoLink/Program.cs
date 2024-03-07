@@ -24,6 +24,7 @@ using WePromoLink.DTO.SignalR;
 using WePromoLink.Services.Profile;
 using WePromoLink.Services.Marketing;
 using MongoDB.Driver;
+using WePromoLink.DTO.Events.Commands.Statistics;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
@@ -83,6 +84,16 @@ builder.Services.AddTransient<IProfileService, ProfileService>();
 builder.Services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
 {
     return new MessageBroker<BaseEvent>(new MessageBrokerOptions
+    {
+        HostName = builder.Configuration["RabbitMQ:hostname"],
+        UserName = builder.Configuration["RabbitMQ:username"],
+        Password = builder.Configuration["RabbitMQ:password"]
+    });
+});
+
+builder.Services.AddSingleton<MessageBroker<StatsBaseCommand>>(sp =>
+{
+    return new MessageBroker<StatsBaseCommand>(new MessageBrokerOptions
     {
         HostName = builder.Configuration["RabbitMQ:hostname"],
         UserName = builder.Configuration["RabbitMQ:username"],

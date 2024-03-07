@@ -4,6 +4,7 @@ using WePromoLink.Controller;
 using WePromoLink.Controller.Tasks;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events;
+using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Services;
 using WePromoLink.Services.Cache;
 using WePromoLink.Shared.RabbitMQ;
@@ -33,6 +34,16 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddTransient<BlobServiceClient>(_ =>
         {
             return new BlobServiceClient(configuration["Azure:blob:connectionstring"]);
+        });
+
+        services.AddSingleton<MessageBroker<StatsBaseCommand>>(sp =>
+        {
+            return new MessageBroker<StatsBaseCommand>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
         });
 
         services.AddSingleton<MessageBroker<BaseEvent>>(sp =>

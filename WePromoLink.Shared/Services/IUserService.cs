@@ -5,6 +5,7 @@ namespace WePromoLink.Services;
 
 public interface IUserService
 {
+    Task<string> GetExternalId();
     Task<bool> Exits(string email);
     Task<bool> IsBlocked();
     Task BlockUser(string firebaseId, string reason);

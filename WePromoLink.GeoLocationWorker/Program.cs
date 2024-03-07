@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events;
 using WePromoLink.DTO.Events.Commands;
+using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.GeoLocationWorker;
 using WePromoLink.Services;
 using WePromoLink.Services.Cache;
@@ -32,6 +33,16 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
         {
             return new MessageBroker<BaseEvent>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
+        });
+
+        services.AddSingleton<MessageBroker<StatsBaseCommand>>(sp =>
+        {
+            return new MessageBroker<StatsBaseCommand>(new MessageBrokerOptions
             {
                 HostName = configuration["RabbitMQ:hostname"],
                 UserName = configuration["RabbitMQ:username"],

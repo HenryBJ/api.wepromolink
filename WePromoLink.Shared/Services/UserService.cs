@@ -20,13 +20,15 @@ public class UserService : IUserService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IEmailSender _emailSender;
     private readonly MessageBroker<BaseEvent> _eventSender;
-    public UserService(DataContext db, IHttpContextAccessor httpContextAccessor, ILogger<UserService> logger, IEmailSender emailSender, MessageBroker<BaseEvent> eventSender)
+    private readonly MessageBroker<StatsBaseCommand> _statSender;
+    public UserService(DataContext db, IHttpContextAccessor httpContextAccessor, ILogger<UserService> logger, IEmailSender emailSender, MessageBroker<BaseEvent> eventSender, MessageBroker<StatsBaseCommand> statSender)
     {
         _db = db;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
         _emailSender = emailSender;
         _eventSender = eventSender;
+        _statSender = statSender;
     }
 
     public async Task BlockUser(string firebaseId, string reason)
@@ -111,7 +113,7 @@ public class UserService : IUserService
                 await _db.SaveChangesAsync();
                 transaction.Commit();
 
-                _eventSender.Send(new AddAvailableCommand{ExternalId = user.ExternalId, Available = payment.Amount});
+                _statSender.Send(new AddAvailableCommand{ExternalId = user.ExternalId, Available = payment.Amount});
 
                 _eventSender.Send(new DepositCompletedEvent
                 {
@@ -133,6 +135,12 @@ public class UserService : IUserService
     public async Task<bool> Exits(string email)
     {
         return await _db.Users.AnyAsync(e => e.Email.ToLower() == email.ToLower());
+    }
+
+    public async Task<string> GetExternalId()
+    {
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        return await _db.Users.Where(e=>e.FirebaseId == firebaseId).Select(e=>e.ExternalId).FirstAsync();
     }
 
     public async Task<PaymentMethodData[]> GetPaymentMethods()

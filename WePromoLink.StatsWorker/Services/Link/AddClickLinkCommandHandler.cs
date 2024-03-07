@@ -3,16 +3,16 @@ using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.DTO.Statistics;
 using WePromoLink.Enums;
 
-namespace WePromoLink.StatsWorker.Services.Campaign;
+namespace WePromoLink.StatsWorker.Services.Link;
 
-public class AddClickCampaignCommandHandler : ChartDataRepository<string, int>, IProcessEvent<AddClickCampaignCommand>
+public class AddClickLinkCommandHandler : ChartDataRepository<string, int>, IProcessEvent<AddClickLinkCommand>
 {
 
-    public AddClickCampaignCommandHandler(IMongoClient client) : base(StatisticsEnum.CampaignXClick, client)
+    public AddClickLinkCommandHandler(IMongoClient client) : base(StatisticsEnum.LinkXClick, client)
     {
     }
 
-    public async Task<bool> Process(AddClickCampaignCommand item)
+    public async Task<bool> Process(AddClickLinkCommand item)
     {
         try
         {

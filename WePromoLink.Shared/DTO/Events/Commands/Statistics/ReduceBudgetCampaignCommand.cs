@@ -1,6 +1,6 @@
 namespace WePromoLink.DTO.Events.Commands.Statistics;
 
-public class ReduceBudgetCampaignCommand: BaseEvent
+public class ReduceBudgetCampaignCommand: StatsBaseCommand
 {
     public string ExternalId { get; set; }
     public decimal Amount { get; set; }

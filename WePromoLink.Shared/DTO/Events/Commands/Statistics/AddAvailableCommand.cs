@@ -1,6 +1,6 @@
 namespace WePromoLink.DTO.Events.Commands.Statistics;
 
-public class AddAvailableCommand: BaseEvent
+public class AddAvailableCommand: StatsBaseCommand
 {
     public string ExternalId { get; set; }
     public decimal Available { get; set; }

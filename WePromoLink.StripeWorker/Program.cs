@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Stripe;
 using WePromoLink.Data;
 using WePromoLink.DTO.Events;
+using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Services;
 using WePromoLink.Services.Cache;
 using WePromoLink.Services.Email;
@@ -46,6 +47,17 @@ IHost host = Host.CreateDefaultBuilder(args)
                 Password = configuration["RabbitMQ:password"]
             });
         });
+
+        services.AddSingleton<MessageBroker<StatsBaseCommand>>(sp =>
+        {
+            return new MessageBroker<StatsBaseCommand>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
+        });
+
 
         services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
         {

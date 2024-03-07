@@ -49,8 +49,20 @@ public class DataController : ControllerBase
         _logger.LogInformation(json);
         switch (collectionName)
         {
+            case StatisticsEnum.CampaignXShare:
+            case StatisticsEnum.CampaignClickCountry:
+            case StatisticsEnum.GeneralShare:
+            case StatisticsEnum.GeneralClickLinks:
+            case StatisticsEnum.GeneralClickCampaign:
             case StatisticsEnum.CampaignXClick:
+            case StatisticsEnum.LinkXClick:
+            case StatisticsEnum.LinkClickCountry:
                 return new OkObjectResult(Newtonsoft.Json.JsonConvert.DeserializeObject<ChartData<string, int>>(json));
+            case StatisticsEnum.Profit:
+            case StatisticsEnum.Available:
+            case StatisticsEnum.CampaignBudget:
+            case StatisticsEnum.LinkProfit:
+                return new OkObjectResult(Newtonsoft.Json.JsonConvert.DeserializeObject<ChartData<string, decimal>>(json));
             default:
                 return Ok();
         }

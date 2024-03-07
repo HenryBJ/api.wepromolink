@@ -8,6 +8,7 @@ using WePromoLink.Services.Email;
 using WePromoLink.Services.Cache;
 using WePromoLink.Services.SignalR;
 using WePromoLink.DTO.SignalR;
+using WePromoLink.DTO.Events.Commands.Statistics;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((hostContext, config) =>
@@ -39,6 +40,16 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<MessageBroker<BaseEvent>>(_ =>
         {
             return new MessageBroker<BaseEvent>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
+        });
+
+        services.AddSingleton<MessageBroker<StatsBaseCommand>>(sp =>
+        {
+            return new MessageBroker<StatsBaseCommand>(new MessageBrokerOptions
             {
                 HostName = configuration["RabbitMQ:hostname"],
                 UserName = configuration["RabbitMQ:username"],

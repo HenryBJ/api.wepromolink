@@ -30,17 +30,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddHttpContextAccessor();
 
         services.AddTransient<IPushService, PushService>();
-        
-        services.AddSingleton<MessageBroker<AddClickCampaignCommand>>(_ =>
-        {
-            return new MessageBroker<AddClickCampaignCommand>(new MessageBrokerOptions
-            {
-                HostName = configuration["RabbitMQ:hostname"],
-                UserName = configuration["RabbitMQ:username"],
-                Password = configuration["RabbitMQ:password"]
-            });
-        });
-
+   
         services.AddSingleton<MessageBroker<Hit>>(_ =>
         {
             return new MessageBroker<Hit>(new MessageBrokerOptions
@@ -55,6 +45,16 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
         {
             return new MessageBroker<BaseEvent>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
+        });
+
+        services.AddSingleton<MessageBroker<StatsBaseCommand>>(sp =>
+        {
+            return new MessageBroker<StatsBaseCommand>(new MessageBrokerOptions
             {
                 HostName = configuration["RabbitMQ:hostname"],
                 UserName = configuration["RabbitMQ:username"],

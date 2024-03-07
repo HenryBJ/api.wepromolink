@@ -39,6 +39,24 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
+    [Route("getExternalId")]
+    [Authorize]
+    [ResponseCache(Duration = int.MaxValue)]
+    public async Task<IActionResult> GetExternalId()
+    {
+        try
+        {
+            var results = await _service.GetExternalId();
+            return new OkObjectResult(results);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
     [Route("isblocked")]
     [Authorize]
     [ResponseCache(Duration = 600)]

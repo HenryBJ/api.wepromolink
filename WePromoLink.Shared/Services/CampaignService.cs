@@ -28,7 +28,8 @@ public class CampaignService : ICampaignService
     private readonly ILogger<CampaignService> _logger;
     private readonly IShareCache _cache;
     private readonly MessageBroker<BaseEvent> _eventSender;
-    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, BTCPaymentService client, IHttpContextAccessor httpContextAccessor, ILogger<CampaignService> logger, IShareCache cache, MessageBroker<BaseEvent> eventSender)
+    private readonly MessageBroker<StatsBaseCommand> _sendSender;
+    public CampaignService(DataContext db, IOptions<BTCPaySettings> options, BTCPaymentService client, IHttpContextAccessor httpContextAccessor, ILogger<CampaignService> logger, IShareCache cache, MessageBroker<BaseEvent> eventSender, MessageBroker<StatsBaseCommand> sendSender)
     {
         _db = db;
         _options = options;
@@ -37,6 +38,7 @@ public class CampaignService : ICampaignService
         _logger = logger;
         _cache = cache;
         _eventSender = eventSender;
+        _sendSender = sendSender;
     }
 
     public async Task<string> CreateCampaign(Campaign campaign)
@@ -110,7 +112,7 @@ public class CampaignService : ICampaignService
 
                 transaction.Commit();
 
-                _eventSender.Send(new AddBudgetCampaignCommand { ExternalId = item.ExternalId, Budget = item.Budget });
+                _sendSender.Send(new AddBudgetCampaignCommand { ExternalId = item.ExternalId, Budget = item.Budget });
                 _eventSender.Send(new CampaignCreatedEvent
                 {
                     CampaignId = item.Id,
@@ -195,7 +197,7 @@ public class CampaignService : ICampaignService
 
                 transaction.Commit();
 
-                _eventSender.Send(new ReduceBudgetCampaignCommand { ExternalId = campaignModel.ExternalId, Amount = removeAmount });
+                _sendSender.Send(new ReduceBudgetCampaignCommand { ExternalId = campaignModel.ExternalId, Amount = removeAmount });
                 _eventSender.Send(new CampaignDeletedEvent
                 {
                     CampaignId = campaignModel.Id,
@@ -297,14 +299,14 @@ public class CampaignService : ICampaignService
                 var diff = campaignModel.Budget - oldbudget;
                 if (diff > 0)
                 {
-                    _eventSender.Send(new AddBudgetCampaignCommand { ExternalId = campaignModel.ExternalId, Budget = diff });
-                    _eventSender.Send(new ReduceAvailableCommand{ ExternalId = user.ExternalId, Amount = diff});
+                    _sendSender.Send(new AddBudgetCampaignCommand { ExternalId = campaignModel.ExternalId, Budget = diff });
+                    _sendSender.Send(new ReduceAvailableCommand{ ExternalId = user.ExternalId, Amount = diff});
                 }
                 else
                 if(diff < 0)
                 {
-                    _eventSender.Send(new ReduceBudgetCampaignCommand{ExternalId = campaignModel.ExternalId, Amount = diff});
-                    _eventSender.Send(new AddAvailableCommand{ExternalId = user.ExternalId, Available = diff});
+                    _sendSender.Send(new ReduceBudgetCampaignCommand{ExternalId = campaignModel.ExternalId, Amount = diff});
+                    _sendSender.Send(new AddAvailableCommand{ExternalId = user.ExternalId, Available = diff});
                 }
 
                 _eventSender.Send(new CampaignEditedEvent

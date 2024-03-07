@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using WePromoLink.Data;
 using WePromoLink.DTO;
 using WePromoLink.DTO.Events;
+using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Shared.RabbitMQ;
@@ -19,6 +20,7 @@ public class LinkService : ILinkService
     private readonly ILogger<LinkService> _logger;
     private readonly MessageBroker<Hit> _messageBroker;
     private readonly MessageBroker<BaseEvent> _eventSender;
+    private readonly MessageBroker<StatsBaseCommand> _statSender;
     private readonly IConfiguration _config;
 
     public LinkService(
@@ -27,7 +29,8 @@ public class LinkService : ILinkService
         ILogger<LinkService> logger,
         MessageBroker<BaseEvent> eventSender,
         MessageBroker<Hit> messageBroker,
-        IConfiguration config)
+        IConfiguration config,
+        MessageBroker<StatsBaseCommand> statSender)
     {
         _db = ctx;
         _httpContextAccessor = httpContextAccessor;
@@ -35,6 +38,7 @@ public class LinkService : ILinkService
         _eventSender = eventSender;
         _messageBroker = messageBroker;
         _config = config;
+        _statSender = statSender;
     }
 
     public async Task<string> Create(string ExternalCampaignId)
@@ -78,6 +82,8 @@ public class LinkService : ILinkService
                 await _db.SaveChangesAsync();
 
                 transaction.Commit();
+
+                _statSender.Send(new AddGeneralShareCommand{ExternalId = userB.ExternalId});
 
                 _eventSender.Send(new CampaignSharedEvent
                 {

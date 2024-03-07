@@ -5,14 +5,15 @@ using WePromoLink.Enums;
 
 namespace WePromoLink.StatsWorker.Services.Campaign;
 
-public class AddClickCampaignCommandHandler : ChartDataRepository<string, int>, IProcessEvent<AddClickCampaignCommand>
+public class AddGeneralClickLinkCommandHandler : ChartDataRepository<string, int>, IProcessEvent<AddGeneralClickLinkCommand>
 {
+    private const int MAX_ITEMS = 20;
 
-    public AddClickCampaignCommandHandler(IMongoClient client) : base(StatisticsEnum.CampaignXClick, client)
+    public AddGeneralClickLinkCommandHandler(IMongoClient client) : base(StatisticsEnum.GeneralClickLinks, client)
     {
     }
 
-    public async Task<bool> Process(AddClickCampaignCommand item)
+    public async Task<bool> Process(AddGeneralClickLinkCommand item)
     {
         try
         {
@@ -27,6 +28,12 @@ public class AddClickCampaignCommandHandler : ChartDataRepository<string, int>, 
                     else
                     if (DateTime.Parse(old.labels.Last()).Date < DateTime.UtcNow.Date)
                     {
+                        if(old.datasets.Count>=MAX_ITEMS)
+                        {
+                            old.datasets.RemoveAt(0);
+                            old.labels.RemoveAt(0);
+                        }
+
                         old.labels.Add(DateTime.UtcNow.Date.ToShortDateString());
                         var lastvalue = old.datasets[0].data.Last();
                         old.datasets[0].data.Add(lastvalue + 1);
@@ -46,7 +53,7 @@ public class AddClickCampaignCommandHandler : ChartDataRepository<string, int>, 
                   borderColor = new List<string>{"rgb(249,115,22)"},
                   borderWidth = 1,
                   data = new List<int>{1},
-                  label = "Clicks"
+                  label = "Unique Clicks on Links"
                 }}
                 });
             }

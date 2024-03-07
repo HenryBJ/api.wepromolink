@@ -1,6 +1,6 @@
 namespace WePromoLink.DTO.Events.Commands.Statistics;
 
-public class AddGeoPinLinkCommand: BaseEvent
+public class AddGeoPinLinkCommand: StatsBaseCommand
 {
     public string ExternalId { get; set; }
     public decimal Latitude { get; set; }

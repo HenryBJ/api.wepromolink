@@ -20,7 +20,7 @@ public class Worker : BackgroundService
     private readonly ILogger<Worker> _logger;
     private MessageBroker<Hit> _messageBroker;
     private readonly MessageBroker<BaseEvent> _eventSender;
-    private readonly MessageBroker<AddClickCampaignCommand> _addClick;
+    private readonly MessageBroker<StatsBaseCommand> _statSender;
     private readonly MessageBroker<GeoLocalizeHitCommand> _commandSender;
 
 
@@ -29,7 +29,7 @@ public class Worker : BackgroundService
         ILogger<Worker> logger,
         MessageBroker<BaseEvent> eventSender,
         MessageBroker<GeoLocalizeHitCommand> commandSender,
-        MessageBroker<AddClickCampaignCommand> addClick)
+        MessageBroker<StatsBaseCommand> statSender)
     {
         var scope = fac.CreateScope();
         _db = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -38,7 +38,7 @@ public class Worker : BackgroundService
         _service = scope.ServiceProvider.GetRequiredService<IPStackService>();
         _eventSender = eventSender;
         _commandSender = commandSender;
-        _addClick = addClick;
+        _statSender = statSender;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -221,7 +221,12 @@ public class Worker : BackgroundService
                 dbtrans.Commit();
 
                 // Actualizamos las estadisticas
-                _addClick.Send(new AddClickCampaignCommand {  ExternalId = campaign.ExternalId });
+                _statSender.Send(new AddClickLinkCommand{ExternalId = link.ExternalId});
+                _statSender.Send(new AddSpendCampaignCommand{ExternalId = campaign.ExternalId, Spend = amount});
+                _statSender.Send(new AddGeneralClickCampaignCommand{ExternalId = campaign.ExternalId});
+                _statSender.Send(new AddGeneralClickLinkCommand{ExternalId = link.User.ExternalId});
+                _statSender.Send(new AddProfitCommand{ Profit = amount, ExternalId = link.User.ExternalId });
+                _statSender.Send(new AddClickCampaignCommand {  ExternalId = campaign.ExternalId });
                 _commandSender.Send(new GeoLocalizeHitCommand { HitId = model.Id });
                 _eventSender.Send(new LinkClickedEvent
                 {

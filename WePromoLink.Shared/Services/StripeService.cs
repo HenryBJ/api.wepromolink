@@ -10,6 +10,7 @@ using Stripe.Checkout;
 using WePromoLink.Data;
 using WePromoLink.DTO;
 using WePromoLink.DTO.Events;
+using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Enums;
 using WePromoLink.Models;
 using WePromoLink.Services.Email;
@@ -25,13 +26,15 @@ public class StripeService
     private readonly IHttpContextAccessor _httpContextAccessor;
     private ILogger<StripeService> _logger { get; set; }
     private readonly MessageBroker<BaseEvent> _messageBroker;
-    public StripeService(DataContext db, IHttpContextAccessor httpContextAccessor, IUserService userService, ILogger<StripeService> logger, MessageBroker<BaseEvent> messageBroker)
+    private readonly MessageBroker<StatsBaseCommand> _statBroker;
+    public StripeService(DataContext db, IHttpContextAccessor httpContextAccessor, IUserService userService, ILogger<StripeService> logger, MessageBroker<BaseEvent> messageBroker, MessageBroker<StatsBaseCommand> statBroker)
     {
         _db = db;
         _httpContextAccessor = httpContextAccessor;
         _userService = userService;
         _logger = logger;
         _messageBroker = messageBroker;
+        _statBroker = statBroker;
     }
 
 
@@ -319,6 +322,7 @@ public class StripeService
 
                 await transaction.CommitAsync();
 
+                _statBroker.Send(new ReduceProfitCommand{Amount = paymentTrans.Amount, ExternalId = user.ExternalId});
                 _messageBroker.Send(new WithdrawCompletedEvent
                 {
                     PaymentTransactionId = paymentTrans.Id,

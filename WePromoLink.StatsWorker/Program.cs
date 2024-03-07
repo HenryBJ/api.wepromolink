@@ -30,9 +30,19 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddTransient<IPushService, PushService>();
         services.AddSingleton<IMongoClient>(new MongoClient(configuration["Mongodb:ConnectionString"]));
 
-        services.AddSingleton<MessageBroker<AddClickCampaignCommand>>(_ =>
+        services.AddSingleton<MessageBroker<StatsBaseCommand>>(sp =>
         {
-            return new MessageBroker<AddClickCampaignCommand>(new MessageBrokerOptions
+            return new MessageBroker<StatsBaseCommand>(new MessageBrokerOptions
+            {
+                HostName = configuration["RabbitMQ:hostname"],
+                UserName = configuration["RabbitMQ:username"],
+                Password = configuration["RabbitMQ:password"]
+            });
+        });
+
+        services.AddSingleton<MessageBroker<BaseEvent>>(_ =>
+        {
+            return new MessageBroker<BaseEvent>(new MessageBrokerOptions
             {
                 HostName = configuration["RabbitMQ:hostname"],
                 UserName = configuration["RabbitMQ:username"],
