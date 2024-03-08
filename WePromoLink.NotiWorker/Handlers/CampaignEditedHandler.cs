@@ -34,7 +34,7 @@ public class CampaignEditedHandler : IRequestHandler<CampaignEditedEvent, bool>
             UserModelId = request.UserId,
             Etag = Nanoid.Nanoid.Generate(size:12),
             Title = "Campaign edited",
-            Message = $"Your campaign called '{request.CampaignNameNew}' has been successfully edited. It has been assigned a new budget of {request.AmountNew.ToString("0.00")} USD.",
+            Message = $"Your campaign called '{request.CampaignNameNew}' has been successfully edited. It has been assigned a new budget of ${request.AmountNew.ToString("0.00")} USD.",
         };
         _db.Notifications.Add(noti);
         _db.SaveChanges();

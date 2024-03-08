@@ -322,7 +322,7 @@ public class StripeService
 
                 await transaction.CommitAsync();
 
-                _statBroker.Send(new ReduceProfitCommand{Amount = paymentTrans.Amount, ExternalId = user.ExternalId});
+                _statBroker.Send(new ReduceProfitCommand{Amount = Math.Abs(paymentTrans.Amount), ExternalId = user.ExternalId});
                 _messageBroker.Send(new WithdrawCompletedEvent
                 {
                     PaymentTransactionId = paymentTrans.Id,
@@ -402,7 +402,7 @@ public class StripeService
         var accService = new Stripe.AccountService();
         AccountCreateOptions options = new AccountCreateOptions
         {
-            Type = AccountType.Express,
+            Type = AccountType.Express,//TODO: Change to Standard for tier 1
             Email = email,
             BusinessType = "individual"
         };

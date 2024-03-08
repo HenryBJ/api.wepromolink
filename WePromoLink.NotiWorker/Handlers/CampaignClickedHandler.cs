@@ -2,7 +2,6 @@ using MediatR;
 using WePromoLink.DTO.Events;
 using WePromoLink.DTO.SignalR;
 using WePromoLink.Services.Email;
-using WePromoLink.Services.SignalR;
 using WePromoLink.Shared.RabbitMQ;
 
 namespace WePromoLink.Handlers;

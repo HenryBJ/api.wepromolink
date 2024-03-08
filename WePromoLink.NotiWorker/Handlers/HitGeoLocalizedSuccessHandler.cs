@@ -43,13 +43,13 @@ public class HitGeoLocalizedSuccessHandler : IRequestHandler<HitGeoLocalizedSucc
         _pushService.SetPushNotification(request.UserId, e =>
         {
             e.Messages ??= new List<string>();
-            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\"> to campaign <b>{request.CampaignName}</b> &#x1F973;");
+            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"20\"> to campaign <b>{request.CampaignName}</b> &#x1F973;");
         });
 
         _pushService.SetPushNotification(request.LinkOwnerId, e =>
         {
             e.Messages ??= new List<string>();
-            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\"> to your link of <b>{request.CampaignName}</b> &#x1F4B0;");
+            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"20\"> to your link of <b>{request.CampaignName}</b> &#x1F4B0;");
         });
 
         if (request.FirstTime)

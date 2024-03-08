@@ -112,7 +112,7 @@ public class CampaignService : ICampaignService
 
                 transaction.Commit();
 
-                _sendSender.Send(new AddBudgetCampaignCommand { ExternalId = item.ExternalId, Budget = item.Budget });
+                _sendSender.Send(new AddBudgetCampaignCommand { ExternalId = item.ExternalId, Budget = Math.Abs(item.Budget) });
                 _eventSender.Send(new CampaignCreatedEvent
                 {
                     CampaignId = item.Id,
@@ -305,8 +305,8 @@ public class CampaignService : ICampaignService
                 else
                 if(diff < 0)
                 {
-                    _sendSender.Send(new ReduceBudgetCampaignCommand{ExternalId = campaignModel.ExternalId, Amount = diff});
-                    _sendSender.Send(new AddAvailableCommand{ExternalId = user.ExternalId, Available = diff});
+                    _sendSender.Send(new ReduceBudgetCampaignCommand{ExternalId = campaignModel.ExternalId, Amount = Math.Abs(diff)});
+                    _sendSender.Send(new AddAvailableCommand{ExternalId = user.ExternalId, Available = Math.Abs(diff)});
                 }
 
                 _eventSender.Send(new CampaignEditedEvent

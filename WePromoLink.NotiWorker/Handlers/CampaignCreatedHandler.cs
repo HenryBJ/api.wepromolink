@@ -38,7 +38,7 @@ public class CampaignCreatedHandler : IRequestHandler<CampaignCreatedEvent, bool
             UserModelId = request.UserId,
             Etag = Nanoid.Nanoid.Generate(size:12),
             Title = "Campaign created",
-            Message = $"Your campaign called '{request.CampaignName}' has been successfully created. It has been assigned a budget of {request.InitialAmount.ToString("0.00")} USD.",
+            Message = $"Your campaign called '{request.CampaignName}' has been successfully created. It has been assigned a budget of ${request.InitialAmount.ToString("0.00")} USD.",
         };
         _db.Notifications.Add(noti);
         _db.SaveChanges();

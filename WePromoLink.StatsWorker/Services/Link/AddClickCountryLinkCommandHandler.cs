@@ -29,6 +29,7 @@ public class AddClickCountryLinkCommandHandler : ChartDataRepository<string, int
                     {
                         old.labels.Add(item.Country);
                         old.datasets[0].data.Add(1);
+                        old.datasets[0].backgroundColor.Add(GenerateColor());
                     }
                     
                     return old;
@@ -42,7 +43,7 @@ public class AddClickCountryLinkCommandHandler : ChartDataRepository<string, int
                     labels = new List<string> { item.Country },
                     datasets = new List<Dataset<int>>{new Dataset<int>
                 {
-                  backgroundColor = new List<string>{"rgb(251,237,213)"},
+                  backgroundColor = new List<string>{GenerateColor()},
                   borderColor = new List<string>{"rgb(249,115,22)"},
                   borderWidth = 1,
                   data = new List<int>{1},
@@ -56,5 +57,14 @@ public class AddClickCountryLinkCommandHandler : ChartDataRepository<string, int
         {
             return false;
         }
+    }
+    private string GenerateColor()
+    {
+        Random random = new Random();
+        int r = random.Next(50, 256); // Valor rojo entre 50 y 255
+        int g = random.Next(50, 256); // Valor verde entre 50 y 255
+        int b = random.Next(50, 256); // Valor azul entre 50 y 255
+
+        return $"rgb({r},{g},{b})";
     }
 }

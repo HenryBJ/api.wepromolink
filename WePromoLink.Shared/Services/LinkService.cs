@@ -84,6 +84,8 @@ public class LinkService : ILinkService
                 transaction.Commit();
 
                 _statSender.Send(new AddGeneralShareCommand{ExternalId = userB.ExternalId});
+                _statSender.Send(new AddShareCampaignCommand{ExternalId = campaign.ExternalId});
+                
 
                 _eventSender.Send(new CampaignSharedEvent
                 {

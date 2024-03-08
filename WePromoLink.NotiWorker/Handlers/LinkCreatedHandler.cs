@@ -16,7 +16,7 @@ public class LinkCreatedHandler : IRequestHandler<LinkCreatedEvent, bool>
     }
     public Task<bool> Handle(LinkCreatedEvent request, CancellationToken cancellationToken)
     {
-        _pushService.SetPushNotification(request.OwnerUserId, e => e.Links++);
+        _pushService.SetPushNotification(request.LinkCreatorUserId, e => e.Links++);
         return Task.FromResult(true);
     }
 }

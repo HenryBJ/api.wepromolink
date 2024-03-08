@@ -42,7 +42,7 @@ public class AddClickLinkCommandHandler : ChartDataRepository<string, int>, IPro
                     labels = new List<string> { item.CreatedAt.Date.ToShortDateString() },
                     datasets = new List<Dataset<int>>{new Dataset<int>
                 {
-                  backgroundColor = new List<string>{"rgb(251,237,213)"},
+                  backgroundColor = new List<string>{"rgb(234,114,39)"},
                   borderColor = new List<string>{"rgb(249,115,22)"},
                   borderWidth = 1,
                   data = new List<int>{1},

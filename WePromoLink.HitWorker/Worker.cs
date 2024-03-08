@@ -142,7 +142,7 @@ public class Worker : BackgroundService
                     {
                         CampaignId = link.Campaign.Id,
                         CampaignName = link.Campaign.Title,
-                        UserId = link.User.Id,
+                        UserId = link.Campaign.User.Id,
                         Amount = link.Campaign.Budget,
                         EPM = link.Campaign.EPM,
                         Name = link.User.Fullname
@@ -221,11 +221,12 @@ public class Worker : BackgroundService
                 dbtrans.Commit();
 
                 // Actualizamos las estadisticas
+                _statSender.Send(new AddProfitLinkCommand{ExternalId = link.ExternalId, Profit=Math.Abs(amount)});
                 _statSender.Send(new AddClickLinkCommand{ExternalId = link.ExternalId});
-                _statSender.Send(new AddSpendCampaignCommand{ExternalId = campaign.ExternalId, Spend = amount});
-                _statSender.Send(new AddGeneralClickCampaignCommand{ExternalId = campaign.ExternalId});
+                _statSender.Send(new AddSpendCampaignCommand{ExternalId = campaign.ExternalId, Spend = Math.Abs(amount)});
+                _statSender.Send(new AddGeneralClickCampaignCommand{ExternalId = campaign.User.ExternalId});
                 _statSender.Send(new AddGeneralClickLinkCommand{ExternalId = link.User.ExternalId});
-                _statSender.Send(new AddProfitCommand{ Profit = amount, ExternalId = link.User.ExternalId });
+                _statSender.Send(new AddProfitCommand{ Profit = Math.Abs(amount), ExternalId = link.User.ExternalId });
                 _statSender.Send(new AddClickCampaignCommand {  ExternalId = campaign.ExternalId });
                 _commandSender.Send(new GeoLocalizeHitCommand { HitId = model.Id });
                 _eventSender.Send(new LinkClickedEvent

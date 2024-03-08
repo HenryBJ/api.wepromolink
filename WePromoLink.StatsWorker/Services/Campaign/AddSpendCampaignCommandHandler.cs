@@ -36,7 +36,7 @@ public class AddSpendCampaignCommandHandler : ChartDataRepository<string, decima
 
                         old.labels.Add(DateTime.UtcNow.Date.ToShortDateString());
                         var lastvalue = old.datasets[0].data.Last();
-                        old.datasets[0].data.Add(lastvalue-Math.Round(item.Spend,2,MidpointRounding.AwayFromZero));
+                        old.datasets[0].data.Add(lastvalue-Math.Abs( Math.Round(item.Spend,2,MidpointRounding.AwayFromZero)));
                     }
                     return old;
                 });
@@ -49,10 +49,10 @@ public class AddSpendCampaignCommandHandler : ChartDataRepository<string, decima
                     labels = new List<string> { item.CreatedAt.Date.ToShortDateString() },
                     datasets = new List<Dataset<decimal>>{new Dataset<decimal>
                 {
-                  backgroundColor = new List<string>{"rgb(251,237,213)"},
+                  backgroundColor = new List<string>{"rgb(234,114,39)"},
                   borderColor = new List<string>{"rgb(249,115,22)"},
                   borderWidth = 1,
-                  data = new List<decimal>{-Math.Round(item.Spend,2,MidpointRounding.AwayFromZero)},
+                  data = new List<decimal>{-Math.Abs(Math.Round(item.Spend,2,MidpointRounding.AwayFromZero))},
                   label = "budget"
                 }}
                 });

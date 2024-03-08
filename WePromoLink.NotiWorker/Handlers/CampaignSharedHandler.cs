@@ -42,7 +42,7 @@ public class CampaignSharedHandler : IRequestHandler<CampaignSharedEvent, bool>
             Id = Guid.NewGuid(),
             ExternalId = Nanoid.Nanoid.GenerateAsync(size: 12).GetAwaiter().GetResult(),
             Status = NotificationStatusEnum.Unread,
-            UserModelId = request.SharedByUserId,
+            UserModelId = request.OwnerUserId,
             Etag = Nanoid.Nanoid.Generate(size:12),
             Title = "Campaign shared",
             Message = $"A link has been created to your campaign called '{request.CampaignName}' by the user {request.SharedByName}",
