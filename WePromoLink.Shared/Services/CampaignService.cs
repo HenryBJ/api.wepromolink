@@ -112,6 +112,7 @@ public class CampaignService : ICampaignService
 
                 transaction.Commit();
 
+                _sendSender.Send(new ReduceAvailableCommand { ExternalId = user.ExternalId, Amount = Math.Abs(item.Budget) });
                 _sendSender.Send(new AddBudgetCampaignCommand { ExternalId = item.ExternalId, Budget = Math.Abs(item.Budget) });
                 _eventSender.Send(new CampaignCreatedEvent
                 {
@@ -300,13 +301,13 @@ public class CampaignService : ICampaignService
                 if (diff > 0)
                 {
                     _sendSender.Send(new AddBudgetCampaignCommand { ExternalId = campaignModel.ExternalId, Budget = diff });
-                    _sendSender.Send(new ReduceAvailableCommand{ ExternalId = user.ExternalId, Amount = diff});
+                    _sendSender.Send(new ReduceAvailableCommand { ExternalId = user.ExternalId, Amount = diff });
                 }
                 else
-                if(diff < 0)
+                if (diff < 0)
                 {
-                    _sendSender.Send(new ReduceBudgetCampaignCommand{ExternalId = campaignModel.ExternalId, Amount = Math.Abs(diff)});
-                    _sendSender.Send(new AddAvailableCommand{ExternalId = user.ExternalId, Available = Math.Abs(diff)});
+                    _sendSender.Send(new ReduceBudgetCampaignCommand { ExternalId = campaignModel.ExternalId, Amount = Math.Abs(diff) });
+                    _sendSender.Send(new AddAvailableCommand { ExternalId = user.ExternalId, Available = Math.Abs(diff) });
                 }
 
                 _eventSender.Send(new CampaignEditedEvent
@@ -362,6 +363,8 @@ public class CampaignService : ICampaignService
             var items = await _db.Campaigns
             .Include(e => e.ImageData)
             .Include(e => e.User)
+            .ThenInclude(e => e.Subscription)
+            .ThenInclude(e => e.SubscriptionPlan)
             .Where(e => e.Status)
             .OrderByDescending(c => c.LastUpdated)
             .Skip(offset)
@@ -371,6 +374,7 @@ public class CampaignService : ICampaignService
             campaigns = items
             .Select(e => new CampaignCard
             {
+                AutorVerified = e.User.Subscription.SubscriptionPlan.Level > 1,
                 AutorExternalId = e.User.ExternalId,
                 AutorName = e.User.Fullname,
                 AutorImageUrl = e.User.ThumbnailImageUrl,

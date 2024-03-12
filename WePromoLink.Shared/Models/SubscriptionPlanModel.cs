@@ -14,9 +14,13 @@ public class SubscriptionPlanModel
     public decimal Commission { get; set; }
     public decimal Annually { get; set; }
     public decimal Discount { get; set; }
+    public decimal DepositFeePercent { get; set; }
+    public decimal WithdrawFeePercent { get; set; }
     public string PaymentMethod { get; set; }
     public string Tag { get; set; }
     public List<SubscriptionFeatureModel> Features { get; set; }
+    public bool Active { get; set; }
+    
     public string? Metadata { get; set; }
 
 }

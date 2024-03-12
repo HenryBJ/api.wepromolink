@@ -18,9 +18,9 @@ public class WithdrawCompletedHandler : IRequestHandler<WithdrawCompletedEvent, 
         _senderDashboard = senderDashboard;
         _pushService = pushService;
     }
-    public Task<bool> Handle(WithdrawCompletedEvent request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(WithdrawCompletedEvent request, CancellationToken cancellationToken)
     {
-        _pushService.SetPushNotification(request.UserId, e => e.Transaction++);
+        await _pushService.SetPushNotification(request.UserId, e => e.Transaction++);
         // Enviamos un correo
         _senderEmail.Send(request.Name!, request.Email!, "Withdraw completed", Templates.Withdraw(new { user = request.Name, amount = request.Amount.ToString("C"), year = DateTime.Now.Year.ToString() })).GetAwaiter().GetResult();
         _senderDashboard.Send(new DashboardStatus
@@ -41,6 +41,6 @@ public class WithdrawCompletedHandler : IRequestHandler<WithdrawCompletedEvent, 
             Withdraw = 1,
             CampaignReported = 0,
         });
-        return Task.FromResult(true);
+        return true;
     }
 }

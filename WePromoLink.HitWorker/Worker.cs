@@ -90,6 +90,12 @@ public class Worker : BackgroundService
                 var linkId = link.Id;
                 var hit = await _db.Hits.Where(e => e.LinkModelId == linkId && e.Origin == origin).SingleOrDefaultAsync();
 
+                link.LastClick = DateTime.UtcNow;
+                _db.Links.Update(link);
+                
+                campaign.LastClick = DateTime.UtcNow;
+                _db.Campaigns.Update(campaign);
+
                 // Actualizamos el HIT
                 if (hit != null)
                 {

@@ -23,9 +23,9 @@ public class CampaignCreatedHandler : IRequestHandler<CampaignCreatedEvent, bool
         _senderDashboard = senderDashboard;
         _pushService = pushService;
     }
-    public Task<bool> Handle(CampaignCreatedEvent request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CampaignCreatedEvent request, CancellationToken cancellationToken)
     {
-        _pushService.SetPushNotification(request.UserId, e => e.Notification++);
+        await _pushService.SetPushNotification(request.UserId, e => e.Notification++);
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
@@ -62,6 +62,6 @@ public class CampaignCreatedHandler : IRequestHandler<CampaignCreatedEvent, bool
             CampaignReported = 0,
         });
 
-        return Task.FromResult(true);
+        return true;
     }
 }

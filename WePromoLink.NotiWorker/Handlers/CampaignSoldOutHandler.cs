@@ -18,10 +18,10 @@ public class CampaignSoldOutHandler : IRequestHandler<CampaignSoldOutEvent, bool
         _senderEmail = senderEmail;
         _pushService = pushService;
     }
-    public Task<bool> Handle(CampaignSoldOutEvent request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CampaignSoldOutEvent request, CancellationToken cancellationToken)
     {
 
-        _pushService.SetPushNotification(request.UserId, e => e.Notification++);
+        await _pushService.SetPushNotification(request.UserId, e => e.Notification++);
 
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -39,6 +39,6 @@ public class CampaignSoldOutHandler : IRequestHandler<CampaignSoldOutEvent, bool
         };
         _db.Notifications.Add(noti);
         _db.SaveChanges();
-        return Task.FromResult(true);
+        return true;
     }
 }

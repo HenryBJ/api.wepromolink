@@ -78,6 +78,10 @@ public class LinkService : ILinkService
                     LastUpdated = DateTime.UtcNow,
                     UserModelId = userA.Id
                 };
+
+                campaign.LastShared = DateTime.UtcNow;
+                _db.Campaigns.Update(campaign);
+                
                 await _db.Links.AddAsync(link);
                 await _db.SaveChangesAsync();
 

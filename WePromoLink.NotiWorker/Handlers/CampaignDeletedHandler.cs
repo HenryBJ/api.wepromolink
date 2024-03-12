@@ -22,9 +22,9 @@ public class CampaignDeletedHandler : IRequestHandler<CampaignDeletedEvent, bool
         _senderDashboard = senderDashboard;
         _pushService = pushService;
     }
-    public Task<bool> Handle(CampaignDeletedEvent request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CampaignDeletedEvent request, CancellationToken cancellationToken)
     {
-        _pushService.SetPushNotification(request.UserId, e => e.Notification++);
+        await _pushService.SetPushNotification(request.UserId, e => e.Notification++);
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
@@ -61,6 +61,6 @@ public class CampaignDeletedHandler : IRequestHandler<CampaignDeletedEvent, bool
             CampaignReported = 0,
         });
 
-        return Task.FromResult(true);
+        return true;
     }
 }

@@ -17,7 +17,7 @@ public class CampaignPublishedHandler : IRequestHandler<CampaignPublishedEvent, 
         _pushService = pushService;
         _fac = fac;
     }
-    public Task<bool> Handle(CampaignPublishedEvent request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CampaignPublishedEvent request, CancellationToken cancellationToken)
     {
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -26,10 +26,10 @@ public class CampaignPublishedHandler : IRequestHandler<CampaignPublishedEvent, 
 
         foreach (var item in listIds)
         {
-            _pushService.SetPushNotification(item!, e => e.Campaign++);
+            await _pushService.SetPushNotification(item!, e => e.Campaign++);
         }
 
 
-        return Task.FromResult(true);
+        return true;
     }
 }

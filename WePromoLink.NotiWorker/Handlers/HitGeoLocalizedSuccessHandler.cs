@@ -24,7 +24,7 @@ public class HitGeoLocalizedSuccessHandler : IRequestHandler<HitGeoLocalizedSucc
         _sender = sender;
         _db = db;
     }
-    public Task<bool> Handle(HitGeoLocalizedSuccessEvent request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(HitGeoLocalizedSuccessEvent request, CancellationToken cancellationToken)
     {
 
         
@@ -40,16 +40,16 @@ public class HitGeoLocalizedSuccessHandler : IRequestHandler<HitGeoLocalizedSucc
             ExternalId = _db.Campaigns.Where(e => request.CampaignId == e.Id).Select(e => e.ExternalId).First()
         });
 
-        _pushService.SetPushNotification(request.UserId, e =>
+        await _pushService.SetPushNotification(request.UserId, e =>
         {
             e.Messages ??= new List<string>();
-            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"20\"> to campaign <b>{request.CampaignName}</b> &#x1F973;");
+            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"auto\" style=\"vertical-align: middle;\"> to campaign <b>{request.CampaignName}</b> &#x1F973;");
         });
 
-        _pushService.SetPushNotification(request.LinkOwnerId, e =>
+        await _pushService.SetPushNotification(request.LinkOwnerId, e =>
         {
             e.Messages ??= new List<string>();
-            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"20\"> to your link of <b>{request.CampaignName}</b> &#x1F4B0;");
+            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"auto\" style=\"vertical-align: middle;\"> to your link of <b>{request.CampaignName}</b> &#x1F4B0;");
         });
 
         if (request.FirstTime)
@@ -71,6 +71,6 @@ public class HitGeoLocalizedSuccessHandler : IRequestHandler<HitGeoLocalizedSucc
                 Withdraw = 0,
                 CampaignReported = 0,
             });
-        return Task.FromResult(true);
+        return true;
     }
 }

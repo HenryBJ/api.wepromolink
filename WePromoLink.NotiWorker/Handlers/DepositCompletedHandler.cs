@@ -23,9 +23,9 @@ public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bo
         _senderDashboard = senderDashboard;
         _pushService = pushService;
     }
-    public Task<bool> Handle(DepositCompletedEvent request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DepositCompletedEvent request, CancellationToken cancellationToken)
     {
-        _pushService.SetPushNotification(request.UserId, e => { e.Transaction++; e.Notification++; });
+        await _pushService.SetPushNotification(request.UserId, e => { e.Transaction++; e.Notification++; });
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
@@ -38,7 +38,7 @@ public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bo
             UserModelId = request.UserId,
             Etag = Nanoid.Nanoid.Generate(size:12),
             Title = "Deposit completed",
-            Message = $"We are pleased to inform you that your deposit has been successfully processed. An amount of ${request.Amount} USD has been credited to your account.",
+            Message = $"We are pleased to inform you that your deposit has been successfully processed. An amount of {request.Amount.ToString("C")} USD has been credited to your account.",
         };
         _db.Notifications.Add(noti);
         _db.SaveChanges();
@@ -65,6 +65,6 @@ public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bo
             CampaignReported = 0,
         });
 
-        return Task.FromResult(true);
+        return true;
     }
 }

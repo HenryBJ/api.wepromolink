@@ -13,4 +13,11 @@ public class NotificationModel
     public DateTime ExpiredAt { get; set; }
     public DateTime LastModified { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    public NotificationModel()
+    {
+        CreatedAt = DateTime.UtcNow;
+        LastModified = DateTime.UtcNow;
+        ExpiredAt = DateTime.UtcNow;
+    }
 }

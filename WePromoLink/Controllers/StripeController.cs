@@ -25,12 +25,29 @@ public class StripeController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    [Route("account/checkout/{priceId}/{firebaseId}")]
-    public async Task<IActionResult> Checkout(string priceId, string firebaseId)
+    [Route("account/checkout")]
+    public async Task<IActionResult> Checkout(CheckoutData data)
     {
         try
         {
-            var url = await _service.Checkout(priceId, firebaseId);
+            var url = await _service.Checkout(data);
+            return new OkObjectResult(url);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("account/upgrade")]
+    public async Task<IActionResult> Upgrade(UpgradeData data)
+    {
+        try
+        {
+            var url = await _service.Upgrade(data);
             return new OkObjectResult(url);
         }
         catch (System.Exception ex)

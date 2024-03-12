@@ -72,6 +72,18 @@ namespace WePromoLink.Services
 
         private async Task<ImageData> ProcessImageAndUpload(IFormFile image)
         {
+            // Establecer calidad
+            int Quality = 50;
+            if(image.Length<=1048576) //1mb
+            {
+                Quality = 75; 
+            } 
+            else
+            if(image.Length<=10485760) //10mb
+            {
+                Quality = 35;
+            }   
+
             // Crear un nombre único para el archivo
             string ext = Path.GetExtension(image.FileName);
             string uniqueFileName = $"image{Nanoid.Nanoid.Generate("0123456789", 15)}{ext}";
@@ -87,7 +99,7 @@ namespace WePromoLink.Services
                 double originalAspectRatio = (double)originalWidth / originalHeight;
 
                 // Crear una versión comprimida de la imagen original
-                string compressedUrl = await CreateCompressedImage(originalImage, uniqueFileName, "compressed", ext.ToLower() == ".png");
+                string compressedUrl = await CreateCompressedImage(originalImage, uniqueFileName, "compressed", ext.ToLower() == ".png", Quality);
 
                 // Crear una versión de tamaño mediano de la imagen original
                 string mediumUrl = await CreateResizedImage(originalImage, uniqueFileName, Convert.ToInt32(400 * originalAspectRatio), 400, "medium");
@@ -132,7 +144,7 @@ namespace WePromoLink.Services
             return blobClient.Uri.ToString();
         }
 
-        private async Task<string> CreateCompressedImage(Image image, string fileName, string container, bool isPNG)
+        private async Task<string> CreateCompressedImage(Image image, string fileName, string container, bool isPNG, int Quality)
         {
             BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(container);
 
@@ -141,7 +153,7 @@ namespace WePromoLink.Services
             {
                // ApplyWaterMark(image); // Apply watermark
                // AddWaterMarkURL(image); 
-                image.SaveAsJpeg(outputStream, new JpegEncoder { Quality = 50 });
+                image.SaveAsJpeg(outputStream, new JpegEncoder { Quality = Quality });
                 outputStream.Position = 0;
                 await blobClient.UploadAsync(outputStream, true);
             }

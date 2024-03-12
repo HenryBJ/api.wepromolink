@@ -10,6 +10,7 @@ public class CampaignCard
     public string? AutorImageUrl { get; set; }
     public string? AutorName { get; set; }
     public string? AutorExternalId { get; set; }
+    public Boolean AutorVerified { get; set; }
     public long LastModified { get; set; }
     
 }

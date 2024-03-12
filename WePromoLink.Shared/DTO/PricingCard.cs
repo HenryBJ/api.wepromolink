@@ -13,6 +13,8 @@ public class PricingCard
     public string PaymentMethod { get; set; }
     public string Tag { get; set; }
     public int Order { get; set; }
+    public bool Disabled { get; set; }
+    public bool Upgradeable { get; set; }
     public List<PricingFeature> Features { get; set; }
 
 

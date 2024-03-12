@@ -23,9 +23,9 @@ public class CampaignSharedHandler : IRequestHandler<CampaignSharedEvent, bool>
         _pushService = pushService;
         _senderDashboard = senderDashboard;
     }
-    public Task<bool> Handle(CampaignSharedEvent request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CampaignSharedEvent request, CancellationToken cancellationToken)
     {
-        _pushService.SetPushNotification(request.OwnerUserId, e =>
+        await _pushService.SetPushNotification(request.OwnerUserId, e =>
         {
             e.Notification++;
             if (e.Messages == null) e.Messages = new List<string>();
@@ -69,6 +69,6 @@ public class CampaignSharedHandler : IRequestHandler<CampaignSharedEvent, bool>
             CampaignReported = 0,
         });
 
-        return Task.FromResult(true);
+        return true;
     }
 }

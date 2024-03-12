@@ -1,4 +1,5 @@
 using Stripe;
+using Stripe.Checkout;
 using WePromoLink.Services;
 using WePromoLink.Shared.RabbitMQ;
 
@@ -38,8 +39,12 @@ public class Worker : BackgroundService
         {
             switch (item.Type)
             {
+                case Events.CheckoutSessionCompleted:
+                    var session = item.Data.Object as Session;
+                    await _stripeService.SetUserExtraInfo(session);
+                    break;
                 case Events.CustomerSubscriptionCreated:
-                    await _stripeService.CreateUser(item.Data.Object as Subscription);
+                    await _stripeService.CreateOrUpgrateUser(item.Data.Object as Subscription);
                     break;
 
                 case Events.CustomerSubscriptionDeleted:
@@ -67,6 +72,13 @@ public class Worker : BackgroundService
                     var invoiceFail = item.Data.Object as Invoice;
                     await _stripeService.HandleInvoiceFailWebHook(invoiceFail!, item.Type);
                     break;
+
+                case Events.InvoiceFinalized:
+                    var invoiceF = item.Data.Object as Invoice;
+                    await _stripeService.FinalizeInvoice(invoiceF!);
+                    break;
+
+
 
                 default:
                     Console.WriteLine("Unhandled event type: {0}", item.Type);

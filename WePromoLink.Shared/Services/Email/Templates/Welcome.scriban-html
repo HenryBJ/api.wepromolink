@@ -30,6 +30,8 @@
       
         .social-icons a {
             color:#ea7227;
+            padding-left:10px;
+            padding-right:10px;
         }
       
         .logo {
@@ -78,15 +80,9 @@
             <a href="https://t.me/wepromolink_support">
                 <img width="30px" height="30px" src="https://wepromolinkstorage.blob.core.windows.net/asset/telegram-3.png" alt="telegram" />
             </a>
-        </td>
-        <td>
+        
             <a href="https://chat.whatsapp.com/Itdy4Fgx9ld3UYClzUCPU6">
                 <img width="30px" height="30px" src="https://wepromolinkstorage.blob.core.windows.net/asset/whatsapp-3.png" alt="whatsapp" />
-            </a>
-        </td>
-        <td>
-            <a href="https://twitter.com/WePromoLink">
-                <img src="https://wepromolinkstorage.blob.core.windows.net/asset/twitter-3.png" alt="twitter"  width="30px" height="30px" />
             </a>
         </td>
         </tr>

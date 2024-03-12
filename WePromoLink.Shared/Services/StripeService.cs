@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Nanoid;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Stripe;
@@ -37,8 +38,50 @@ public class StripeService
         _statBroker = statBroker;
     }
 
+    public async Task SetUserExtraInfo(Session session)
+    {
+        var m = session.Metadata;
+        if(m.Count == 0) return;
+        await _userService.SetUserExtraInfo(session.CustomerEmail.ToLower(),m["firebaseid"],m["photourl"]);
+    }
 
-    public async Task CreateUser(Subscription subscription)
+    public async Task<string> Upgrade(UpgradeData data)
+    {
+        // Get customerId
+        var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
+        var customerId = _db.Users.Where(e=>e.FirebaseId == firebaseId).Select(e=>e.CustomerId).First();
+
+        // If there is a cost, must set quantity to charge at the moment
+        var cost = await _db.SubscriptionPlans
+                            .Where(e => e.MonthlyPriceId == data.PriceId || e.AnnualyPriceId == data.PriceId)
+                            .Select(e => e.Annually + e.Monthly)
+                            .SingleAsync();
+
+        SessionCreateOptions options = new SessionCreateOptions
+        {
+            PaymentMethodTypes = new List<string>
+            {
+                "card",
+            },
+            LineItems = new List<SessionLineItemOptions>
+            {
+                  new SessionLineItemOptions
+                {
+                    Price = data.PriceId,
+                    Quantity = cost > 0 ? 1:null
+                },
+            },
+            Mode = "subscription",
+            SuccessUrl = "https://wepromolink.com/dashboard",
+            CancelUrl = "https://wepromolink.com/pricing",
+            Customer= customerId,
+        };
+        SessionService? service = new Stripe.Checkout.SessionService();
+        var session = service.Create(options);
+        return session.Url;
+    }
+
+    public async Task CreateOrUpgrateUser(Subscription subscription)
     {
         try
         {
@@ -46,14 +89,38 @@ public class StripeService
             {
                 var priceId = subscription.Items.Data[0].Price.Id;
                 var subPlan = await _db.SubscriptionPlans.Where(e => e.AnnualyPriceId == priceId || e.MonthlyPriceId == priceId).SingleOrDefaultAsync();
+                
+                var subService = new Stripe.SubscriptionService();
+                var fullSub = await subService.GetAsync(subscription.Id);
+
+                // If Customer already exits, lets upgrade    
+                if(_db.Users.Any(e=>e.CustomerId == subscription.CustomerId))
+                {
+                    var sub = new SubscriptionModel
+                    {
+                        StripeId = fullSub.Id,
+                        Status = subscription.Status,
+                        SubscriptionPlanModelId = subPlan.Id,
+                        CreatedAt = DateTime.UtcNow,
+                        ExternalId = Nanoid.Nanoid.Generate(size:12),
+                        Id = Guid.NewGuid(),
+                        IsCanceled = false,
+                        IsExpired = false,
+                        LastPayment = fullSub.LatestInvoice?.PaymentIntent?.Created,
+                        NextPayment = fullSub.NextPendingInvoiceItemInvoice,
+                    };
+                    _db.Subscriptions.Add(sub);
+                    await _db.SaveChangesAsync();
+                    await _userService.Upgrade(subscription.CustomerId,sub.Id);
+                    //TODO: Add Upgrade event
+                    return;
+                }
+                
+                
                 var service = new CustomerService();
                 Customer customer = await service.GetAsync(subscription.CustomerId);
 
-
-                var subService = new Stripe.SubscriptionService();
-                var fullSub = await subService.GetAsync(subscription.Id);
-                var lastInvoiceDate = fullSub.LatestInvoice?.PaymentIntent?.Created;
-                var upcommigInvoiceDate = fullSub.NextPendingInvoiceItemInvoice;
+                
 
                 await _userService.Create(new User
                 {
@@ -61,15 +128,16 @@ public class StripeService
                     {
                         SubscriptionId = fullSub.Id,
                         Status = subscription.Status,
-                        LastPaymentDate = lastInvoiceDate,
-                        NextPaymentDate = upcommigInvoiceDate
+                        LastPaymentDate = fullSub.LatestInvoice?.PaymentIntent?.Created,
+                        NextPaymentDate = fullSub.NextPendingInvoiceItemInvoice
                     },
+                    PhotoUrl = "",
                     Fullname = customer.Name,
                     Email = customer.Email,
                     CustomerId = customer.Id,
                     ProductId = subscription.Items.Data[0].Price.ProductId,
                     SubscriptionPlanModelId = subPlan?.Id
-                }, subPlan!.Commission > 0); // If have commission must be subscribed at this moment
+                },true); 
             }
 
         }
@@ -96,14 +164,14 @@ public class StripeService
         await _db.SaveChangesAsync();
     }
 
-    public async Task<string> Checkout(string priceId, string firebaseId)
+    public async Task<string> Checkout(CheckoutData data)
     {
         // Get Email from firebaseId
-        var email = await FirebaseUtil.GetEmailById(firebaseId);
+        var email = await FirebaseUtil.GetEmailById(data.FirebaseId);
 
         // If there is a cost, must set quantity to charge at the moment
         var cost = await _db.SubscriptionPlans
-                            .Where(e => e.MonthlyPriceId == priceId || e.AnnualyPriceId == priceId)
+                            .Where(e => e.MonthlyPriceId == data.PriceId || e.AnnualyPriceId == data.PriceId)
                             .Select(e => e.Annually + e.Monthly)
                             .SingleAsync();
 
@@ -117,14 +185,19 @@ public class StripeService
             {
                   new SessionLineItemOptions
                 {
-                    Price = priceId,
+                    Price = data.PriceId,
                     Quantity = cost > 0 ? 1:null
                 },
             },
             Mode = "subscription",
             SuccessUrl = "https://wepromolink.com/thanks",
             CancelUrl = "https://wepromolink.com/pricing",
-            CustomerEmail = email
+            CustomerEmail = email,
+            Metadata = new Dictionary<string, string>
+            {
+                { "firebaseid", data.FirebaseId },
+                { "photourl", data.PhotoUrl },
+            },
         };
         SessionService? service = new Stripe.Checkout.SessionService();
         var session = service.Create(options);
@@ -135,12 +208,17 @@ public class StripeService
     {
         // Get UserId
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        var user = _db.Users.Include(e => e.StripeBillingMethod).Where(e => e.FirebaseId == firebaseId).Single();
+        var user = _db.Users
+        .Include(e => e.StripeBillingMethod)
+        .Include(e => e.Subscription)
+        .ThenInclude(e => e.SubscriptionPlan)
+        .Where(e => e.FirebaseId == firebaseId).Single();
 
+        bool isExpress = user.Subscription.SubscriptionPlan.Level > 1;
         if (string.IsNullOrEmpty(user.StripeBillingMethod.AccountId))
         {
             // Creating
-            user.StripeBillingMethod.AccountId = await CreateStripeAccount(user.Email);
+            user.StripeBillingMethod.AccountId = await CreateStripeAccount(user.Email, isExpress);
         }
 
         user.StripeBillingMethod.LastModified = DateTime.UtcNow;
@@ -322,7 +400,7 @@ public class StripeService
 
                 await transaction.CommitAsync();
 
-                _statBroker.Send(new ReduceProfitCommand{Amount = Math.Abs(paymentTrans.Amount), ExternalId = user.ExternalId});
+                _statBroker.Send(new ReduceProfitCommand { Amount = Math.Abs(paymentTrans.Amount), ExternalId = user.ExternalId });
                 _messageBroker.Send(new WithdrawCompletedEvent
                 {
                     PaymentTransactionId = paymentTrans.Id,
@@ -389,6 +467,10 @@ public class StripeService
                 Name = pay.User?.Fullname,
                 FailureReason = reason
             });
+
+            pay.Status = TransactionStatusEnum.Fail;
+            _db.PaymentTransactions.Update(pay);
+            _db.SaveChanges();
         }
         else
         {
@@ -397,12 +479,40 @@ public class StripeService
 
     }
 
-    private async Task<string> CreateStripeAccount(string email)
+    public async Task FinalizeInvoice(Invoice invoice)
+    {
+        if (invoice.Metadata.ContainsKey("paymentId"))
+        {
+            var paymentId = invoice.Metadata["paymentId"];
+            var pay = await _db.PaymentTransactions
+            .Include(e => e.User)
+            .Where(e => e.ExternalId == paymentId)
+            .SingleOrDefaultAsync();
+
+            if (pay == null) throw new Exception("Payment transaction not found");
+
+            if(pay.Status == TransactionStatusEnum.Pending)
+            {
+                pay.Status = TransactionStatusEnum.Cancelled;
+                pay.ExpiredAt = DateTime.UtcNow;
+                _db.PaymentTransactions.Update(pay);
+                _db.SaveChanges();
+            }    
+            
+        }
+        else
+        {
+            _logger.LogInformation("Receive invoice event without payment info, must be from subscription");
+        }
+
+    }
+
+    private async Task<string> CreateStripeAccount(string email, bool isExpress = false)
     {
         var accService = new Stripe.AccountService();
         AccountCreateOptions options = new AccountCreateOptions
         {
-            Type = AccountType.Express,//TODO: Change to Standard for tier 1
+            Type = isExpress ? AccountType.Express : AccountType.Standard,
             Email = email,
             BusinessType = "individual"
         };

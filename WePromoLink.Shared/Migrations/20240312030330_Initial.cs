@@ -188,8 +188,13 @@ namespace WePromoLink.Shared.Migrations
                     Commission = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Annually = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
                     Discount = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
+                    DepositFeePercent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    WithdrawFeePercent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Tag = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    Disabled = table.Column<bool>(type: "bit", nullable: false),
+                    Upgradeable = table.Column<bool>(type: "bit", nullable: false),
                     Metadata = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -273,6 +278,7 @@ namespace WePromoLink.Shared.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BoolValue = table.Column<bool>(type: "bit", nullable: true),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Order = table.Column<int>(type: "int", nullable: false),
                     SubscriptionPlanModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -808,11 +814,14 @@ namespace WePromoLink.Shared.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExternalId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StripeTranferId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentProcessorFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     LinkModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CampaignModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(10,4)", precision: 10, scale: 4, nullable: false),
+                    AmountNet = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Metadata = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -842,11 +851,11 @@ namespace WePromoLink.Shared.Migrations
 
             migrationBuilder.InsertData(
                 table: "SubscriptionPlans",
-                columns: new[] { "Id", "Annually", "AnnualyPriceId", "Commission", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPriceId", "Order", "PaymentMethod", "Tag", "Title" },
+                columns: new[] { "Id", "Active", "Annually", "AnnualyPriceId", "Commission", "DepositFeePercent", "Disabled", "Discount", "ExternalId", "Level", "Metadata", "Monthly", "MonthlyPriceId", "Order", "PaymentMethod", "Tag", "Title", "Upgradeable", "WithdrawFeePercent" },
                 values: new object[,]
                 {
-                    { new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"), 0m, "", 0.01m, 0m, "swr4YVUhcnjJ", 1, null, 0m, "price_1Ol0LGC26XBdqsojWuT9BKvb", 2, "stripe", "", "Basic" },
-                    { new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"), 0m, "", 0m, 0m, "SoIk3H2vnIpb", 2, null, 4.99m, "price_1OkwiHC26XBdqsojpgor0QaV", 3, "stripe", "Popular", "Professional" }
+                    { new Guid("251343f4-52e2-45f6-b30f-f24a8c49741e"), true, 891m, "price_1OsdMCC26XBdqsojOddpYcZQ", 0m, 0m, false, 25m, "EIAvzngmir3W", 2, null, 99m, "price_1OsdMCC26XBdqsojSdyEGOUY", 3, "stripe", "Popular", "Professional", false, 0m },
+                    { new Guid("51daa39e-0e84-4d94-a770-b769463850a8"), true, 0m, "", 0m, 10m, false, 0m, "x2Cc9RQucEzF", 1, null, 0m, "", 2, "stripe", "", "Basic", false, 10m }
                 });
 
             migrationBuilder.InsertData(
@@ -854,26 +863,28 @@ namespace WePromoLink.Shared.Migrations
                 columns: new[] { "Id", "Group", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"), 2, "Which payment methods do you prefer for platform subscriptions and earnings withdrawals?" },
-                    { new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"), 5, "What additional features or improvements would you like to see on the WePromoLink platform?" },
-                    { new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"), 1, "What motivates you to use a platform like WePromoLink?" },
-                    { new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"), 4, "How useful do you find the WePromoLink platform for your advertising needs?" },
-                    { new Guid("bcda607a-be83-48fa-8710-a464cd5d81c5"), 3, "Do you prefer a monthly subscription fee or paying a commission on earnings?" }
+                    { new Guid("481e23cc-274b-4e77-a615-4e7fe9cbb065"), 2, "Which payment methods do you prefer for platform subscriptions and earnings withdrawals?" },
+                    { new Guid("527355e6-b2dd-4948-978d-cd27ca2f8e6a"), 1, "What motivates you to use a platform like WePromoLink?" },
+                    { new Guid("53b02b05-e776-430a-9c3a-d2b7664eb13e"), 4, "How useful do you find the WePromoLink platform for your advertising needs?" },
+                    { new Guid("a746e9b7-1205-417f-b52d-11c06237abad"), 5, "What additional features or improvements would you like to see on the WePromoLink platform?" },
+                    { new Guid("b9537c05-0004-4063-852e-90de39f90c6e"), 3, "Do you prefer a monthly subscription fee or paying a commission on earnings?" }
                 });
 
             migrationBuilder.InsertData(
                 table: "SubscriptionFeatures",
-                columns: new[] { "Id", "BoolValue", "Name", "SubscriptionPlanModelId", "Value" },
+                columns: new[] { "Id", "BoolValue", "Name", "Order", "SubscriptionPlanModelId", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("25a029e4-2bc5-4d8a-953b-61504ea7b879"), false, "Commission per click", new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"), "U$0.00" },
-                    { new Guid("33d6956c-c000-411c-aa41-0f91d893cac9"), true, "Contain ads", new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"), "" },
-                    { new Guid("4301b911-3f20-4ba7-9ed1-b8ad568eeaa0"), false, "Links", new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"), "Unlimited" },
-                    { new Guid("4724a846-12ab-4423-bbbe-65e8d825ea43"), false, "Campaigns", new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"), "Unlimited" },
-                    { new Guid("97bcec47-6d0f-4a9e-8acb-741cc3cee8bf"), false, "Links", new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"), "Unlimited" },
-                    { new Guid("998a1683-e4cb-4f49-8f75-5b8d26c7cf3e"), false, "Contain ads", new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"), "" },
-                    { new Guid("a2c3dc40-977e-4e2b-bde1-0d828bb72b38"), false, "Campaigns", new Guid("88f73d2f-69ce-45d5-8171-ece2c49dfb7b"), "Unlimited" },
-                    { new Guid("a92469d4-81d7-4c1d-bcb3-265f064443f3"), false, "Commission per click", new Guid("29a030e6-e678-4c8e-bed6-9b8c31268571"), "U$0.01" }
+                    { new Guid("00c9aeda-0782-4d05-bd88-6ef9d12cca8a"), false, "Links", 2, new Guid("51daa39e-0e84-4d94-a770-b769463850a8"), "Unlimited" },
+                    { new Guid("0708ecc6-a8e7-4fd4-912b-dd48a8c20574"), false, "Deposit fee", 4, new Guid("51daa39e-0e84-4d94-a770-b769463850a8"), "10%" },
+                    { new Guid("0ecf7d20-ef7c-40da-b144-f26d71b60a78"), false, "Links", 2, new Guid("251343f4-52e2-45f6-b30f-f24a8c49741e"), "Unlimited" },
+                    { new Guid("22b8e6cb-55dc-4932-98d3-37c6ffdb1ebc"), false, "Stripe Account", 3, new Guid("251343f4-52e2-45f6-b30f-f24a8c49741e"), "Express" },
+                    { new Guid("a758b320-74b4-4f95-87d1-b9c88aa88fc3"), false, "Campaigns", 1, new Guid("251343f4-52e2-45f6-b30f-f24a8c49741e"), "Unlimited" },
+                    { new Guid("aa4946d6-4547-414a-9b39-f104a4181fb8"), true, "Withdraw fee", 5, new Guid("51daa39e-0e84-4d94-a770-b769463850a8"), "10%" },
+                    { new Guid("af6ca5f3-deaa-422d-af72-fd2467166569"), true, "Stripe Account", 3, new Guid("51daa39e-0e84-4d94-a770-b769463850a8"), "Standard" },
+                    { new Guid("dcadc223-3611-4a85-b4fa-f22dd299b385"), false, "Deposit fee", 4, new Guid("251343f4-52e2-45f6-b30f-f24a8c49741e"), "0%" },
+                    { new Guid("e36dc510-e30b-4b3b-bd56-d9df6bf5a49f"), false, "Campaigns", 1, new Guid("51daa39e-0e84-4d94-a770-b769463850a8"), "Unlimited" },
+                    { new Guid("f417261e-ae11-40ae-84ff-9e9c2dda01d1"), false, "Withdraw fee", 5, new Guid("251343f4-52e2-45f6-b30f-f24a8c49741e"), "0%" }
                 });
 
             migrationBuilder.InsertData(
@@ -881,27 +892,27 @@ namespace WePromoLink.Shared.Migrations
                 columns: new[] { "Id", "SurveyQuestionModelId", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("102db161-8515-4cc7-9aab-2e0aa9d91125"), new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"), "Credit/Debit card" },
-                    { new Guid("18493212-3ae0-4b49-889c-b1d441c05559"), new Guid("bcda607a-be83-48fa-8710-a464cd5d81c5"), "Commission on earnings" },
-                    { new Guid("19c9c571-ac8f-4f7d-8053-54f9d1f1c4d1"), new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"), "Promoting my products or services" },
-                    { new Guid("3443683c-d757-4011-bb30-64e41f970786"), new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"), "Very useful" },
-                    { new Guid("35a6dcb9-c6ac-40bd-96da-297eafd07f7f"), new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"), "I'm not sure" },
-                    { new Guid("3e7e4fe7-2848-4ebf-882d-bb3906524250"), new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"), "Advanced analytics and reporting" },
-                    { new Guid("432db7cd-aacd-403c-99ab-8c243ffec0fe"), new Guid("bcda607a-be83-48fa-8710-a464cd5d81c5"), "Monthly subscription fee" },
-                    { new Guid("4f352dee-5b0b-4e3f-a4f1-c93aabdbe96d"), new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"), "Exploring new advertising opportunities" },
-                    { new Guid("736b026b-b79a-4721-b41c-8426d898cd0d"), new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"), "Extremely useful" },
-                    { new Guid("76ccbdf1-4fb2-40aa-8c5a-e10a9b5aaeb1"), new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"), "Not useful at all" },
-                    { new Guid("9421c406-3291-45fd-a92e-c49dd7fc053a"), new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"), "Connecting with other users and businesses" },
-                    { new Guid("cbe9f9e2-6505-4704-b7fa-f08ba222ced5"), new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"), "Bank transfer" },
-                    { new Guid("cbf13998-292c-43eb-a7d5-0465db1a2ea5"), new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"), "Improved user interface and navigation" },
-                    { new Guid("ce11e04a-23ff-4733-a2d3-b5cd1b102a70"), new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"), "Somewhat useful" },
-                    { new Guid("d28a1e23-e0b5-4d5d-b13d-4c96ac8c5b58"), new Guid("bcda607a-be83-48fa-8710-a464cd5d81c5"), "I'm not sure" },
-                    { new Guid("d4e0fd46-a356-4d75-bf03-a3e945188ef3"), new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"), "PayPal" },
-                    { new Guid("d73e2668-7f0f-4351-8ce1-d1c536a35bb7"), new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"), "More campaign customization options" },
-                    { new Guid("dd1720fa-d533-41e7-b7ce-0b8fa943b7a6"), new Guid("39b09178-a1ce-4105-a640-7875b64c3f37"), "Integration with other advertising platforms" },
-                    { new Guid("df9638f3-3f01-4eeb-926f-191452db1a47"), new Guid("005de81a-ea60-462e-bc13-b24b3ce83a0f"), "Stripe" },
-                    { new Guid("e004f790-e7a8-4e70-93b8-98c5b990d031"), new Guid("78206eeb-68b7-4207-b5dc-068082aa1cdb"), "Earning money through affiliate marketing" },
-                    { new Guid("f247c8c7-b061-4ff5-93e2-8d0af201a7e4"), new Guid("b56250cd-f296-4ed9-85d0-d15c4b45a84d"), "Not very useful" }
+                    { new Guid("04c6ad19-1e4f-4c94-9866-bc7232900a3f"), new Guid("a746e9b7-1205-417f-b52d-11c06237abad"), "Advanced analytics and reporting" },
+                    { new Guid("0a0b9c44-d4b9-4575-a8a6-23070ba6d519"), new Guid("527355e6-b2dd-4948-978d-cd27ca2f8e6a"), "Earning money through affiliate marketing" },
+                    { new Guid("0c2b7934-ad7a-4fc7-bfeb-a6391ce00f71"), new Guid("53b02b05-e776-430a-9c3a-d2b7664eb13e"), "Not very useful" },
+                    { new Guid("39f8b69d-9724-43ef-bef9-6761710263e2"), new Guid("53b02b05-e776-430a-9c3a-d2b7664eb13e"), "Very useful" },
+                    { new Guid("414c8646-14f1-4644-bab1-30adc65d9b55"), new Guid("53b02b05-e776-430a-9c3a-d2b7664eb13e"), "Not useful at all" },
+                    { new Guid("48fca2f4-cd5c-41d4-bbe4-b0a1b5861287"), new Guid("a746e9b7-1205-417f-b52d-11c06237abad"), "Improved user interface and navigation" },
+                    { new Guid("56818da3-c514-405c-98ba-16bc021662eb"), new Guid("481e23cc-274b-4e77-a615-4e7fe9cbb065"), "PayPal" },
+                    { new Guid("6c69816d-b809-49c4-8cd0-e61f2cb45496"), new Guid("527355e6-b2dd-4948-978d-cd27ca2f8e6a"), "Exploring new advertising opportunities" },
+                    { new Guid("6c8b8778-b109-4ec1-b4df-89b198cee430"), new Guid("53b02b05-e776-430a-9c3a-d2b7664eb13e"), "Extremely useful" },
+                    { new Guid("7b79f529-f5fc-425e-816f-7586928b6936"), new Guid("b9537c05-0004-4063-852e-90de39f90c6e"), "I'm not sure" },
+                    { new Guid("7d39037c-d5b7-4422-bf5e-cf89e09b7aaf"), new Guid("a746e9b7-1205-417f-b52d-11c06237abad"), "Integration with other advertising platforms" },
+                    { new Guid("8398cc5b-6bfb-482a-9837-3685bda7a9de"), new Guid("481e23cc-274b-4e77-a615-4e7fe9cbb065"), "Stripe" },
+                    { new Guid("bac2f4e7-d8b2-4ff0-a7f9-3569d3341497"), new Guid("a746e9b7-1205-417f-b52d-11c06237abad"), "I'm not sure" },
+                    { new Guid("bb88a70b-d2be-41f1-a653-3d6a89890466"), new Guid("527355e6-b2dd-4948-978d-cd27ca2f8e6a"), "Promoting my products or services" },
+                    { new Guid("c4abbe42-b81e-4814-9760-1b2aeeb86401"), new Guid("53b02b05-e776-430a-9c3a-d2b7664eb13e"), "Somewhat useful" },
+                    { new Guid("c65b3ca9-eaad-45ce-8d6c-636d8fb5ad48"), new Guid("b9537c05-0004-4063-852e-90de39f90c6e"), "Monthly subscription fee" },
+                    { new Guid("c78c8031-5b76-42d4-9604-becc575085c4"), new Guid("481e23cc-274b-4e77-a615-4e7fe9cbb065"), "Credit/Debit card" },
+                    { new Guid("ca42c8fe-3c21-47a9-a070-0cba26382a36"), new Guid("a746e9b7-1205-417f-b52d-11c06237abad"), "More campaign customization options" },
+                    { new Guid("ceb885db-0f1c-455a-b616-d17ebc18b70f"), new Guid("481e23cc-274b-4e77-a615-4e7fe9cbb065"), "Bank transfer" },
+                    { new Guid("f2495822-6154-4099-a41a-d2ab9eeb9501"), new Guid("b9537c05-0004-4063-852e-90de39f90c6e"), "Commission on earnings" },
+                    { new Guid("f6482cc9-1485-44fb-bee9-1304daf07d68"), new Guid("527355e6-b2dd-4948-978d-cd27ca2f8e6a"), "Connecting with other users and businesses" }
                 });
 
             migrationBuilder.CreateIndex(

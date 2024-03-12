@@ -57,14 +57,16 @@ public class DataContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasData(new[]
             {
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Campaigns",BoolValue = false,SubscriptionPlanModelId = subPlanBasic, Value="Unlimited"},
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Links",BoolValue = false,SubscriptionPlanModelId = subPlanBasic, Value="Unlimited"},
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Commission per click",BoolValue = false,SubscriptionPlanModelId = subPlanBasic, Value="U$0.01"},
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = true,SubscriptionPlanModelId = subPlanBasic, Value=""},
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Campaigns",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="Unlimited"},
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Links",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="Unlimited"},
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Commission per click",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="U$0.00"},
-                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Name="Contain ads",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value=""}
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 1, Name="Campaigns",BoolValue = false,SubscriptionPlanModelId = subPlanBasic, Value="Unlimited"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 2, Name="Links",BoolValue = false,SubscriptionPlanModelId = subPlanBasic, Value="Unlimited"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 4, Name="Deposit fee",BoolValue = false,SubscriptionPlanModelId = subPlanBasic, Value="10%"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 5, Name="Withdraw fee",BoolValue = true,SubscriptionPlanModelId = subPlanBasic, Value="10%"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 3, Name="Stripe Account",BoolValue = true,SubscriptionPlanModelId = subPlanBasic, Value="Standard"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 1, Name="Campaigns",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="Unlimited"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 2, Name="Links",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="Unlimited"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 4, Name="Deposit fee",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="0%"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 5, Name="Withdraw fee",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="0%"},
+                new SubscriptionFeatureModel { Id=Guid.NewGuid(), Order = 3, Name="Stripe Account",BoolValue = false,SubscriptionPlanModelId = subPlanProfesional, Value="Express"}
             });
         });
 
@@ -263,9 +265,11 @@ public class DataContext : DbContext
             entity.HasData(new[]{
                 new SubscriptionPlanModel {
                     Id = subPlanBasic,
-                    MonthlyPriceId = "price_1Ol0LGC26XBdqsojWuT9BKvb",
+                    MonthlyPriceId = "",
                     AnnualyPriceId = "",
-                    Commission = 0.01m,
+                    DepositFeePercent = 10,
+                    WithdrawFeePercent = 10,
+                    Commission = 0,
                     Annually = 0,
                     Monthly = 0,
                     Discount = 0,
@@ -274,22 +278,26 @@ public class DataContext : DbContext
                     Tag = "",
                     Title = "Basic",
                     ExternalId = Nanoid.Nanoid.Generate(size:12),
-                    Order = 2
+                    Order = 2,
+                    Active = true
                 },
                 new SubscriptionPlanModel {
                     Id = subPlanProfesional,
-                    MonthlyPriceId = "price_1OkwiHC26XBdqsojpgor0QaV",
-                    AnnualyPriceId = "",
+                    MonthlyPriceId = "price_1OsdMCC26XBdqsojSdyEGOUY",
+                    AnnualyPriceId = "price_1OsdMCC26XBdqsojOddpYcZQ",
+                    DepositFeePercent = 0,
+                    WithdrawFeePercent = 0,
                     Commission = 0,
-                    Annually = 0,
-                    Monthly = 4.99m,
-                    Discount = 0,
+                    Annually = 891m,
+                    Monthly = 99m,
+                    Discount = 25,
                     Level = 2,
                     PaymentMethod = "stripe",
                     Tag = "Popular",
                     Title = "Professional",
                     ExternalId = Nanoid.Nanoid.Generate(size:12),
-                    Order = 3
+                    Order = 3,
+                    Active = true
                 },
             });
         });
@@ -346,7 +354,7 @@ public class DataContext : DbContext
         });
 
         builder.Entity<GenericEventModel>(entity => entity.HasKey(e => e.Id));
-        
+
     }
 
     public void MigrateDB()

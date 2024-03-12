@@ -19,12 +19,12 @@ public class CampaignEditedHandler : IRequestHandler<CampaignEditedEvent, bool>
         _fac = fac;
         _pushService = pushService;
     }
-    public Task<bool> Handle(CampaignEditedEvent request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CampaignEditedEvent request, CancellationToken cancellationToken)
     {
         using var scope = _fac.CreateScope();
         var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
         
-        _pushService.SetPushNotification(request.UserId, e => e.Notification++);
+        await _pushService.SetPushNotification(request.UserId, e => e.Notification++);
         //Create a Notification
         var noti = new NotificationModel
         {
@@ -38,6 +38,6 @@ public class CampaignEditedHandler : IRequestHandler<CampaignEditedEvent, bool>
         };
         _db.Notifications.Add(noti);
         _db.SaveChanges();
-        return Task.FromResult(true);
+        return true;
     }
 }

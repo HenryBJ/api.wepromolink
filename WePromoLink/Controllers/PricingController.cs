@@ -23,7 +23,7 @@ public class PricingController : ControllerBase
 
     [HttpGet]
     [Route("all")]
-    [ResponseCache(Duration = 1800)] // duración en segundos (30 minutos)
+    // [ResponseCache(Duration = 1800)] // duración en segundos (30 minutos)
     public async Task<IActionResult> GetAll()
     {
         try

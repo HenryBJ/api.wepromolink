@@ -116,16 +116,59 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPut]
-    [Route("firebaseuid")]
-    public async Task<IActionResult> SetFirebaseUid([FromBody] dynamic request)
+    [HttpGet]
+    [Route("depositfee")]
+    [Authorize]
+    public async Task<IActionResult> GetDepositFee()
     {
         try
         {
-            string email = request.GetProperty("email").GetString();
-            string uid = request.GetProperty("uid").GetString();
-            await _service.SetFirebaseUid(email, uid);
-            return new OkResult();
+            var results = await _service.DepositFee();
+            _httpContextAccessor.HttpContext!.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+            {
+                Public = true,
+                MaxAge = TimeSpan.FromMinutes(30)
+            };
+            return new OkObjectResult(results);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Route("withdrawfee")]
+    [Authorize]
+    public async Task<IActionResult> GetWithdrawFee()
+    {
+        try
+        {
+            var results = await _service.WithdrawFee();
+            _httpContextAccessor.HttpContext!.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+            {
+                Public = true,
+                MaxAge = TimeSpan.FromMinutes(30)
+            };
+            return new OkObjectResult(results);
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex.Message);
+            return new StatusCodeResult(500);
+        }
+    }
+
+    [HttpGet]
+    [Route("level")]
+    [Authorize]
+    public async Task<IActionResult> GetLevel()
+    {
+        try
+        {
+            var results = await _service.GetLevel();
+            return new OkObjectResult(results);
         }
         catch (System.Exception ex)
         {
