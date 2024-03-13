@@ -437,7 +437,11 @@ public class StripeService
             .Include(e => e.User)
             .Where(e => e.ExternalId == paymentId)
             .SingleOrDefaultAsync();
-            if (pay == null) throw new Exception("Payment transaction not found");
+            if (pay == null)
+            {
+                _logger.LogWarning("Payment transaction not found");
+                return; 
+            }
             await _userService.Deposit(pay);
         }
         else
@@ -489,7 +493,11 @@ public class StripeService
             .Where(e => e.ExternalId == paymentId)
             .SingleOrDefaultAsync();
 
-            if (pay == null) throw new Exception("Payment transaction not found");
+            if (pay == null)
+            {
+                _logger.LogWarning("Payment transaction not found");
+                return;
+            } 
 
             if(pay.Status == TransactionStatusEnum.Pending)
             {

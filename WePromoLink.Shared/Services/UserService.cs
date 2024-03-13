@@ -344,7 +344,8 @@ public class UserService : IUserService
 
         if (user == null)
         {
-            Console.WriteLine("Warning: Updating Subscription from Stripe, user not found");
+            _logger.LogWarning($"Warning: Updating Subscription from Stripe, user not found, Subscription Status: {subscriptionInfo.Status}");
+            return;
         }
 
         var sub = user!.Subscription;
