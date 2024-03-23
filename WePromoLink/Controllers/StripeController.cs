@@ -110,12 +110,12 @@ public class StripeController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    [Route("account/isverified")]
-    public async Task<IActionResult> HasVerifiedAccount()
+    [Route("account/hasExpressStripe")]
+    public async Task<IActionResult> HasExpressStripe()
     {
         try
         {
-            var response = await _service.HasVerifiedAccount();
+            var response = await _service.HasExpressStripe();
             return new OkObjectResult(response);
         }
         catch (System.Exception ex)

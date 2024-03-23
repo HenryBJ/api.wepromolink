@@ -25,6 +25,7 @@ using WePromoLink.Services.Profile;
 using WePromoLink.Services.Marketing;
 using MongoDB.Driver;
 using WePromoLink.DTO.Events.Commands.Statistics;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:ApiKey"];
@@ -163,7 +164,7 @@ app.UseAuthorization();
 
 InitializeDataBase(app);
 
-app.MapGet("/", () => $"WePromoLink API v1.0.3 - {DateTime.Now.ToShortDateString()}");
+app.MapGet("/", () => $"WePromoLink API v1.0.3 - {DateTime.Now.ToString("d", new CultureInfo("es-ES"))}");
 
 
 // Access to link (HIT)

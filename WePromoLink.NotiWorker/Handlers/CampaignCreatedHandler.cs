@@ -56,10 +56,9 @@ public class CampaignCreatedHandler : IRequestHandler<CampaignCreatedEvent, bool
             TotalAvailable = 0,
             TotalProfit = 0,
             Transactions = 0,
-            UnVerifiedUsers = 0,
-            VerifiedUsers = 0,
             Withdraw = 0,
             CampaignReported = 0,
+            TotalFee = 0
         });
 
         return true;

@@ -3,8 +3,6 @@ namespace WePromoLink.DTO.SignalR;
 public class DashboardStatus
 {
     public long RegisteredUsers { get; set; }
-    public long VerifiedUsers { get; set; }
-    public long UnVerifiedUsers { get; set; }
     public long Campaigns { get; set; }
     public long Shareds { get; set; }
     public long Hits { get; set; }
@@ -17,6 +15,7 @@ public class DashboardStatus
     public decimal CampaignBudget { get; set; }
     public decimal TotalAvailable { get; set; }
     public decimal TotalProfit { get; set; }
+    public decimal TotalFee { get; set; }
     public DateTime LastModified { get; set; }
 
     public DashboardStatus()

@@ -31,8 +31,7 @@ public class UserRegisteredHandler : IRequestHandler<UserRegisteredEvent, bool>
             TotalAvailable = 0,
             TotalProfit = 0,
             Transactions = 0,
-            UnVerifiedUsers = 0,
-            VerifiedUsers = 0,
+            TotalFee = 0,
             Withdraw = 0,
             CampaignReported = 0,
         });

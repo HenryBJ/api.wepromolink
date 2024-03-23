@@ -46,8 +46,7 @@ public class DashboardWorker : BackgroundService
                 e.TotalAvailable += ev.TotalAvailable;
                 e.TotalProfit += ev.TotalProfit;
                 e.Transactions += ev.Transactions;
-                e.UnVerifiedUsers += ev.UnVerifiedUsers;
-                e.VerifiedUsers += ev.VerifiedUsers;
+                e.TotalFee+= ev.TotalFee;
                 e.Withdraw += ev.Withdraw;
                 e.CampaignReported += ev.CampaignReported;
                 e.LastModified = DateTime.UtcNow;

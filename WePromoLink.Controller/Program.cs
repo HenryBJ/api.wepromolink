@@ -7,6 +7,7 @@ using WePromoLink.DTO.Events;
 using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.Services;
 using WePromoLink.Services.Cache;
+using WePromoLink.Services.CRM;
 using WePromoLink.Shared.RabbitMQ;
 
 IHost host = Host.CreateDefaultBuilder(args)
@@ -20,6 +21,9 @@ IHost host = Host.CreateDefaultBuilder(args)
         var connectionString = configuration.GetConnectionString("Default");
         services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
 
+        var CRMconnectionString = configuration.GetConnectionString("CRM");
+        services.AddDbContext<CRMDataContext>(x => x.UseSqlServer(CRMconnectionString));
+
         services.AddHttpContextAccessor();
         services.AddSingleton<IShareCache>(x =>
         {
@@ -30,6 +34,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         });
 
         services.AddTransient<IPushService, PushService>();
+        services.AddTransient<ILeadService, LeadService>();
+        services.AddTransient<ICampaignRunnerService, CampaignRunnerService>();
 
         services.AddTransient<BlobServiceClient>(_ =>
         {
@@ -57,6 +63,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         });
 
         services.AddSingleton<CleanImagesTask>();
+        services.AddSingleton<CampaignEmailRunnerTask>();
 
         services.AddHostedService<Worker>();
     })

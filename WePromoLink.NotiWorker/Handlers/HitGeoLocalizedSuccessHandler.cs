@@ -43,13 +43,13 @@ public class HitGeoLocalizedSuccessHandler : IRequestHandler<HitGeoLocalizedSucc
         await _pushService.SetPushNotification(request.UserId, e =>
         {
             e.Messages ??= new List<string>();
-            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"auto\" style=\"vertical-align: middle;\"> to campaign <b>{request.CampaignName}</b> &#x1F973;");
+            e.Messages.Add($"Click from <img style=\"display:inline\" src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"auto\" style=\"vertical-align: middle;\"> to campaign <b>{request.CampaignName}</b> &#x1F973;");
         });
 
         await _pushService.SetPushNotification(request.LinkOwnerId, e =>
         {
             e.Messages ??= new List<string>();
-            e.Messages.Add($"Click from <img src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"auto\" style=\"vertical-align: middle;\"> to your link of <b>{request.CampaignName}</b> &#x1F4B0;");
+            e.Messages.Add($"Click from <img style=\"display:inline\" src=\"{request.FlagUrl}\" alt=\"country\" width=\"20\" height=\"auto\" style=\"vertical-align: middle;\"> to your link of <b>{request.CampaignName}</b> &#x1F4B0;");
         });
 
         if (request.FirstTime)
@@ -66,10 +66,9 @@ public class HitGeoLocalizedSuccessHandler : IRequestHandler<HitGeoLocalizedSucc
                 TotalAvailable = 0,
                 TotalProfit = 0,
                 Transactions = 0,
-                UnVerifiedUsers = 0,
-                VerifiedUsers = 0,
                 Withdraw = 0,
                 CampaignReported = 0,
+                TotalFee = 0
             });
         return true;
     }

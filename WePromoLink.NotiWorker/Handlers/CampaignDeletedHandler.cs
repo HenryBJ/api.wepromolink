@@ -16,11 +16,12 @@ public class CampaignDeletedHandler : IRequestHandler<CampaignDeletedEvent, bool
     private readonly IPushService _pushService;
     private readonly MessageBroker<DashboardStatus> _senderDashboard;
     private readonly IServiceScopeFactory _fac;
-    public CampaignDeletedHandler(IEmailSender senderEmail, MessageBroker<DashboardStatus> senderDashboard, IPushService pushService)
+    public CampaignDeletedHandler(IEmailSender senderEmail, MessageBroker<DashboardStatus> senderDashboard, IPushService pushService, IServiceScopeFactory fac)
     {
         _senderEmail = senderEmail;
         _senderDashboard = senderDashboard;
         _pushService = pushService;
+        _fac = fac;
     }
     public async Task<bool> Handle(CampaignDeletedEvent request, CancellationToken cancellationToken)
     {
@@ -55,10 +56,9 @@ public class CampaignDeletedHandler : IRequestHandler<CampaignDeletedEvent, bool
             TotalAvailable = 0,
             TotalProfit = 0,
             Transactions = 0,
-            UnVerifiedUsers = 0,
-            VerifiedUsers = 0,
             Withdraw = 0,
             CampaignReported = 0,
+            TotalFee = 0
         });
 
         return true;

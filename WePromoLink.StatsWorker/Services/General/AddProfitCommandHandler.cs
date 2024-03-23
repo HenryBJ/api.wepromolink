@@ -1,3 +1,4 @@
+using System.Globalization;
 using MongoDB.Driver;
 using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.DTO.Statistics;
@@ -21,12 +22,12 @@ public class AddProfitCommandHandler : ChartDataRepository<string, decimal>, IPr
             {
                 await UpdateChartData(item.ExternalId, old =>
                 {
-                    if (DateTime.Parse(old.labels.Last()).Date == DateTime.UtcNow.Date)
+                    if (DateTime.Parse(old.labels.Last(), new CultureInfo("es-ES")).Date == DateTime.UtcNow.Date)
                     {
                         old.datasets[0].data[old.datasets[0].data.Count - 1] += Math.Round(item.Profit, 2, MidpointRounding.AwayFromZero);
                     }
                     else
-                    if (DateTime.Parse(old.labels.Last()).Date < DateTime.UtcNow.Date)
+                    if (DateTime.Parse(old.labels.Last(), new CultureInfo("es-ES")).Date < DateTime.UtcNow.Date)
                     {
                         if(old.datasets.Count>=MAX_ITEMS)
                         {
@@ -34,7 +35,7 @@ public class AddProfitCommandHandler : ChartDataRepository<string, decimal>, IPr
                             old.labels.RemoveAt(0);
                         }
 
-                        old.labels.Add(DateTime.UtcNow.Date.ToShortDateString());
+                        old.labels.Add(DateTime.UtcNow.Date.ToString("d", new CultureInfo("es-ES")));
                         var lastvalue = old.datasets[0].data.Last();
                         old.datasets[0].data.Add(lastvalue+Math.Round(item.Profit, 2, MidpointRounding.AwayFromZero));
                     }
@@ -46,7 +47,7 @@ public class AddProfitCommandHandler : ChartDataRepository<string, decimal>, IPr
                 InsertChartData(new ChartData<string, decimal>
                 {
                     _id = item.ExternalId,
-                    labels = new List<string> { item.CreatedAt.Date.ToShortDateString() },
+                    labels = new List<string> { item.CreatedAt.Date.ToString("d", new CultureInfo("es-ES")) },
                     datasets = new List<Dataset<decimal>>{new Dataset<decimal>
                 {
                   backgroundColor = new List<string>{"rgb(234,114,39)"},

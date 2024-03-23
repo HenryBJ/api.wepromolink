@@ -17,11 +17,16 @@ using WePromoLink.Services.SubscriptionPlan;
 using WePromoLink.Services.StaticPages;
 using Azure.Storage.Blobs;
 using NameCheap;
+using WePromoLink.DTO.Events.Commands.Statistics;
+using WePromoLink.Services.CRM;
+using Polly;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("Default");
+var CRMconnectionString = builder.Configuration.GetConnectionString("CRM");
 
 builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration["SignalR:ConnectionString"]);
 builder.Services.AddTransient<BlobServiceClient>(_ =>
@@ -30,6 +35,7 @@ builder.Services.AddTransient<BlobServiceClient>(_ =>
 });
 builder.Services.AddControllers();
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
+builder.Services.AddDbContext<CRMDataContext>(x => x.UseSqlServer(CRMconnectionString));
 builder.Services.AddSingleton<IShareCache>(x =>
 {
     return new RedisCache(
@@ -52,6 +58,9 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<ISubPlanService, SubPlanService>();
 builder.Services.AddTransient<IStaticPageService, StaticPageService>();
 
+builder.Services.AddTransient<ILeadService, LeadService>();
+builder.Services.AddTransient<ICampaignRunnerService, CampaignRunnerService>();
+
 builder.Services.AddTransient<IPushService, PushService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<StripeService>();
@@ -65,6 +74,17 @@ builder.Services.AddSingleton<MessageBroker<BaseEvent>>(sp =>
         Password = builder.Configuration["RabbitMQ:password"]
     });
 });
+
+builder.Services.AddSingleton<MessageBroker<StatsBaseCommand>>(sp =>
+{
+    return new MessageBroker<StatsBaseCommand>(new MessageBrokerOptions
+    {
+        HostName = builder.Configuration["RabbitMQ:hostname"],
+        UserName = builder.Configuration["RabbitMQ:username"],
+        Password = builder.Configuration["RabbitMQ:password"]
+    });
+});
+
 
 builder.Services.AddSingleton<MessageBroker<DashboardStatus>>(sp =>
 {
@@ -127,7 +147,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(builder =>
    {
-       builder.WithOrigins("https://dashboard.wepromolink.com", "http://localhost:3000")
+       builder.WithOrigins("https://*.wepromolink.com", "http://localhost:3000")
            .AllowAnyHeader()
            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
            .AllowCredentials();
@@ -138,6 +158,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+InitializeDataBase(app);
+
 Send2kFactorQR(app, builder.Configuration["Auth:user"], builder.Configuration["Auth:secret"]);
 
 
@@ -145,12 +167,12 @@ Send2kFactorQR(app, builder.Configuration["Auth:user"], builder.Configuration["A
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<DashboardHub>("/dashboard");
-    endpoints.MapGet("/", () => $"WePromoLink ADMIN API v1.0.3 - {DateTime.Now.ToShortDateString()}");
+    endpoints.MapGet("/", () => $"WePromoLink ADMIN API v1.0.3 - {DateTime.Now.ToString("d", new CultureInfo("es-ES"))}");
     endpoints.MapControllers();
 });
 
 // app.MapHub<DashboardHub>("/dashboard");
-// app.MapGet("/", () => $"WePromoLink ADMIN API v1.0.3 - {DateTime.Now.ToShortDateString()}");
+// app.MapGet("/", () => $"WePromoLink ADMIN API v1.0.3 - {DateTime.Now.ToString("d", new CultureInfo("es-ES"))}");
 // app.MapControllers();
 
 app.Run();
@@ -168,4 +190,19 @@ void Send2kFactorQR(IApplicationBuilder app, string email, string secret)
         scope.ServiceProvider?.GetService<IEmailSender>()?
         .Send("Admin", email, "WePromoLink 2KF QR", Templates.GenerateQR(new { ManualCode = manualCode, QrCodeUrl = qrUrl }));
     }
+};
+
+void InitializeDataBase(IApplicationBuilder app)
+{
+    Policy
+    .Handle<Exception>()
+    .WaitAndRetry(9, r => TimeSpan.FromSeconds(5))
+    .Execute(() =>
+    {
+        using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+            Console.WriteLine("Migration DB...");
+            scope.ServiceProvider?.GetService<CRMDataContext>()?.MigrateDB();
+        }
+    });
 };

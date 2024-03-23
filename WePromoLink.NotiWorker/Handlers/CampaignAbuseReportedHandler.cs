@@ -30,10 +30,9 @@ public class CampaignAbuseReportedHandler : IRequestHandler<CampaignAbuseReporte
             TotalAvailable = 0,
             TotalProfit = 0,
             Transactions = 0,
-            UnVerifiedUsers = 0,
-            VerifiedUsers = 0,
             Withdraw = 0,
             CampaignReported = 1,
+            TotalFee = 0
         });
         return Task.FromResult(true);
     }

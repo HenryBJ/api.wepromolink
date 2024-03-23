@@ -53,9 +53,8 @@ public class AdminDashboardService: IAdminDashboardHub
             TotalAvailable = await _db.Users.Select(e => e.Available).SumAsync(),
             TotalProfit = await _db.Users.Select(e => e.Profit).SumAsync(),
             Transactions = await _db.PaymentTransactions.LongCountAsync(),
-            UnVerifiedUsers = await _db.StripeBillings.Where(e => !e.IsVerified).LongCountAsync(),
-            VerifiedUsers = await _db.StripeBillings.Where(e => e.IsVerified).LongCountAsync(),
             CampaignReported = await _db.AbuseReports.LongCountAsync(),
+            TotalFee = await _db.PaymentTransactions.Where(e=>e.TransactionType == TransactionTypeEnum.Fee).SumAsync(e=>Math.Abs(e.Amount)),
             LastModified = DateTime.UtcNow
         };
     }

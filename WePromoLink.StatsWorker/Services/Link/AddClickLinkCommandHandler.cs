@@ -1,3 +1,4 @@
+using System.Globalization;
 using MongoDB.Driver;
 using WePromoLink.DTO.Events.Commands.Statistics;
 using WePromoLink.DTO.Statistics;
@@ -20,14 +21,14 @@ public class AddClickLinkCommandHandler : ChartDataRepository<string, int>, IPro
             {
                 await UpdateChartData(item.ExternalId, old =>
                 {
-                    if (DateTime.Parse(old.labels.Last()).Date == DateTime.UtcNow.Date)
+                    if (DateTime.Parse(old.labels.Last(), new CultureInfo("es-ES")).Date == DateTime.UtcNow.Date)
                     {
                         old.datasets[0].data[old.datasets[0].data.Count - 1] += 1;
                     }
                     else
-                    if (DateTime.Parse(old.labels.Last()).Date < DateTime.UtcNow.Date)
+                    if (DateTime.Parse(old.labels.Last(), new CultureInfo("es-ES")).Date < DateTime.UtcNow.Date)
                     {
-                        old.labels.Add(DateTime.UtcNow.Date.ToShortDateString());
+                        old.labels.Add(DateTime.UtcNow.Date.ToString("d", new CultureInfo("es-ES")));
                         var lastvalue = old.datasets[0].data.Last();
                         old.datasets[0].data.Add(lastvalue + 1);
                     }
@@ -39,7 +40,7 @@ public class AddClickLinkCommandHandler : ChartDataRepository<string, int>, IPro
                 InsertChartData(new ChartData<string, int>
                 {
                     _id = item.ExternalId,
-                    labels = new List<string> { item.CreatedAt.Date.ToShortDateString() },
+                    labels = new List<string> { item.CreatedAt.Date.ToString("d", new CultureInfo("es-ES")) },
                     datasets = new List<Dataset<int>>{new Dataset<int>
                 {
                   backgroundColor = new List<string>{"rgb(234,114,39)"},

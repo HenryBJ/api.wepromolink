@@ -41,15 +41,15 @@ public class StripeService
     public async Task SetUserExtraInfo(Session session)
     {
         var m = session.Metadata;
-        if(m.Count == 0) return;
-        await _userService.SetUserExtraInfo(session.CustomerEmail.ToLower(),m["firebaseid"],m["photourl"]);
+        if (m.Count == 0) return;
+        await _userService.SetUserExtraInfo(session.CustomerEmail.ToLower(), m["firebaseid"], m["photourl"]);
     }
 
     public async Task<string> Upgrade(UpgradeData data)
     {
         // Get customerId
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        var customerId = _db.Users.Where(e=>e.FirebaseId == firebaseId).Select(e=>e.CustomerId).First();
+        var customerId = _db.Users.Where(e => e.FirebaseId == firebaseId).Select(e => e.CustomerId).First();
 
         // If there is a cost, must set quantity to charge at the moment
         var cost = await _db.SubscriptionPlans
@@ -74,7 +74,7 @@ public class StripeService
             Mode = "subscription",
             SuccessUrl = "https://wepromolink.com/dashboard",
             CancelUrl = "https://wepromolink.com/pricing",
-            Customer= customerId,
+            Customer = customerId,
         };
         SessionService? service = new Stripe.Checkout.SessionService();
         var session = service.Create(options);
@@ -89,12 +89,12 @@ public class StripeService
             {
                 var priceId = subscription.Items.Data[0].Price.Id;
                 var subPlan = await _db.SubscriptionPlans.Where(e => e.AnnualyPriceId == priceId || e.MonthlyPriceId == priceId).SingleOrDefaultAsync();
-                
+
                 var subService = new Stripe.SubscriptionService();
                 var fullSub = await subService.GetAsync(subscription.Id);
 
                 // If Customer already exits, lets upgrade    
-                if(_db.Users.Any(e=>e.CustomerId == subscription.CustomerId))
+                if (_db.Users.Any(e => e.CustomerId == subscription.CustomerId))
                 {
                     var sub = new SubscriptionModel
                     {
@@ -102,7 +102,7 @@ public class StripeService
                         Status = subscription.Status,
                         SubscriptionPlanModelId = subPlan.Id,
                         CreatedAt = DateTime.UtcNow,
-                        ExternalId = Nanoid.Nanoid.Generate(size:12),
+                        ExternalId = Nanoid.Nanoid.Generate(size: 12),
                         Id = Guid.NewGuid(),
                         IsCanceled = false,
                         IsExpired = false,
@@ -111,16 +111,16 @@ public class StripeService
                     };
                     _db.Subscriptions.Add(sub);
                     await _db.SaveChangesAsync();
-                    await _userService.Upgrade(subscription.CustomerId,sub.Id);
+                    await _userService.Upgrade(subscription.CustomerId, sub.Id);
                     //TODO: Add Upgrade event
                     return;
                 }
-                
-                
+
+
                 var service = new CustomerService();
                 Customer customer = await service.GetAsync(subscription.CustomerId);
 
-                
+
 
                 await _userService.Create(new User
                 {
@@ -137,7 +137,7 @@ public class StripeService
                     CustomerId = customer.Id,
                     ProductId = subscription.Items.Data[0].Price.ProductId,
                     SubscriptionPlanModelId = subPlan?.Id
-                },true); 
+                }, true);
             }
 
         }
@@ -238,13 +238,13 @@ public class StripeService
         return response.Url;
     }
 
-    public async Task<bool> HasVerifiedAccount()
+    public async Task<bool> HasExpressStripe()
     {
-        // Get User
+        // if it is verified and level >1 mean the subs plan have express account
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
         var hasVerified = await _db.Users
         .Where(e => e.FirebaseId == firebaseId)
-        .Select(e => e.StripeBillingMethod.IsVerified)
+        .Select(e => e.StripeBillingMethod.IsVerified && e.Subscription.SubscriptionPlan.Level > 1)
         .SingleAsync();
         return hasVerified;
     }
@@ -350,11 +350,12 @@ public class StripeService
     {
         using (var transaction = _db.Database.BeginTransaction())
         {
-            int amountCents = amount * 100;
             // Get User
             var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
             var user = await _db.Users
             .Include(e => e.StripeBillingMethod)
+            .Include(e => e.Subscription)
+            .ThenInclude(e => e.SubscriptionPlan)
             .Where(e => e.FirebaseId == firebaseId)
             .SingleAsync();
 
@@ -368,11 +369,31 @@ public class StripeService
                 _db.Users.Update(user);
 
                 if (user.Profit < 0) throw new Exception("Profit negative");
+                decimal withdrawFee = user.Subscription.SubscriptionPlan.WithdrawFeePercent;
+                decimal feeAmount = amount * (100 - withdrawFee) / 100;
+
+                if (withdrawFee > 0)
+                {
+                    var paymentFee = new PaymentTransaction
+                    {
+                        Id = Guid.NewGuid(),
+                        CreatedAt = DateTime.UtcNow,
+                        UserModelId = user.Id,
+                        CompletedAt = DateTime.UtcNow,
+                        ExternalId = Nanoid.Nanoid.Generate(size: 12),
+                        Status = TransactionStatusEnum.Completed,
+                        Title = "Withdraw Fee",
+                        Amount = -amount * withdrawFee / 100,
+                        TransactionType = TransactionTypeEnum.Fee,
+                        AmountNet = -amount * withdrawFee / 100,
+                    };
+                    _db.PaymentTransactions.Add(paymentFee);
+                }
 
                 // Create Stripe transaction
                 var options = new TransferCreateOptions
                 {
-                    Amount = amountCents,
+                    Amount = Convert.ToInt64(feeAmount * 100),
                     Currency = "usd",
                     Destination = user.StripeBillingMethod.AccountId,
                     Description = "WePromoLink Withdraw",
@@ -385,16 +406,17 @@ public class StripeService
                 {
                     Id = Guid.NewGuid(),
                     StripeTranferId = transfer.Id,
-                    Amount = amount,
+                    Amount = feeAmount,
                     CreatedAt = DateTime.UtcNow,
                     ExternalId = await Nanoid.Nanoid.GenerateAsync(size: 12),
                     Status = TransactionStatusEnum.Completed,
-                    Title = $"Withdraw ${amount}",
+                    Title = $"Withdraw ${feeAmount}",
                     TransactionType = TransactionTypeEnum.Withdraw,
                     UserModelId = user.Id,
                     ExpiredAt = DateTime.UtcNow.AddDays(10),
                     Metadata = "stripe"
                 };
+
                 await _db.PaymentTransactions.AddAsync(paymentTrans);
                 await _db.SaveChangesAsync();
 
@@ -409,6 +431,7 @@ public class StripeService
                     UserId = user.Id,
                     Name = user.Fullname,
                     Email = user.Email,
+                    Fee = Math.Abs(amount * withdrawFee / 100)
                 });
             }
             catch (System.Exception ex)
@@ -440,7 +463,7 @@ public class StripeService
             if (pay == null)
             {
                 _logger.LogWarning("Payment transaction not found");
-                return; 
+                return;
             }
             await _userService.Deposit(pay);
         }
@@ -497,16 +520,16 @@ public class StripeService
             {
                 _logger.LogWarning("Payment transaction not found");
                 return;
-            } 
+            }
 
-            if(pay.Status == TransactionStatusEnum.Pending)
+            if (pay.Status == TransactionStatusEnum.Pending)
             {
                 pay.Status = TransactionStatusEnum.Cancelled;
                 pay.ExpiredAt = DateTime.UtcNow;
                 _db.PaymentTransactions.Update(pay);
                 _db.SaveChanges();
-            }    
-            
+            }
+
         }
         else
         {

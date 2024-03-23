@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Mvc;
@@ -130,7 +131,7 @@ app.MapGet("/", async httpContext =>
         </head>
         <body>
             <h1>Welcome to WePromoLink's Static Page</h1>
-            <p>Current Date: {DateTime.Now.ToShortDateString()}</p>
+            <p>Current Date: {DateTime.Now.ToString("d", new CultureInfo("es-ES"))}</p>
             <p>Subdomain: {subdomain}</p>
             <p>Thank you for visiting our static page!</p>
             <p>If you're looking for more information, please visit our website:</p>

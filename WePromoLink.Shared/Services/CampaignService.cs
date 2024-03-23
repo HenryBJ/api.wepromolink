@@ -554,7 +554,7 @@ public class CampaignService : ICampaignService
     {
         if (string.IsNullOrEmpty(campaignId)) throw new Exception("Invalid Campaign ID");
         var firebaseId = FirebaseUtil.GetFirebaseId(_httpContextAccessor);
-        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).Include(e => e.Available).SingleOrDefaultAsync();
+        var user = await _db.Users.Where(e => e.FirebaseId == firebaseId).SingleOrDefaultAsync();
         if (user == null) throw new Exception("User no found");
         if (user.IsBlocked) throw new Exception("User is blocked");
         if (!user.IsSubscribed) throw new Exception("User is not subscribed");

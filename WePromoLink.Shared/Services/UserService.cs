@@ -148,7 +148,8 @@ public class UserService : IUserService
                     PaymentTransactionId = payment.Id,
                     UserId = payment.UserModelId ?? Guid.Empty,
                     Name = payment.User?.Fullname,
-                    Email = payment.User?.Email
+                    Email = payment.User?.Email,
+                    Fee = Math.Abs(payment.Amount * depositFee / 100)
                 });
             }
             catch (System.Exception ex)

@@ -36,7 +36,7 @@ public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bo
             ExternalId = Nanoid.Nanoid.GenerateAsync(size: 12).GetAwaiter().GetResult(),
             Status = NotificationStatusEnum.Unread,
             UserModelId = request.UserId,
-            Etag = Nanoid.Nanoid.Generate(size:12),
+            Etag = Nanoid.Nanoid.Generate(size: 12),
             Title = "Deposit completed",
             Message = $"We are pleased to inform you that your deposit has been successfully processed. An amount of {request.Amount.ToString("C")} USD has been credited to your account.",
         };
@@ -59,10 +59,9 @@ public class DepositCompletedHandler : IRequestHandler<DepositCompletedEvent, bo
             TotalAvailable = 0,
             TotalProfit = 0,
             Transactions = 0,
-            UnVerifiedUsers = 0,
-            VerifiedUsers = 0,
             Withdraw = 0,
             CampaignReported = 0,
+            TotalFee = request.Fee ?? 0
         });
 
         return true;
