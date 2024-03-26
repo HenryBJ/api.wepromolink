@@ -13,13 +13,13 @@ spec:
       labels:
         app: staticpage-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: staticpage-container
           image: cod4it/wepromolink.staticpage:$MICROSERVICE_STATICPAGE
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -38,13 +38,13 @@ spec:
       labels:
         app: backoffice-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: backoffice-container
           image: cod4it/wepromolink.backoffice:$MICROSERVICE_BACKOFFICE
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -63,13 +63,13 @@ spec:
       labels:
         app: btcpayworker-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: btcpayworker-container
           image: cod4it/wepromolink.btcpayworker:$MICROSERVICE_BTCPAYWORKER
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -88,13 +88,13 @@ spec:
       labels:
         app: geolocationworker-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: geolocationworker-container
           image: cod4it/wepromolink.geolocationworker:$MICROSERVICE_GEOLOCATIONWORKER
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -113,13 +113,13 @@ spec:
       labels:
         app: notiworker-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: notiworker-container
           image: cod4it/wepromolink.notiworker:$MICROSERVICE_NOTIWORKER
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -138,13 +138,13 @@ spec:
       labels:
         app: controller-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: controller-container
           image: cod4it/wepromolink.controller:$MICROSERVICE_CONTROLLER
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -163,13 +163,13 @@ spec:
       labels:
         app: statsworker-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: statsworker-container
           image: cod4it/wepromolink.statsworker:$MICROSERVICE_STATWORKER
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -188,13 +188,13 @@ spec:
       labels:
         app: hitworker-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: hitworker-container
           image: cod4it/wepromolink.hitworker:$MICROSERVICE_HITWORKER
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -213,13 +213,13 @@ spec:
       labels:
         app: stripeworker-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: stripeworker-container
           image: cod4it/wepromolink.stripeworker:$MICROSERVICE_STRIPEWORKER
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -238,13 +238,13 @@ spec:
       labels:
         app: webapi-app
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
         - name: webapi-container
           image: cod4it/wepromolink:$MICROSERVICE_WEPROMOLINK
           ports:
             - containerPort: 80
-          imagePullSecrets:
-            - name: dockerhub-secret
           envFrom:
           - configMapRef:
               name: my-configmap
