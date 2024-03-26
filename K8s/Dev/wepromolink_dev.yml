@@ -18,6 +18,8 @@ spec:
           image: cod4it/wepromolink.staticpage:$MICROSERVICE_STATICPAGE
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -41,6 +43,8 @@ spec:
           image: cod4it/wepromolink.backoffice:$MICROSERVICE_BACKOFFICE
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -64,6 +68,8 @@ spec:
           image: cod4it/wepromolink.btcpayworker:$MICROSERVICE_BTCPAYWORKER
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -87,6 +93,8 @@ spec:
           image: cod4it/wepromolink.geolocationworker:$MICROSERVICE_GEOLOCATIONWORKER
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -110,6 +118,8 @@ spec:
           image: cod4it/wepromolink.notiworker:$MICROSERVICE_NOTIWORKER
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -133,6 +143,8 @@ spec:
           image: cod4it/wepromolink.controller:$MICROSERVICE_CONTROLLER
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -156,6 +168,8 @@ spec:
           image: cod4it/wepromolink.statsworker:$MICROSERVICE_STATWORKER
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -179,6 +193,8 @@ spec:
           image: cod4it/wepromolink.hitworker:$MICROSERVICE_HITWORKER
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -202,6 +218,8 @@ spec:
           image: cod4it/wepromolink.stripeworker:$MICROSERVICE_STRIPEWORKER
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
             - configMapRef:
                 name: my-configmap
@@ -225,6 +243,8 @@ spec:
           image: cod4it/wepromolink:$MICROSERVICE_WEPROMOLINK
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: dockerhub-secret
           envFrom:
           - configMapRef:
               name: my-configmap

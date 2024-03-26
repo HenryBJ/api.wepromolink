@@ -169,6 +169,10 @@ public class StripeService
         // Get Email from firebaseId
         var email = await FirebaseUtil.GetEmailById(data.FirebaseId);
 
+        // If it is already registered, return empty
+        bool alreadyExists = _db.Users.Any(e => e.Email.ToLower() == email.ToLower());
+        if (alreadyExists) return string.Empty;
+
         // If there is a cost, must set quantity to charge at the moment
         var cost = await _db.SubscriptionPlans
                             .Where(e => e.MonthlyPriceId == data.PriceId || e.AnnualyPriceId == data.PriceId)
