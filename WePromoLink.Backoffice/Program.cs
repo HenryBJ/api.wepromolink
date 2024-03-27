@@ -147,7 +147,9 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseCors(builder =>
    {
-       builder.WithOrigins("https://*.wepromolink.com", "http://localhost:3000")
+       builder
+       .SetIsOriginAllowedToAllowWildcardSubdomains()
+       .WithOrigins("https://*.wepromolink.com", "http://localhost:3000")
            .AllowAnyHeader()
            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
            .AllowCredentials();
