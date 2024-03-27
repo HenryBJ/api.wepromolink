@@ -199,6 +199,7 @@ public class CampaignService : ICampaignService
                 transaction.Commit();
 
                 _sendSender.Send(new ReduceBudgetCampaignCommand { ExternalId = campaignModel.ExternalId, Amount = removeAmount });
+                _sendSender.Send(new AddAvailableCommand { ExternalId = user.ExternalId, Available = Math.Abs(removeAmount) });
                 _eventSender.Send(new CampaignDeletedEvent
                 {
                     CampaignId = campaignModel.Id,
