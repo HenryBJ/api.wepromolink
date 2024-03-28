@@ -81,8 +81,13 @@ public class Worker : BackgroundService
                 .ThenInclude(e => e.SubscriptionPlan)
                 .Where(e => e.ExternalId == item.LinkId)
                 .SingleOrDefaultAsync();
-                if (link == null) return false;
+                if (link == null)
+                {
+                    _logger.LogWarning("LINK NOT FOUND");
+                    return true;
+                }
 
+                // Obtenemos la data necesaria
                 var userFromLink = link.User;
                 var profitFromLink = link.User.Profit;
                 var userFromCampaign = link.Campaign.User;
@@ -90,11 +95,13 @@ public class Worker : BackgroundService
                 var linkId = link.Id;
                 var hit = await _db.Hits.Where(e => e.LinkModelId == linkId && e.Origin == origin).SingleOrDefaultAsync();
 
+                // Actualizamos LastClick del Link y de la Campaign    
                 link.LastClick = DateTime.UtcNow;
                 _db.Links.Update(link);
-                
+
                 campaign.LastClick = DateTime.UtcNow;
                 _db.Campaigns.Update(campaign);
+                await _db.SaveChangesAsync();
 
                 // Actualizamos el HIT
                 if (hit != null)
@@ -133,26 +140,7 @@ public class Worker : BackgroundService
                 if (!campaign.Status)
                 {
                     _logger.LogInformation("Hit on a deactivate campaign");
-                    return true;
-                }
-                else if (campaign.Budget < (10 / 1000)) // menos de un click
-                {
-                    _logger.LogInformation("Hit on a campaign with minimun budget, turn off campaign");
-                    campaign.Status = false;
-                    campaign.LastUpdated = DateTime.UtcNow;
-                    _db.Campaigns.Update(campaign);
-                    await _db.SaveChangesAsync();
                     dbtrans.Commit();
-
-                    _eventSender.Send(new CampaignSoldOutEvent
-                    {
-                        CampaignId = link.Campaign.Id,
-                        CampaignName = link.Campaign.Title,
-                        UserId = link.Campaign.User.Id,
-                        Amount = link.Campaign.Budget,
-                        EPM = link.Campaign.EPM,
-                        Name = link.User.Fullname
-                    });
                     return true;
                 }
 
@@ -174,7 +162,6 @@ public class Worker : BackgroundService
                     Commission = userFromCampaign.Subscription.SubscriptionPlan.Commission,
                     SubscriptionId = userFromCampaign.Subscription.StripeId
                 };
-
 
                 _db.Hits.Add(model);
                 await _db.SaveChangesAsync();
@@ -221,19 +208,28 @@ public class Worker : BackgroundService
                     Title = "Click Cost"
                 };
 
+                if (lastHit)
+                {
+                    _logger.LogInformation("Hit on a campaign with minimun budget, turn off campaign");
+                    campaign.Status = false;
+                    campaign.LastUpdated = DateTime.UtcNow;
+                    _db.Campaigns.Update(campaign);
+                    await _db.SaveChangesAsync();
+                }
+
                 await _db.PaymentTransactions.AddAsync(paymentA);
                 await _db.PaymentTransactions.AddAsync(paymentB);
                 await _db.SaveChangesAsync();
                 dbtrans.Commit();
 
                 // Actualizamos las estadisticas
-                _statSender.Send(new AddProfitLinkCommand{ExternalId = link.ExternalId, Profit=Math.Abs(amount)});
-                _statSender.Send(new AddClickLinkCommand{ExternalId = link.ExternalId});
-                _statSender.Send(new AddSpendCampaignCommand{ExternalId = campaign.ExternalId, Spend = Math.Abs(amount)});
-                _statSender.Send(new AddGeneralClickCampaignCommand{ExternalId = campaign.User.ExternalId});
-                _statSender.Send(new AddGeneralClickLinkCommand{ExternalId = link.User.ExternalId});
-                _statSender.Send(new AddProfitCommand{ Profit = Math.Abs(amount), ExternalId = link.User.ExternalId });
-                _statSender.Send(new AddClickCampaignCommand {  ExternalId = campaign.ExternalId });
+                _statSender.Send(new AddProfitLinkCommand { ExternalId = link.ExternalId, Profit = Math.Abs(amount) });
+                _statSender.Send(new AddClickLinkCommand { ExternalId = link.ExternalId });
+                _statSender.Send(new AddSpendCampaignCommand { ExternalId = campaign.ExternalId, Spend = Math.Abs(amount) });
+                _statSender.Send(new AddGeneralClickCampaignCommand { ExternalId = campaign.User.ExternalId });
+                _statSender.Send(new AddGeneralClickLinkCommand { ExternalId = link.User.ExternalId });
+                _statSender.Send(new AddProfitCommand { Profit = Math.Abs(amount), ExternalId = link.User.ExternalId });
+                _statSender.Send(new AddClickCampaignCommand { ExternalId = campaign.ExternalId });
                 _commandSender.Send(new GeoLocalizeHitCommand { HitId = model.Id });
                 _eventSender.Send(new LinkClickedEvent
                 {
@@ -244,6 +240,19 @@ public class Worker : BackgroundService
                     LinkCreatorName = link.User.Fullname,
                     UserId = link.User.Id
                 });
+
+                if (lastHit)
+                {
+                    _eventSender.Send(new CampaignSoldOutEvent
+                    {
+                        CampaignId = link.Campaign.Id,
+                        CampaignName = link.Campaign.Title,
+                        UserId = link.Campaign.User.Id,
+                        Amount = link.Campaign.Budget,
+                        EPM = link.Campaign.EPM,
+                        Name = link.User.Fullname
+                    });
+                }
 
                 _eventSender.Send(new HitCreatedEvent
                 {
@@ -282,7 +291,7 @@ public class Worker : BackgroundService
             {
                 dbtrans.Rollback();
                 _logger.LogError(ex.Message);
-                return false;
+                return true;
             }
         }
     }

@@ -13,10 +13,11 @@ public class CampaignSoldOutHandler : IRequestHandler<CampaignSoldOutEvent, bool
     private readonly IEmailSender _senderEmail;
     private readonly IServiceScopeFactory _fac;
     private readonly IPushService _pushService;
-    public CampaignSoldOutHandler(IEmailSender senderEmail, IPushService pushService)
+    public CampaignSoldOutHandler(IEmailSender senderEmail, IPushService pushService, IServiceScopeFactory fac)
     {
         _senderEmail = senderEmail;
         _pushService = pushService;
+        _fac = fac;
     }
     public async Task<bool> Handle(CampaignSoldOutEvent request, CancellationToken cancellationToken)
     {

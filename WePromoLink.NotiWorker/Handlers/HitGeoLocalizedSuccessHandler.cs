@@ -15,19 +15,21 @@ public class HitGeoLocalizedSuccessHandler : IRequestHandler<HitGeoLocalizedSucc
     private readonly MessageBroker<DashboardStatus> _senderDashboard;
     private readonly MessageBroker<StatsBaseCommand> _sender;
     private readonly IPushService _pushService;
-    private readonly DataContext _db;
-    public HitGeoLocalizedSuccessHandler(IEmailSender senderEmail, MessageBroker<DashboardStatus> senderDashboard, IPushService pushService, MessageBroker<StatsBaseCommand> sender, DataContext db)
+    private readonly IServiceScopeFactory _fac;
+    public HitGeoLocalizedSuccessHandler(IEmailSender senderEmail, MessageBroker<DashboardStatus> senderDashboard, IPushService pushService, MessageBroker<StatsBaseCommand> sender, IServiceScopeFactory fac)
     {
         _senderEmail = senderEmail;
         _senderDashboard = senderDashboard;
         _pushService = pushService;
         _sender = sender;
-        _db = db;
+        _fac = fac;
     }
     public async Task<bool> Handle(HitGeoLocalizedSuccessEvent request, CancellationToken cancellationToken)
     {
 
-        
+        using var scope = _fac.CreateScope();
+        var _db = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         _sender.Send(new AddClickCountryLinkCommand
         {
             Country = request.Country!,
